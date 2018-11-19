@@ -15,8 +15,13 @@ namespace MySQL_Clear_standart
 {
     public partial class Form1 : Form
     {
+        List<string> Lineitem = new List<string>();        
         public Form1()
         {
+            Lineitem.Add("L_ORDERKEY");
+            Lineitem.Add("L_SHIPDATE");
+            Lineitem.Add("L_EXTENDEDPRICE");
+            Lineitem.Add("L_DISCOUNT");
             InitializeComponent();
         }
 
@@ -31,7 +36,7 @@ namespace MySQL_Clear_standart
             MySqlParser mySqlParser = new MySqlParser(commonTokenStream);
             mySqlParser.BuildParseTree = true;
             IParseTree tree = mySqlParser.root();
-            var treeNodeDrawable = new CommonNode(tree, 0);
+            var treeNodeDrawable = new CommonNode(tree);
             TreeVisitor vTree = new TreeVisitor(treeNodeDrawable);
 
             if (pictureBox1.Image != null)
@@ -40,20 +45,54 @@ namespace MySQL_Clear_standart
                 pictureBox1.Image = null;
             }
             
-            Image image = vTree.Draw();
+            //Image image = vTree.Draw();
             vTree.VisitTree(treeNodeDrawable);
             foreach (string str in vTree.GetTablesName(treeNodeDrawable))
             {
                 output += str.ToString()+"\r\n";
             }
-            output += "\r\n========================";
-            foreach (ICommonNode node in vTree.GetTerminalNodes(treeNodeDrawable))
+            output += "\r\n========================\r\n";
+            vTree.GetColumnNames(treeNodeDrawable);
+            foreach (string str in vTree.ColumnNames)
             {
-                output += node.Index.ToString() + "\r\n";
+                output += str + "\r\n";
             }
-            //Image image = vTree.Draw();
+            output += "\r\n========================\r\n";
+            vTree.GetCompairColumnNames(treeNodeDrawable);
+            foreach (string str in vTree.CompairColumnNames)
+            {
+                output += str + "\r\n";
+            }
+            output += "\r\n========================\r\n";
+            output += Select(vTree.ColumnNames, vTree.CompairColumnNames);
+
+            Image image = vTree.Draw();
             textBox1.Text = output;
             pictureBox1.Image = image;
+        }
+        private string Select(List<string> columns, List<string> compairColumns)
+        {
+            columns.Distinct();
+            compairColumns.Distinct();
+            List<string> clearColumns = columns.Except(compairColumns).ToList();
+            
+            string selectString = "SELECT";
+            //foreach (string str in clearColumns)
+            //{
+            //    selectString += " " + str;
+            //}
+            foreach (string col in Lineitem)
+            {
+                foreach (string str in clearColumns)
+                {
+                    if (col == str)
+                    {
+                        selectString += " " + str;
+                    }
+                }
+            }
+            selectString += " FROM Lineitem";
+            return selectString;
         }
     }
 }

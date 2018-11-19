@@ -14,10 +14,10 @@ namespace MySQL_Clear_standart
     {
         IParseTree _tree;        
         static int _index;        
-        public CommonNode(IParseTree tree, int index )
+        public CommonNode(IParseTree tree)
         {                     
             _tree = tree;
-            _index = index + 1;            
+            _index++;            
         }             
         public int Index
         {
@@ -29,11 +29,13 @@ namespace MySQL_Clear_standart
             {
                 if (_tree.ChildCount != 0)
                 {
-                    return _index.ToString() + " " + _tree.GetType().Name.Replace("Context","");
+                    //return _index.ToString() + " " + _tree.GetType().Name.Replace("Context","");
+                    return _tree.GetType().Name.Replace("Context", "");
                 }
                 else
                 {
-                    return _index.ToString() +" " + _tree.ToString();
+                    //return _index.ToString() +" " + _tree.ToString();
+                    return _tree.ToString();
                 }
             }
         }
@@ -55,7 +57,7 @@ namespace MySQL_Clear_standart
             {
                 for (int i = 0; i < _tree.ChildCount; ++i)
                 {
-                    yield return new CommonNode(_tree.GetChild(i), _index);
+                    yield return new CommonNode(_tree.GetChild(i));
                 }
             }
         }

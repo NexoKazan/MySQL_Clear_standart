@@ -18,9 +18,13 @@ namespace MySQL_Clear_standart
 
         private List<string> _nodePaths = new List<string>();
         private List<string> _tablesNames = new List<string>();
-        private static List<ICommonNode> _terminalNodes = new List<ICommonNode>();
+        private List<string> _columnNames = new List<string>();
+        private List<string> _compairColumnNames = new List<string>();
+        private List<ICommonNode> _terminalNodes = new List<ICommonNode>();
 
         private static bool _tablesPointer = false;
+        private bool _columnNamePointer = false;
+        private bool _compairPointer = false;
 
         public ICommonNode CommonNode { get; private set; }
 
@@ -34,6 +38,20 @@ namespace MySQL_Clear_standart
             get
             {
                 return _terminalNodes;
+            }
+        }
+        public List<string> CompairColumnNames
+        {
+            get
+            {
+                return _compairColumnNames;
+            }
+        }
+        public List<string> ColumnNames
+        {
+            get
+            {
+                return _columnNames;
             }
         }
         public List<string> NodePaths
@@ -61,6 +79,53 @@ namespace MySQL_Clear_standart
                 ++i;
             }
 
+            return;
+        }
+        public void GetColumnNames(ICommonNode node)
+        {            
+            if (node.Text == "FullColumnName")
+            {
+                _columnNamePointer = true;
+            }
+            if(node.Type == "Leaf" && _columnNamePointer)
+            {
+                _columnNames.Add(node.Text);
+                _columnNamePointer = false;
+            }
+            var enumerator = node.Children.GetEnumerator();
+            int i = 0;
+            while (enumerator.MoveNext())
+            {
+                var currentNode = enumerator.Current;
+                GetColumnNames(currentNode);
+                ++i;
+            }
+            return;
+        }
+        public void GetCompairColumnNames(ICommonNode node)
+        {
+            if (node.Text == "BinaryComparasionPredicate")
+            {
+                _compairPointer = true;
+            }
+            if (node.Text == "FullColumnName")
+            {
+                _columnNamePointer = true;
+            }
+            if (node.Type == "Leaf" && _columnNamePointer && _compairPointer)
+            {
+                _compairColumnNames.Add(node.Text);
+                _columnNamePointer = false;
+                _compairPointer = false;
+            }
+            var enumerator = node.Children.GetEnumerator();
+            int i = 0;
+            while (enumerator.MoveNext())
+            {
+                var currentNode = enumerator.Current;
+                GetCompairColumnNames(currentNode);
+                ++i;
+            }
             return;
         }
         public List<string> GetTablesName(ICommonNode node)
@@ -101,6 +166,8 @@ namespace MySQL_Clear_standart
             }
             return _terminalNodes;
         }
+
+        
 
         #region Drawing
         private Image Draw(ICommonNode node, out int center)
