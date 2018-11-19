@@ -10,6 +10,7 @@ using System.Windows.Forms;
 using Antlr4;
 using Antlr4.Runtime;
 using Antlr4.Runtime.Tree;
+using System.Drawing.Imaging;
 
 namespace MySQL_Clear_standart
 {
@@ -93,6 +94,26 @@ namespace MySQL_Clear_standart
             }
             selectString += " FROM Lineitem";
             return selectString;
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            saveFileDialog1.Filter = "Images|*.png;*.bmp;*.jpg";
+            ImageFormat format = ImageFormat.Png;
+            if (saveFileDialog1.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                string ext = System.IO.Path.GetExtension(saveFileDialog1.FileName);
+                switch (ext)
+                {
+                    case ".jpg":
+                        format = ImageFormat.Jpeg;
+                        break;
+                    case ".bmp":
+                        format = ImageFormat.Bmp;
+                        break;
+                }
+                pictureBox1.Image.Save(saveFileDialog1.FileName, format);
+            }
         }
     }
 }
