@@ -47,27 +47,57 @@ namespace MySQL_Clear_standart
             }
             
             //Image image = vTree.Draw();
-            vTree.VisitTree(treeNodeDrawable);
-            foreach (string str in vTree.GetTablesName(treeNodeDrawable))
-            {
-                output += str.ToString()+"\r\n";
-            }
-            output += "\r\n========================\r\n";
-            vTree.GetColumnNames(treeNodeDrawable);
-            foreach (string str in vTree.ColumnNames)
-            {
-                output += str + "\r\n";
-            }
-            output += "\r\n========================\r\n";
-            vTree.GetCompairColumnNames(treeNodeDrawable);
-            foreach (string str in vTree.CompairColumnNames)
-            {
-                output += str + "\r\n";
-            }
-            output += "\r\n========================\r\n";
-            output += Select(vTree.ColumnNames, vTree.CompairColumnNames);
+            
+            //vTree.VisitTree(treeNodeDrawable);
+            //foreach (string str in vTree.GetTablesName(treeNodeDrawable))
+            //{
+            //    output += str.ToString()+"\r\n";
+            //}
+            //output += "\r\n========================\r\n";
+            //vTree.GetColumnNames(treeNodeDrawable);
+            //foreach (string str in vTree.ColumnNames)
+            //{
+            //    output += str + "\r\n";
+            //}
+            //output += "\r\n========================\r\n";
+            //vTree.GetCompairColumnNames(treeNodeDrawable);
+            //foreach (string str in vTree.CompairColumnNames)
+            //{
+            //    output += str + "\r\n";
+            //}
+            //output += "\r\n========================\r\n";
+            //output += Select(vTree.ColumnNames, vTree.CompairColumnNames);
 
-            Image image = vTree.Draw();
+            output += "\r\n========TableNames============\r\n";
+            ParseTreeWalker walker = new ParseTreeWalker();
+            MyMySQLListener listener = new MyMySQLListener();
+            walker.Walk(listener, tree);
+            foreach (string tableName in listener.TableNames)
+            {
+                output += tableName + "\r\n";
+            }
+            output += "\r\n========ColumnNames===========\r\n";
+            List<string> col = listener.ColumnNames;
+            col = col.Distinct().ToList();
+            col.Sort();
+            col.Remove(listener._asString);
+            foreach (string columnName in col)
+            {
+                output += columnName + "\r\n";
+            }
+            output += "\r\n========ExprColumnNames========\r\n";
+            List<string> exprCol = listener.ExprColumnNames;
+            exprCol = exprCol.Distinct().ToList();
+            exprCol.Sort();
+            exprCol.Remove(listener._asString);
+            foreach (string columnName in exprCol)
+            {
+                output += columnName + "\r\n";
+            }
+            output += "\r\n========Return================\r\n";
+            output += listener._return;
+
+            Image image = vTree.Draw();            
             textBox1.Text = output;
             pictureBox1.Image = image;
         }

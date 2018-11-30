@@ -50,7 +50,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CommonNode.cs" />
+    <Compile Include="MyMySQLListener.cs" />
+    <Compile Include="Visual\CommonNode.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -63,11 +64,11 @@
     <Compile Include="Generatedclass\MySqlParserBaseVisitor.cs" />
     <Compile Include="Generatedclass\MySqlParserListener.cs" />
     <Compile Include="Generatedclass\MySqlParserVisitor.cs" />
-    <Compile Include="ICommonNode.cs" />
+    <Compile Include="Visual\ICommonNode.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TextMeasurer.cs" />
-    <Compile Include="TreeVisitor.cs" />
+    <Compile Include="Visual\TextMeasurer.cs" />
+    <Compile Include="Visual\TreeVisitor.cs" />
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>
@@ -104,9 +105,7 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Visual\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -30,7 +30,7 @@ namespace MySQL_Clear_standart
                 if (_tree.ChildCount != 0)
                 {
                     //return _index.ToString() + " " + _tree.GetType().Name.Replace("Context","");
-                    return _tree.GetType().Name.Replace("Context", "");
+                    return _tree.GetType().Name.Replace("Context", "");                    
                 }
                 else
                 {
