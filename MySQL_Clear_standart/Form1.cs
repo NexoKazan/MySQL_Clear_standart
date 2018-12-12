@@ -145,5 +145,7 @@ namespace MySQL_Clear_standart
                 pictureBox1.Image.Save(saveFileDialog1.FileName, format);
             }
         }
+
+        
     }
 }
