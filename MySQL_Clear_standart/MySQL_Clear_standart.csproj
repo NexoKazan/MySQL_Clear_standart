@@ -51,6 +51,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MyMySQLListener.cs" />
+    <Compile Include="SelectStructure.cs" />
     <Compile Include="Visual\CommonNode.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
