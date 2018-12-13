@@ -16,8 +16,9 @@ namespace MySQL_Clear_standart
 {
     public partial class Form1 : Form
     {
-        #region baseImpl
         List<string> Lineitem = new List<string>();
+        private SelectStructure[] _selectQuerry;
+        #region baseDefinition объявляются переменный для построения дерева
         private string output = " ";
         private string inputString;
         private ICharStream inputStream;
@@ -29,7 +30,7 @@ namespace MySQL_Clear_standart
         private TreeVisitor vTree;
         private ParseTreeWalker walker;
         private MyMySQLListener listener;
-        #endregion
+        #endregion 
 
         public Form1()
         {
@@ -38,6 +39,9 @@ namespace MySQL_Clear_standart
             Lineitem.Add("L_EXTENDEDPRICE");
             Lineitem.Add("L_DISCOUNT");
             InitializeComponent();
+            #region baseImpl инициализируются переменный для построения дерева
+
+            textBox2.Text = textBox1.Text;
             inputString = textBox1.Text;
             inputStream = new AntlrInputStream(inputString);
             mySqlLexer = new MySqlLexer(inputStream);
@@ -50,11 +54,20 @@ namespace MySQL_Clear_standart
             walker = new ParseTreeWalker();
             listener = new MyMySQLListener();
             walker.Walk(listener, tree);
+            #endregion
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
             DefaultOutput();
+            _selectQuerry = new SelectStructure[listener.TableNames.Count];
+            for (int i = 0; i < listener.TableNames.Count; i++)
+            {
+                _selectQuerry[i] = new SelectStructure("s"+i.ToString(), listener.TableNames[i], listener.ColumnNames, new List<string>());
+            }
+
+            output = _selectQuerry[0].Output;
+            textBox3.Text = output;
             textBox1.Text = output;
         }
         private string Select(List<string> columns, List<string> compairColumns)
@@ -165,6 +178,27 @@ namespace MySQL_Clear_standart
             }
             Image image = vTree.Draw();
             pictureBox1.Image = image;
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            textBox3.Text = output;
+        }
+
+        private void Form1_SizeChanged(object sender, EventArgs e)
+        {
+            ReSize();
+        }
+
+        private void ReSize()
+        {
+            textBox2.Width = textBox3.Width = (tabPage2.Width - 212) / 2;
+            textBox3.Location = new Point(textBox2.Location.X + 200 + textBox2.Width, textBox3.Location.Y);
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            ReSize();
         }
     }
 }

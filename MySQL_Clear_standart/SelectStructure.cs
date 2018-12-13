@@ -40,7 +40,7 @@ namespace MySQL_Clear_standart
                 _output += s + " ";
             }
 
-            _output += "FROM " + _tableName + "\r\n" + "WHERE " + "\r\n";
+            _output += "\r\n" + "FROM " + _tableName + "\r\n" + "WHERE " + "\r\n";
             foreach (string s in _whereList)
             {
                 _output += s + "\r\n";
