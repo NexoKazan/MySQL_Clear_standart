@@ -16,7 +16,21 @@ namespace MySQL_Clear_standart
 {
     public partial class Form1 : Form
     {
-        List<string> Lineitem = new List<string>();        
+        #region baseImpl
+        List<string> Lineitem = new List<string>();
+        private string output = " ";
+        private string inputString;
+        private ICharStream inputStream;
+        private ITokenSource mySqlLexer;
+        private CommonTokenStream commonTokenStream;
+        private MySqlParser mySqlParser;
+        private IParseTree tree;
+        private CommonNode treeNodeDrawable;
+        private TreeVisitor vTree;
+        private ParseTreeWalker walker;
+        private MyMySQLListener listener;
+        #endregion
+
         public Form1()
         {
             Lineitem.Add("L_ORDERKEY");
@@ -24,82 +38,24 @@ namespace MySQL_Clear_standart
             Lineitem.Add("L_EXTENDEDPRICE");
             Lineitem.Add("L_DISCOUNT");
             InitializeComponent();
+            inputString = textBox1.Text;
+            inputStream = new AntlrInputStream(inputString);
+            mySqlLexer = new MySqlLexer(inputStream);
+            commonTokenStream = new CommonTokenStream(mySqlLexer);
+            mySqlParser = new MySqlParser(commonTokenStream);
+            mySqlParser.BuildParseTree = true;
+            tree = mySqlParser.root();
+            treeNodeDrawable = new CommonNode(tree);
+            vTree = new TreeVisitor(treeNodeDrawable);
+            walker = new ParseTreeWalker();
+            listener = new MyMySQLListener();
+            walker.Walk(listener, tree);
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
-            string inputString = textBox1.Text;
-            string output = " ";
-            //output = textBox1.Text;
-            ICharStream inputStream = new AntlrInputStream(inputString.ToString());
-            ITokenSource mySqlLexer = new MySqlLexer(inputStream);
-            CommonTokenStream commonTokenStream = new CommonTokenStream(mySqlLexer);
-            MySqlParser mySqlParser = new MySqlParser(commonTokenStream);
-            mySqlParser.BuildParseTree = true;
-            IParseTree tree = mySqlParser.root();
-            var treeNodeDrawable = new CommonNode(tree);
-            TreeVisitor vTree = new TreeVisitor(treeNodeDrawable);
-
-            if (pictureBox1.Image != null)
-            {
-                pictureBox1.Image.Dispose();
-                pictureBox1.Image = null;
-            }
-            
-            //Image image = vTree.Draw();
-            
-            //vTree.VisitTree(treeNodeDrawable);
-            //foreach (string str in vTree.GetTablesName(treeNodeDrawable))
-            //{
-            //    output += str.ToString()+"\r\n";
-            //}
-            //output += "\r\n========================\r\n";
-            //vTree.GetColumnNames(treeNodeDrawable);
-            //foreach (string str in vTree.ColumnNames)
-            //{
-            //    output += str + "\r\n";
-            //}
-            //output += "\r\n========================\r\n";
-            //vTree.GetCompairColumnNames(treeNodeDrawable);
-            //foreach (string str in vTree.CompairColumnNames)
-            //{
-            //    output += str + "\r\n";
-            //}
-            //output += "\r\n========================\r\n";
-            //output += Select(vTree.ColumnNames, vTree.CompairColumnNames);
-
-            output += "\r\n========TableNames============\r\n";
-            ParseTreeWalker walker = new ParseTreeWalker();
-            MyMySQLListener listener = new MyMySQLListener();
-            walker.Walk(listener, tree);
-            foreach (string tableName in listener.TableNames)
-            {
-                output += tableName + "\r\n";
-            }
-            output += "\r\n========ColumnNames===========\r\n";
-            List<string> col = listener.ColumnNames;
-            col = col.Distinct().ToList();
-            col.Sort();
-            col.Remove(listener._asString);
-            foreach (string columnName in col)
-            {
-                output += columnName + "\r\n";
-            }
-            output += "\r\n========ExprColumnNames========\r\n";
-            List<string> exprCol = listener.ExprColumnNames;
-            exprCol = exprCol.Distinct().ToList();
-            exprCol.Sort();
-            exprCol.Remove(listener._asString);
-            foreach (string columnName in exprCol)
-            {
-                output += columnName + "\r\n";
-            }
-            output += "\r\n========Return================\r\n";
-            output += listener._return;
-
-            Image image = vTree.Draw();            
+            DefaultOutput();
             textBox1.Text = output;
-            pictureBox1.Image = image;
         }
         private string Select(List<string> columns, List<string> compairColumns)
         {
@@ -146,6 +102,69 @@ namespace MySQL_Clear_standart
             }
         }
 
-        
+        private void button3_Click(object sender, EventArgs e)
+        {
+            textBox1.Text = "SELECT\r\n\tL_ORDERKEY,\r\n\tSUM(L_EXTENDEDPRICE * (1 - L_DISCOUNT)) AS REVENUE,\r\n\tO_ORDERDATE,\r\n\tO_SHIPPRIORITY\r\nFROM\r\n\tCUSTOMER,\r\n\tORDERS,\r\n\tLINEITEM\r\nWHERE\r\n\tC_MKTSEGMENT = \'HOUSEHOLD\'\r\n\tAND C_CUSTKEY = O_CUSTKEY\r\n\tAND L_ORDERKEY = O_ORDERKEY\r\n\tAND O_ORDERDATE < \'1995-03-31\'\r\n\tAND L_SHIPDATE  > \'1995-03-31\'\r\nGROUP BY\r\n\tL_ORDERKEY,\r\n\tO_ORDERDATE,\r\n\tO_SHIPPRIORITY\r\nORDER BY\r\n\tREVENUE DESC,\r\n\tO_ORDERDATE;\r\n";
+        }
+
+        private void DefaultOutput()
+        {
+            #region вынесено в зону видимости класса
+
+            //string inputString = textBox1.Text;
+            //string output = " ";
+            //ICharStream inputStream = new AntlrInputStream(inputString);
+            //ITokenSource mySqlLexer = new MySqlLexer(inputStream);
+            //CommonTokenStream commonTokenStream = new CommonTokenStream(mySqlLexer);
+            //MySqlParser mySqlParser = new MySqlParser(commonTokenStream);
+            //mySqlParser.BuildParseTree = true;
+            //IParseTree tree = mySqlParser.root();
+            //var treeNodeDrawable = new CommonNode(tree);
+            //TreeVisitor vTree = new TreeVisitor(treeNodeDrawable);
+            //if (pictureBox1.Image != null)
+            //{
+            //    pictureBox1.Image.Dispose();
+            //    pictureBox1.Image = null;
+            //}
+            //ParseTreeWalker walker = new ParseTreeWalker();
+            //MyMySQLListener listener = new MyMySQLListener();
+            //walker.Walk(listener, tree);
+            #endregion
+            
+
+            output += "\r\n========TableNames============\r\n";
+           
+            foreach (string tableName in listener.TableNames)
+            {
+                output += tableName + "\r\n";
+            }
+            output += "\r\n========ColumnNames===========\r\n";
+            List<string> col = listener.ColumnNames;
+            col = col.Distinct().ToList();
+            col.Sort();
+            col.Remove(listener._asString);
+            foreach (string columnName in col)
+            {
+                output += columnName + "\r\n";
+            }
+            output += "\r\n========ExprColumnNames========\r\n";
+            List<string> exprCol = listener.ExprColumnNames;
+            exprCol = exprCol.Distinct().ToList();
+            exprCol.Sort();
+            exprCol.Remove(listener._asString);
+            foreach (string columnName in exprCol)
+            {
+                output += columnName + "\r\n";
+            }
+            output += "\r\n========Return================\r\n";
+            output += listener._return;
+            if (pictureBox1.Image != null)
+            {
+                pictureBox1.Image.Dispose();
+                pictureBox1.Image = null;
+            }
+            Image image = vTree.Draw();
+            pictureBox1.Image = image;
+        }
     }
 }
