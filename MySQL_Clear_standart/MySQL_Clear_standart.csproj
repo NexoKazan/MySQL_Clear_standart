@@ -50,6 +50,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DataBaseSchemeStructure\ColumnStructure.cs" />
+    <Compile Include="DataBaseSchemeStructure\DataBaseStructure.cs" />
+    <Compile Include="DataBaseSchemeStructure\TableStructure.cs" />
     <Compile Include="MyMySQLListener.cs" />
     <Compile Include="SelectStructure.cs" />
     <Compile Include="Visual\CommonNode.cs" />

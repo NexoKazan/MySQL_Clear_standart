@@ -11,12 +11,20 @@ using Antlr4;
 using Antlr4.Runtime;
 using Antlr4.Runtime.Tree;
 using System.Drawing.Imaging;
+using MySQL_Clear_standart.DataBaseSchemeStructure;
 
 namespace MySQL_Clear_standart
 {
     public partial class Form1 : Form
     {
         List<string> Lineitem = new List<string>();
+
+        #region Создание схемы БД
+        DataBaseStructure dbName = new DataBaseStructure();
+        TableStructure[] tables = new TableStructure[3];
+        
+
+        #endregion
         private SelectStructure[] _selectQuerry;
         #region baseDefinition объявляются переменный для построения дерева
         private string output = " ";
