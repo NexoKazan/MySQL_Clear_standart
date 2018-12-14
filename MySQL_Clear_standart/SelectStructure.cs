@@ -32,12 +32,16 @@ namespace MySQL_Clear_standart
             }
         }
 
+        public string Name
+        {
+            get { return _name; }
+        }
         private void CreateQuerry()
         {
             _output = "SELECT ";
             foreach (string s in _columnsList)
             {
-                _output += s + " ";
+                _output +="\r\n\t" + s + " ";
             }
 
             _output += "\r\n" + "FROM " + _tableName + "\r\n" + "WHERE " + "\r\n";

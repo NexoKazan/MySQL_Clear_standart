@@ -20,9 +20,50 @@ namespace MySQL_Clear_standart
         List<string> Lineitem = new List<string>();
 
         #region Создание схемы БД
-        DataBaseStructure dbName = new DataBaseStructure();
-        TableStructure[] tables = new TableStructure[3];
-        
+       /*C_CUSTKEY
+         C_MKTSEGMENT
+         L_DISCOUNT
+         L_EXTENDEDPRICE
+         L_ORDERKEY
+         L_SHIPDATE
+         O_CUSTKEY
+         O_ORDERDATE
+         O_ORDERKEY
+         O_SHIPPRIORITY
+       */
+
+        private DataBaseStructure _dbName;
+        private TableStructure[] _table;
+        private ColumnStructure[] _orderColumns;
+        private ColumnStructure[] _lineitemColumns;
+        private ColumnStructure[] _customerColumns;
+
+        private void FillScheme()
+        {
+            _orderColumns = new ColumnStructure[4];
+            _orderColumns[0] = new ColumnStructure("O_CUSTKEY");
+            _orderColumns[1] = new ColumnStructure("O_ORDERDATE");
+            _orderColumns[2] = new ColumnStructure("O_ORDERKEY");
+            _orderColumns[3] = new ColumnStructure("O_SHIPPRIORITY");
+
+            _lineitemColumns = new ColumnStructure[4];
+            _lineitemColumns[0] = new ColumnStructure("L_DISCOUNT");
+            _lineitemColumns[1] = new ColumnStructure("L_EXTENDEDPRICE");
+            _lineitemColumns[2] = new ColumnStructure("L_ORDERKEY");
+            _lineitemColumns[3] = new ColumnStructure("L_SHIPDATE");
+
+            _customerColumns = new ColumnStructure[2];
+            _customerColumns[0] = new ColumnStructure("C_CUSTKEY");
+            _customerColumns[1] = new ColumnStructure("C_MKTSEGMENT");
+
+            _table = new TableStructure[3];
+            _table[0] = new TableStructure("CUSTOMER", _customerColumns);
+            _table[1] = new TableStructure("LINEITEM", _lineitemColumns);
+            _table[2] = new TableStructure("ORDERS", _orderColumns);
+
+            _dbName = new DataBaseStructure("TPCH", _table);
+        }
+
 
         #endregion
         private SelectStructure[] _selectQuerry;
@@ -68,39 +109,7 @@ namespace MySQL_Clear_standart
         private void button1_Click(object sender, EventArgs e)
         {
             DefaultOutput();
-            _selectQuerry = new SelectStructure[listener.TableNames.Count];
-            for (int i = 0; i < listener.TableNames.Count; i++)
-            {
-                _selectQuerry[i] = new SelectStructure("s"+i.ToString(), listener.TableNames[i], listener.ColumnNames, new List<string>());
-            }
-
-            output = _selectQuerry[0].Output;
-            textBox3.Text = output;
             textBox1.Text = output;
-        }
-        private string Select(List<string> columns, List<string> compairColumns)
-        {
-            columns.Distinct();
-            compairColumns.Distinct();
-            List<string> clearColumns = columns.Except(compairColumns).ToList();
-            
-            string selectString = "SELECT";
-            //foreach (string str in clearColumns)
-            //{
-            //    selectString += " " + str;
-            //}
-            foreach (string col in Lineitem)
-            {
-                foreach (string str in clearColumns)
-                {
-                    if (col == str)
-                    {
-                        selectString += " " + str;
-                    }
-                }
-            }
-            selectString += " FROM Lineitem";
-            return selectString;
         }
 
         private void button2_Click(object sender, EventArgs e)
@@ -190,7 +199,22 @@ namespace MySQL_Clear_standart
 
         private void button4_Click(object sender, EventArgs e)
         {
-            textBox3.Text = output;
+            _selectQuerry = new SelectStructure[listener.TableNames.Count];
+            listener.TableNames.Sort();
+            for (int i = 0; i < listener.TableNames.Count; i++)
+            {
+                _selectQuerry[i] = new SelectStructure("s" + i.ToString(), listener.TableNames[i], GetClearColumns(listener.ColumnNames, listener.ExprColumnNames, _table[i]), listener.WhereList);
+            }
+
+            textBox3.Text += _selectQuerry[0].Name + "\r\n";
+            textBox3.Text += "\r\n" + _selectQuerry[0].Output + "\r\n";
+
+            textBox3.Text += _selectQuerry[1].Name + "\r\n";
+            textBox3.Text += "\r\n" + _selectQuerry[1].Output + "\r\n";
+
+            textBox3.Text += _selectQuerry[2].Name + "\r\n";
+            textBox3.Text += "\r\n" + _selectQuerry[2].Output + "\r\n";
+            //textBox3.Text = _dbName.GetText();
         }
 
         private void Form1_SizeChanged(object sender, EventArgs e)
@@ -206,7 +230,37 @@ namespace MySQL_Clear_standart
 
         private void Form1_Load(object sender, EventArgs e)
         {
+            FillScheme();
             ReSize();
+        }
+
+        private List<string> GetClearColumns(List<string> allColumns, List<string> removeColumns, TableStructure table)
+        {
+            List<string> outList = new List<string>();
+            for (int i = 0; i < removeColumns.Count; i++)
+            {
+                for (int j = 0; j < allColumns.Count; j++)
+                {
+                    if (allColumns[j] == removeColumns[i])
+                    {
+                        allColumns.Remove(allColumns[j]);
+                        break;
+                    }
+                }
+            }
+            allColumns = allColumns.Distinct().ToList();
+            foreach (string allColumn in allColumns)
+            {
+                for (int i = 0; i < table.Columns.Length; i++)
+                {
+                    if (allColumn == table.Columns[i].Name)
+                    {
+                        outList.Add(allColumn);
+                        break;
+                    }
+                }
+            }
+            return outList;
         }
     }
 }

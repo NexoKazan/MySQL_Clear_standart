@@ -12,6 +12,7 @@ namespace MySQL_Clear_standart
         public List<string> TableNames = new List<string>();
         public List<string> ColumnNames = new List<string>();
         public List<string> ExprColumnNames = new List<string>();
+        public List<string> WhereList = new List<string>();
         public string _return = "Return: ";
         public string _asString;
 
@@ -29,12 +30,15 @@ namespace MySQL_Clear_standart
             _asString += context.uid().GetText();
         }
        
-        public override void EnterBinaryComparasionPredicate([NotNull] MySqlParser.BinaryComparasionPredicateContext context) {
-            //_return += context.right.GetChild(0).GetType().Name + " \r\n";
+        public override void EnterBinaryComparasionPredicate([NotNull] MySqlParser.BinaryComparasionPredicateContext context)
+        {
+            _return = context.Payload.GetText();
+            //_return += context.right.GetChild(0).GetType() + " \r\n";
             //_return += context.right.GetText() + " \r\n";
             if (context.Stop.Type != 968)
             {
                 ExprColumnNames.Add(context.left.GetText());
+                WhereList.Add(context.Payload.GetText());
             }
         }
     }
