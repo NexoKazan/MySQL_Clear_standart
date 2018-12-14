@@ -201,6 +201,10 @@ namespace MySQL_Clear_standart
         {
             _selectQuerry = new SelectStructure[listener.TableNames.Count];
             listener.TableNames.Sort();
+            foreach (WhereStructure ws in listener.WhereList)
+            {
+                ws.FindeTable(_dbName);
+            }
             for (int i = 0; i < listener.TableNames.Count; i++)
             {
                 _selectQuerry[i] = new SelectStructure("s" + i.ToString(), listener.TableNames[i], GetClearColumns(listener.ColumnNames, listener.ExprColumnNames, _table[i]), listener.WhereList);

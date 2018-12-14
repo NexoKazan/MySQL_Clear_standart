@@ -13,9 +13,9 @@ namespace MySQL_Clear_standart
         private string _tableName;
         private static int _id = 0;
         private List<string> _columnsList;
-        private List<string> _whereList;
+        private List<WhereStructure> _whereList;
         
-        public SelectStructure(string name, string tableName, List<string> columnsList, List<string> whereList)
+        public SelectStructure(string name, string tableName, List<string> columnsList, List<WhereStructure> whereList)
         {
             _name = name;
             _tableName = tableName;
@@ -44,10 +44,14 @@ namespace MySQL_Clear_standart
                 _output +="\r\n\t" + s + " ";
             }
 
-            _output += "\r\n" + "FROM " + _tableName + "\r\n" + "WHERE " + "\r\n";
-            foreach (string s in _whereList)
+            _output += "\r\n" + "FROM " + "\r\n\t" + _tableName + "\r\n" + "WHERE ";
+            foreach (WhereStructure whereStructure in _whereList)
             {
-                _output += s + "\r\n";
+                if (whereStructure.Table == _tableName)
+                {
+                    _output += "\r\n\t" + whereStructure.getWhereString;
+                }
+
             }
 
         }

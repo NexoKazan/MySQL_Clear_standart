@@ -12,7 +12,7 @@ namespace MySQL_Clear_standart
         public List<string> TableNames = new List<string>();
         public List<string> ColumnNames = new List<string>();
         public List<string> ExprColumnNames = new List<string>();
-        public List<string> WhereList = new List<string>();
+        public List<WhereStructure> WhereList = new List<WhereStructure>();
         public string _return = "Return: ";
         public string _asString;
 
@@ -38,7 +38,7 @@ namespace MySQL_Clear_standart
             if (context.Stop.Type != 968)
             {
                 ExprColumnNames.Add(context.left.GetText());
-                WhereList.Add(context.Payload.GetText());
+                WhereList.Add(new WhereStructure(context.Payload.GetText(), context.left.GetText()));
             }
         }
     }
