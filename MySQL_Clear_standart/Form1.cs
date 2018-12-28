@@ -11,7 +11,10 @@ using Antlr4;
 using Antlr4.Runtime;
 using Antlr4.Runtime.Tree;
 using System.Drawing.Imaging;
+using System.Xml.Serialization;
 using MySQL_Clear_standart.DataBaseSchemeStructure;
+using System.IO;
+using System.Runtime.InteropServices;
 
 namespace MySQL_Clear_standart
 {
@@ -106,9 +109,30 @@ namespace MySQL_Clear_standart
             #endregion
         }
 
+        #region чек сериализации
+        protected void serializer_UnknownNode(object sender, XmlNodeEventArgs e)
+        {
+            MessageBox.Show("Unknown Node:" + e.Name + "\t" + e.Text);
+        }
+
+        protected void serializer_UnknownAttribute(object sender, XmlAttributeEventArgs e)
+        {
+            System.Xml.XmlAttribute attr = e.Attr;
+            MessageBox.Show("Unknown attribute " + attr.Name + "='" + attr.Value + "'");
+        }
+        #endregion
         private void button1_Click(object sender, EventArgs e)
         {
             DefaultOutput();
+            XmlSerializer formatter2 = new XmlSerializer(typeof(DataBaseStructure));
+            formatter2.UnknownNode += new XmlNodeEventHandler(serializer_UnknownNode);
+            formatter2.UnknownAttribute += new XmlAttributeEventHandler(serializer_UnknownAttribute);
+            FileStream fs2 = new FileStream("db2.xml", FileMode.Open);
+            DataBaseStructure db2;
+            db2 = (DataBaseStructure) formatter2.Deserialize(fs2);
+            MessageBox.Show(db2.Name);
+            fs2.Dispose();
+            output = db2.GetText();
             textBox1.Text = output;
         }
 
@@ -219,6 +243,7 @@ namespace MySQL_Clear_standart
             textBox3.Text += _selectQuerry[2].Name + "\r\n";
             textBox3.Text += "\r\n" + _selectQuerry[2].Output + "\r\n";
             //textBox3.Text = _dbName.GetText();
+            
         }
 
         private void Form1_SizeChanged(object sender, EventArgs e)
@@ -236,6 +261,11 @@ namespace MySQL_Clear_standart
         {
             FillScheme();
             ReSize();
+            XmlSerializer formatter = new XmlSerializer(typeof(DataBaseStructure));
+            FileStream fs = new FileStream("db.xml", FileMode.Create, FileAccess.ReadWrite);
+            formatter.Serialize(fs, _dbName);
+            MessageBox.Show("Объект сериализован");
+            fs.Dispose();
         }
 
         private List<string> GetClearColumns(List<string> allColumns, List<string> removeColumns, TableStructure table)

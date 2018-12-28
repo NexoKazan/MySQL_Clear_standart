@@ -5,27 +5,36 @@ using System.Runtime.InteropServices;
 using System.Runtime.Remoting.Messaging;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
 
 namespace MySQL_Clear_standart.DataBaseSchemeStructure
 {
-    class DataBaseStructure
+    
+    public class DataBaseStructure
     {
         private TableStructure[] _tables;
         private string _name;
+
+        public DataBaseStructure()
+        { }
+
         public DataBaseStructure(string name, TableStructure[] tables)
         {
             _tables = tables;
             _name = name;
         }
 
+        [XmlArray]
         public TableStructure[] Tables
         {
             get { return _tables; }
+            set { _tables = value; }
         }
 
-        public string Name
-        {
+        [XmlAttribute]
+        public string Name {
             get { return _name; }
+            set { _name = value; }
         }
 
         public string GetText()
