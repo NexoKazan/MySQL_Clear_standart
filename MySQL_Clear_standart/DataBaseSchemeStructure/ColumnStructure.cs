@@ -48,10 +48,10 @@ namespace MySQL_Clear_standart.DataBaseSchemeStructure
         }
 
 
-        //public string Type
-        //{
-        //    get { return _type; }
-        //    set { value = _type; }
-        //}
+        public string Type
+        {
+            get { return _type; }
+            set { value = _type; }
+        }
     }
 }

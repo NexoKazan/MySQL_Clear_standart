@@ -43,28 +43,36 @@ namespace MySQL_Clear_standart
 
         private void FillScheme()
         {
-            _orderColumns = new ColumnStructure[4];
-            _orderColumns[0] = new ColumnStructure("O_CUSTKEY");
-            _orderColumns[1] = new ColumnStructure("O_ORDERDATE");
-            _orderColumns[2] = new ColumnStructure("O_ORDERKEY");
-            _orderColumns[3] = new ColumnStructure("O_SHIPPRIORITY");
+            #region Устаревший метод заполнения схемы БД.
+            //_orderColumns = new ColumnStructure[4];
+            //_orderColumns[0] = new ColumnStructure("O_CUSTKEY");
+            //_orderColumns[1] = new ColumnStructure("O_ORDERDATE");
+            //_orderColumns[2] = new ColumnStructure("O_ORDERKEY");
+            //_orderColumns[3] = new ColumnStructure("O_SHIPPRIORITY");
 
-            _lineitemColumns = new ColumnStructure[4];
-            _lineitemColumns[0] = new ColumnStructure("L_DISCOUNT");
-            _lineitemColumns[1] = new ColumnStructure("L_EXTENDEDPRICE");
-            _lineitemColumns[2] = new ColumnStructure("L_ORDERKEY");
-            _lineitemColumns[3] = new ColumnStructure("L_SHIPDATE");
+            //_lineitemColumns = new ColumnStructure[4];
+            //_lineitemColumns[0] = new ColumnStructure("L_DISCOUNT");
+            //_lineitemColumns[1] = new ColumnStructure("L_EXTENDEDPRICE");
+            //_lineitemColumns[2] = new ColumnStructure("L_ORDERKEY");
+            //_lineitemColumns[3] = new ColumnStructure("L_SHIPDATE");
 
-            _customerColumns = new ColumnStructure[2];
-            _customerColumns[0] = new ColumnStructure("C_CUSTKEY");
-            _customerColumns[1] = new ColumnStructure("C_MKTSEGMENT");
+            //_customerColumns = new ColumnStructure[2];
+            //_customerColumns[0] = new ColumnStructure("C_CUSTKEY");
+            //_customerColumns[1] = new ColumnStructure("C_MKTSEGMENT");
 
-            _table = new TableStructure[3];
-            _table[0] = new TableStructure("CUSTOMER", _customerColumns);
-            _table[1] = new TableStructure("LINEITEM", _lineitemColumns);
-            _table[2] = new TableStructure("ORDERS", _orderColumns);
+            //_table = new TableStructure[3];
+            //_table[0] = new TableStructure("CUSTOMER", _customerColumns);
+            //_table[1] = new TableStructure("LINEITEM", _lineitemColumns);
+            //_table[2] = new TableStructure("ORDERS", _orderColumns);
 
-            _dbName = new DataBaseStructure("TPCH", _table);
+            //_dbName = new DataBaseStructure("TPCH", _table); 
+            #endregion
+
+            using (FileStream dbCreateFileStream = new FileStream("db.xml", FileMode.Open, FileAccess.ReadWrite))
+            {
+                XmlSerializer dbCreateSerializer = new XmlSerializer(typeof(DataBaseStructure));
+                _dbName = (DataBaseStructure) dbCreateSerializer.Deserialize(dbCreateFileStream);
+            }
         }
 
 
@@ -124,15 +132,7 @@ namespace MySQL_Clear_standart
         private void button1_Click(object sender, EventArgs e)
         {
             DefaultOutput();
-            XmlSerializer formatter2 = new XmlSerializer(typeof(DataBaseStructure));
-            formatter2.UnknownNode += new XmlNodeEventHandler(serializer_UnknownNode);
-            formatter2.UnknownAttribute += new XmlAttributeEventHandler(serializer_UnknownAttribute);
-            FileStream fs2 = new FileStream("db2.xml", FileMode.Open);
-            DataBaseStructure db2;
-            db2 = (DataBaseStructure) formatter2.Deserialize(fs2);
-            MessageBox.Show(db2.Name);
-            fs2.Dispose();
-            output = db2.GetText();
+            //output = 
             textBox1.Text = output;
         }
 
@@ -261,11 +261,14 @@ namespace MySQL_Clear_standart
         {
             FillScheme();
             ReSize();
-            XmlSerializer formatter = new XmlSerializer(typeof(DataBaseStructure));
-            FileStream fs = new FileStream("db.xml", FileMode.Create, FileAccess.ReadWrite);
-            formatter.Serialize(fs, _dbName);
-            MessageBox.Show("Объект сериализован");
-            fs.Dispose();
+            
+            using (FileStream fs = new FileStream("db_result.xml", FileMode.Create, FileAccess.ReadWrite))
+            {
+                XmlSerializer dbSerializer = new XmlSerializer(typeof(DataBaseStructure));
+                dbSerializer.Serialize(fs, _dbName);
+            }
+            
+           
         }
 
         private List<string> GetClearColumns(List<string> allColumns, List<string> removeColumns, TableStructure table)
