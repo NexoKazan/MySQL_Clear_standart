@@ -17,7 +17,7 @@ namespace MySQL_Clear_standart
         public CommonNode(IParseTree tree)
         {                     
             _tree = tree;
-            _index++;            
+            _index++;
         }             
         public int Index
         {

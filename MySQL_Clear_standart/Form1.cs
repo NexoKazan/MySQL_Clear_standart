@@ -20,8 +20,6 @@ namespace MySQL_Clear_standart
 {
     public partial class Form1 : Form
     {
-        List<string> Lineitem = new List<string>();
-
         #region Создание схемы БД
        /*C_CUSTKEY
          C_MKTSEGMENT
@@ -68,7 +66,7 @@ namespace MySQL_Clear_standart
             //_dbName = new DataBaseStructure("TPCH", _table); 
             #endregion
 
-            using (FileStream dbCreateFileStream = new FileStream("db.xml", FileMode.Open, FileAccess.ReadWrite))
+            using (FileStream dbCreateFileStream = new FileStream("db.xml", FileMode.Open, FileAccess.ReadWrite))  // Заполнение БД из XML
             {
                 XmlSerializer dbCreateSerializer = new XmlSerializer(typeof(DataBaseStructure));
                 _dbName = (DataBaseStructure) dbCreateSerializer.Deserialize(dbCreateFileStream);
@@ -78,9 +76,10 @@ namespace MySQL_Clear_standart
 
         #endregion
         private SelectStructure[] _selectQuerry;
+       
         #region baseDefinition объявляются переменный для построения дерева
-        private string output = " ";
-        private string inputString;
+        private string output = " "; 
+        private string inputString; 
         private ICharStream inputStream;
         private ITokenSource mySqlLexer;
         private CommonTokenStream commonTokenStream;
@@ -94,13 +93,8 @@ namespace MySQL_Clear_standart
 
         public Form1()
         {
-            Lineitem.Add("L_ORDERKEY");
-            Lineitem.Add("L_SHIPDATE");
-            Lineitem.Add("L_EXTENDEDPRICE");
-            Lineitem.Add("L_DISCOUNT");
             InitializeComponent();
             #region baseImpl инициализируются переменный для построения дерева
-
             textBox2.Text = textBox1.Text;
             inputString = textBox1.Text;
             inputStream = new AntlrInputStream(inputString);
@@ -131,13 +125,15 @@ namespace MySQL_Clear_standart
         #endregion
         private void button1_Click(object sender, EventArgs e)
         {
+            //Кнопка для картинки
             DefaultOutput();
-            //output = 
+           // output = 
             textBox1.Text = output;
         }
 
         private void button2_Click(object sender, EventArgs e)
         {
+            //кнопка для сохранения картинки
             saveFileDialog1.Filter = "Images|*.png;*.bmp;*.jpg";
             ImageFormat format = ImageFormat.Png;
             if (saveFileDialog1.ShowDialog() == System.Windows.Forms.DialogResult.OK)
@@ -158,6 +154,7 @@ namespace MySQL_Clear_standart
 
         private void button3_Click(object sender, EventArgs e)
         {
+            //восстановление Запроса
             textBox1.Text = "SELECT\r\n\tL_ORDERKEY,\r\n\tSUM(L_EXTENDEDPRICE * (1 - L_DISCOUNT)) AS REVENUE,\r\n\tO_ORDERDATE,\r\n\tO_SHIPPRIORITY\r\nFROM\r\n\tCUSTOMER,\r\n\tORDERS,\r\n\tLINEITEM\r\nWHERE\r\n\tC_MKTSEGMENT = \'HOUSEHOLD\'\r\n\tAND C_CUSTKEY = O_CUSTKEY\r\n\tAND L_ORDERKEY = O_ORDERKEY\r\n\tAND O_ORDERDATE < \'1995-03-31\'\r\n\tAND L_SHIPDATE  > \'1995-03-31\'\r\nGROUP BY\r\n\tL_ORDERKEY,\r\n\tO_ORDERDATE,\r\n\tO_SHIPPRIORITY\r\nORDER BY\r\n\tREVENUE DESC,\r\n\tO_ORDERDATE;\r\n";
         }
 
@@ -223,6 +220,7 @@ namespace MySQL_Clear_standart
 
         private void button4_Click(object sender, EventArgs e)
         {
+            //составление запросов SELECT
             _selectQuerry = new SelectStructure[listener.TableNames.Count];
             listener.TableNames.Sort();
             foreach (WhereStructure ws in listener.WhereList)
@@ -231,19 +229,17 @@ namespace MySQL_Clear_standart
             }
             for (int i = 0; i < listener.TableNames.Count; i++)
             {
-                _selectQuerry[i] = new SelectStructure("s" + i.ToString(), listener.TableNames[i], GetClearColumns(listener.ColumnNames, listener.ExprColumnNames, _table[i]), listener.WhereList);
+                _selectQuerry[i] = new SelectStructure("s" + i.ToString(), listener.TableNames[i], 
+                    GetClearColumns(listener.ColumnNames, listener.ExprColumnNames, _dbName.Tables[i]),
+                    listener.WhereList);
             }
 
-            textBox3.Text += _selectQuerry[0].Name + "\r\n";
-            textBox3.Text += "\r\n" + _selectQuerry[0].Output + "\r\n";
-
-            textBox3.Text += _selectQuerry[1].Name + "\r\n";
-            textBox3.Text += "\r\n" + _selectQuerry[1].Output + "\r\n";
-
-            textBox3.Text += _selectQuerry[2].Name + "\r\n";
-            textBox3.Text += "\r\n" + _selectQuerry[2].Output + "\r\n";
-            //textBox3.Text = _dbName.GetText();
-            
+            textBox3.Clear();
+            for (int i = 0; i < _selectQuerry.Length; i++)
+            {
+                textBox3.Text += "\r\n========" + _selectQuerry[i].Name + "=========\r\n";
+                textBox3.Text += _selectQuerry[i].Output + "\r\n";
+            }
         }
 
         private void Form1_SizeChanged(object sender, EventArgs e)
@@ -261,7 +257,6 @@ namespace MySQL_Clear_standart
         {
             FillScheme();
             ReSize();
-            
             using (FileStream fs = new FileStream("db_result.xml", FileMode.Create, FileAccess.ReadWrite))
             {
                 XmlSerializer dbSerializer = new XmlSerializer(typeof(DataBaseStructure));
@@ -273,20 +268,14 @@ namespace MySQL_Clear_standart
 
         private List<string> GetClearColumns(List<string> allColumns, List<string> removeColumns, TableStructure table)
         {
+            List<string> midList = new List<string>();
             List<string> outList = new List<string>();
-            for (int i = 0; i < removeColumns.Count; i++)
+            for (int i = 0; i < allColumns.Count; i++)
             {
-                for (int j = 0; j < allColumns.Count; j++)
-                {
-                    if (allColumns[j] == removeColumns[i])
-                    {
-                        allColumns.Remove(allColumns[j]);
-                        break;
-                    }
-                }
+               
             }
-            allColumns = allColumns.Distinct().ToList();
-            foreach (string allColumn in allColumns)
+            midList = midList.Distinct().ToList();
+            foreach (string allColumn in midList)
             {
                 for (int i = 0; i < table.Columns.Length; i++)
                 {

@@ -32,7 +32,7 @@ namespace MySQL_Clear_standart
        
         public override void EnterBinaryComparasionPredicate([NotNull] MySqlParser.BinaryComparasionPredicateContext context)
         {
-            _return = context.Payload.GetText();
+            //_return = context.ToStringTree();
             //_return += context.right.GetChild(0).GetType() + " \r\n";
             //_return += context.right.GetText() + " \r\n";
             if (context.Stop.Type != 968)
