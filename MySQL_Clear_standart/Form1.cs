@@ -164,6 +164,22 @@ namespace MySQL_Clear_standart
             }
         }
 
+        private void button5_Click(object sender, EventArgs e)
+        {
+            pictureBox1.Visible = false;
+            textBox1.Width = Width - 8;
+            GetTree();
+            output += "\r\n========Return================\r\n";
+            output += listener._return;
+            //output += mySqlParser.Vocabulary.GetDisplayName(113) + " ";
+            //output += mySqlParser.Vocabulary.GetLiteralName(113) + " ";
+            //output += mySqlParser.Vocabulary.GetSymbolicName(113) + " ";
+            //output += mySqlParser.Vocabulary.GetDisplayName(647) + " ";
+            //output += mySqlParser.Vocabulary.GetDisplayName(636) + " ";
+            //output += mySqlParser.Vocabulary.GetDisplayName(616) + " ";
+            textBox1.Text = output;
+        }
+
         private void Form1_SizeChanged(object sender, EventArgs e)
         {
             ReSize();
@@ -236,6 +252,7 @@ namespace MySQL_Clear_standart
             }
             output += "\r\n========Return================\r\n";
             output += listener._return;
+
             if (pictureBox1.Image != null)
             {
                 pictureBox1.Image.Dispose();
@@ -296,6 +313,6 @@ namespace MySQL_Clear_standart
             }
             return outList;
         }
-
+        
     }
 }
