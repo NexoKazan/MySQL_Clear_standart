@@ -94,21 +94,7 @@ namespace MySQL_Clear_standart
         public Form1()
         {
             InitializeComponent();
-            #region baseImpl инициализируются переменный для построения дерева
-            textBox2.Text = textBox1.Text;
-            inputString = textBox1.Text;
-            inputStream = new AntlrInputStream(inputString);
-            mySqlLexer = new MySqlLexer(inputStream);
-            commonTokenStream = new CommonTokenStream(mySqlLexer);
-            mySqlParser = new MySqlParser(commonTokenStream);
-            mySqlParser.BuildParseTree = true;
-            tree = mySqlParser.root();
-            treeNodeDrawable = new CommonNode(tree);
-            vTree = new TreeVisitor(treeNodeDrawable);
-            walker = new ParseTreeWalker();
-            listener = new MyMySQLListener();
-            walker.Walk(listener, tree);
-            #endregion
+            GetTree();
         }
 
         #region чек сериализации
@@ -221,6 +207,7 @@ namespace MySQL_Clear_standart
         private void button4_Click(object sender, EventArgs e)
         {
             //составление запросов SELECT
+            GetTree();
             _selectQuerry = new SelectStructure[listener.TableNames.Count];
             listener.TableNames.Sort();
             foreach (WhereStructure ws in listener.WhereList)
@@ -247,12 +234,6 @@ namespace MySQL_Clear_standart
             ReSize();
         }
 
-        private void ReSize()
-        {
-            textBox2.Width = textBox3.Width = (tabPage2.Width - 212) / 2;
-            textBox3.Location = new Point(textBox2.Location.X + 200 + textBox2.Width, textBox3.Location.Y);
-        }
-
         private void Form1_Load(object sender, EventArgs e)
         {
             FillScheme();
@@ -266,16 +247,45 @@ namespace MySQL_Clear_standart
            
         }
 
+
+
+        private void GetTree()
+        {
+            textBox2.Text = textBox1.Text;
+            inputString = textBox1.Text;
+            inputStream = new AntlrInputStream(inputString);
+            mySqlLexer = new MySqlLexer(inputStream);
+            commonTokenStream = new CommonTokenStream(mySqlLexer);
+            mySqlParser = new MySqlParser(commonTokenStream);
+            mySqlParser.BuildParseTree = true;
+            tree = mySqlParser.root();
+            treeNodeDrawable = new CommonNode(tree);
+            vTree = new TreeVisitor(treeNodeDrawable);
+            walker = new ParseTreeWalker();
+            listener = new MyMySQLListener();
+            walker.Walk(listener, tree);
+        }
+        private void ReSize()
+        {
+            textBox2.Width = textBox3.Width = (tabPage2.Width - 212) / 2;
+            textBox3.Location = new Point(textBox2.Location.X + 200 + textBox2.Width, textBox3.Location.Y);
+        }
         private List<string> GetClearColumns(List<string> allColumns, List<string> removeColumns, TableStructure table)
         {
-            List<string> midList = new List<string>();
+            List<string> inList = allColumns;
             List<string> outList = new List<string>();
-            for (int i = 0; i < allColumns.Count; i++)
+            int j = 0;
+            for (int i = 0; i < inList.Count; i++)
             {
-               
+                if (j < removeColumns.Count && inList[i] == removeColumns[j])
+                {
+                    inList.Remove(inList[i]);
+                    i = 0;
+                    j++;
+                }
             }
-            midList = midList.Distinct().ToList();
-            foreach (string allColumn in midList)
+            inList = inList.Distinct().ToList();
+            foreach (string allColumn in inList)
             {
                 for (int i = 0; i < table.Columns.Length; i++)
                 {
@@ -287,6 +297,16 @@ namespace MySQL_Clear_standart
                 }
             }
             return outList;
+        }
+
+        private void textBox1_TextChanged(object sender, EventArgs e)
+        {
+            textBox2.Text = textBox1.Text;
+        }
+
+        private void textBox2_TextChanged(object sender, EventArgs e)
+        {
+            textBox1.Text = textBox2.Text;
         }
     }
 }
