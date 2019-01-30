@@ -34,11 +34,6 @@ namespace MySQL_Clear_standart
        */
 
         private DataBaseStructure _dbName;
-        private TableStructure[] _table;
-        private ColumnStructure[] _orderColumns;
-        private ColumnStructure[] _lineitemColumns;
-        private ColumnStructure[] _customerColumns;
-
         private void FillScheme()
         {
             #region Устаревший метод заполнения схемы БД.
@@ -72,8 +67,6 @@ namespace MySQL_Clear_standart
                 _dbName = (DataBaseStructure) dbCreateSerializer.Deserialize(dbCreateFileStream);
             }
         }
-
-
         #endregion
         private SelectStructure[] _selectQuerry;
        
@@ -112,8 +105,9 @@ namespace MySQL_Clear_standart
         private void button1_Click(object sender, EventArgs e)
         {
             //Кнопка для картинки
+            GetTree();
             DefaultOutput();
-           // output = 
+            //output = 
             textBox1.Text = output;
         }
 
@@ -144,33 +138,81 @@ namespace MySQL_Clear_standart
             textBox1.Text = "SELECT\r\n\tL_ORDERKEY,\r\n\tSUM(L_EXTENDEDPRICE * (1 - L_DISCOUNT)) AS REVENUE,\r\n\tO_ORDERDATE,\r\n\tO_SHIPPRIORITY\r\nFROM\r\n\tCUSTOMER,\r\n\tORDERS,\r\n\tLINEITEM\r\nWHERE\r\n\tC_MKTSEGMENT = \'HOUSEHOLD\'\r\n\tAND C_CUSTKEY = O_CUSTKEY\r\n\tAND L_ORDERKEY = O_ORDERKEY\r\n\tAND O_ORDERDATE < \'1995-03-31\'\r\n\tAND L_SHIPDATE  > \'1995-03-31\'\r\nGROUP BY\r\n\tL_ORDERKEY,\r\n\tO_ORDERDATE,\r\n\tO_SHIPPRIORITY\r\nORDER BY\r\n\tREVENUE DESC,\r\n\tO_ORDERDATE;\r\n";
         }
 
+        private void button4_Click(object sender, EventArgs e)
+        {
+            //составление запросов SELECT
+            GetTree();
+            _selectQuerry = new SelectStructure[listener.TableNames.Count];
+            //listener.TableNames.Sort();
+            foreach (WhereStructure ws in listener.WhereList)
+            {
+                ws.FindeTable(_dbName);
+            }
+
+            for (int i = 0; i < listener.TableNames.Count; i++)
+            {
+                _selectQuerry[i] = new SelectStructure("s" + i.ToString(), listener.TableNames[i],
+                                       GetClearColumns(listener.ColumnNames, listener.ExprColumnNames,
+                                           GetCorrectTable(listener.TableNames[i], _dbName)),
+                                            listener.WhereList);
+            }
+
+            textBox3.Clear();
+            for (int i = 0; i < _selectQuerry.Length; i++)
+            {
+                textBox3.Text += "\r\n========" + _selectQuerry[i].Name + "=========\r\n";
+                textBox3.Text += _selectQuerry[i].Output + "\r\n";
+            }
+        }
+
+        private void Form1_SizeChanged(object sender, EventArgs e)
+        {
+            ReSize();
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            FillScheme();
+            ReSize();
+            GetTree();
+            using (FileStream fs = new FileStream("db_result.xml", FileMode.Create, FileAccess.ReadWrite))
+            {
+                XmlSerializer dbSerializer = new XmlSerializer(typeof(DataBaseStructure));
+                dbSerializer.Serialize(fs, _dbName);
+            }
+
+
+        }
+
+        private void textBox1_TextChanged(object sender, EventArgs e)
+        {
+            textBox2.Text = textBox1.Text;
+        }
+
+        private void textBox2_TextChanged(object sender, EventArgs e)
+        {
+            textBox1.Text = textBox2.Text;
+        }
+
+
+        private TableStructure GetCorrectTable(string listenerTable, DataBaseStructure db)
+        {
+            TableStructure outTable = new TableStructure();
+            foreach (TableStructure table in db.Tables)
+            {
+                if (table.Name == listenerTable)
+                {
+                    outTable = table;
+                    break;
+                }
+            }
+
+            return outTable;
+        }
         private void DefaultOutput()
         {
-            #region вынесено в зону видимости класса
-
-            //string inputString = textBox1.Text;
-            //string output = " ";
-            //ICharStream inputStream = new AntlrInputStream(inputString);
-            //ITokenSource mySqlLexer = new MySqlLexer(inputStream);
-            //CommonTokenStream commonTokenStream = new CommonTokenStream(mySqlLexer);
-            //MySqlParser mySqlParser = new MySqlParser(commonTokenStream);
-            //mySqlParser.BuildParseTree = true;
-            //IParseTree tree = mySqlParser.root();
-            //var treeNodeDrawable = new CommonNode(tree);
-            //TreeVisitor vTree = new TreeVisitor(treeNodeDrawable);
-            //if (pictureBox1.Image != null)
-            //{
-            //    pictureBox1.Image.Dispose();
-            //    pictureBox1.Image = null;
-            //}
-            //ParseTreeWalker walker = new ParseTreeWalker();
-            //MyMySQLListener listener = new MyMySQLListener();
-            //walker.Walk(listener, tree);
-            #endregion
-            
 
             output += "\r\n========TableNames============\r\n";
-           
             foreach (string tableName in listener.TableNames)
             {
                 output += tableName + "\r\n";
@@ -204,51 +246,6 @@ namespace MySQL_Clear_standart
             pictureBox1.Image = image;
         }
 
-        private void button4_Click(object sender, EventArgs e)
-        {
-            //составление запросов SELECT
-            GetTree();
-            _selectQuerry = new SelectStructure[listener.TableNames.Count];
-            listener.TableNames.Sort();
-            foreach (WhereStructure ws in listener.WhereList)
-            {
-                ws.FindeTable(_dbName);
-            }
-            for (int i = 0; i < listener.TableNames.Count; i++)
-            {
-                _selectQuerry[i] = new SelectStructure("s" + i.ToString(), listener.TableNames[i], 
-                    GetClearColumns(listener.ColumnNames, listener.ExprColumnNames, _dbName.Tables[i]),
-                    listener.WhereList);
-            }
-
-            textBox3.Clear();
-            for (int i = 0; i < _selectQuerry.Length; i++)
-            {
-                textBox3.Text += "\r\n========" + _selectQuerry[i].Name + "=========\r\n";
-                textBox3.Text += _selectQuerry[i].Output + "\r\n";
-            }
-        }
-
-        private void Form1_SizeChanged(object sender, EventArgs e)
-        {
-            ReSize();
-        }
-
-        private void Form1_Load(object sender, EventArgs e)
-        {
-            FillScheme();
-            ReSize();
-            using (FileStream fs = new FileStream("db_result.xml", FileMode.Create, FileAccess.ReadWrite))
-            {
-                XmlSerializer dbSerializer = new XmlSerializer(typeof(DataBaseStructure));
-                dbSerializer.Serialize(fs, _dbName);
-            }
-            
-           
-        }
-
-
-
         private void GetTree()
         {
             textBox2.Text = textBox1.Text;
@@ -265,11 +262,13 @@ namespace MySQL_Clear_standart
             listener = new MyMySQLListener();
             walker.Walk(listener, tree);
         }
+
         private void ReSize()
         {
             textBox2.Width = textBox3.Width = (tabPage2.Width - 212) / 2;
             textBox3.Location = new Point(textBox2.Location.X + 200 + textBox2.Width, textBox3.Location.Y);
         }
+
         private List<string> GetClearColumns(List<string> allColumns, List<string> removeColumns, TableStructure table)
         {
             List<string> inList = allColumns;
@@ -299,14 +298,5 @@ namespace MySQL_Clear_standart
             return outList;
         }
 
-        private void textBox1_TextChanged(object sender, EventArgs e)
-        {
-            textBox2.Text = textBox1.Text;
-        }
-
-        private void textBox2_TextChanged(object sender, EventArgs e)
-        {
-            textBox1.Text = textBox2.Text;
-        }
     }
 }
