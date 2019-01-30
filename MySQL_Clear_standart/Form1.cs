@@ -143,7 +143,6 @@ namespace MySQL_Clear_standart
             //составление запросов SELECT
             GetTree();
             _selectQuerry = new SelectStructure[listener.TableNames.Count];
-            //listener.TableNames.Sort();
             foreach (WhereStructure ws in listener.WhereList)
             {
                 ws.FindeTable(_dbName);
