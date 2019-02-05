@@ -15,6 +15,7 @@ namespace MySQL_Clear_standart
         public List<string> ColumnNames = new List<string>();
         public List<string> ExprColumnNames = new List<string>();
         public List<WhereStructure> WhereList = new List<WhereStructure>();
+        private bool _triggerAggregateWindowedFunction = false;
         public string _return = "Return:\r\n";
         public string _asString;
 
@@ -26,7 +27,7 @@ namespace MySQL_Clear_standart
         public override void EnterQuerySpecification([NotNull] MySqlParser.QuerySpecificationContext context)
         {
             //_return += context.Start.Text + " " + context.Start.Type + "!! \r\n";
-            _return += context.getAltNumber() + "!! \r\n";
+            //_return += context.getAltNumber() + "!! \r\n";
         }
         public override void EnterFullColumnName([NotNull] MySqlParser.FullColumnNameContext context)
         {
@@ -49,6 +50,30 @@ namespace MySQL_Clear_standart
                 ExprColumnNames.Add(context.left.GetText());
                 WhereList.Add(new WhereStructure(context.Payload.GetText(), context.left.GetText()));
             }
+        }
+
+        public override void EnterAggregateFunctionCall([NotNull] MySqlParser.AggregateFunctionCallContext context)
+        {
+            _triggerAggregateWindowedFunction = true;
+        }
+
+        public override void ExitAggregateFunctionCall([NotNull] MySqlParser.AggregateFunctionCallContext context)
+        {
+            _triggerAggregateWindowedFunction = false;
+        }
+
+        public override void EnterFullColumnNameExpressionAtom(
+            [NotNull] MySqlParser.FullColumnNameExpressionAtomContext context)
+        {
+            if (_triggerAggregateWindowedFunction)
+            {
+                ExprColumnNames.Add(context.GetText());
+            }
+        }
+
+        public override void EnterSelectFunctionElement([NotNull] MySqlParser.SelectFunctionElementContext context)
+        {
+            _return += context.functionCall().GetText();
         }
     }
 }
