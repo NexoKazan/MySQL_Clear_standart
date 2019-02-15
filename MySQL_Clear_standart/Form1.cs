@@ -235,7 +235,7 @@ namespace MySQL_Clear_standart
                 _selectQuerry[i] = new SelectStructure("s" + i.ToString(), listener.TableNames[i],
                                        GetClearColumns(listener.ColumnNames, listener.ExprColumnNames,
                                            GetCorrectTable(listener.TableNames[i], _dbName)),
-                                            listener.WhereList, listener.AsList);
+                                            listener.WhereList, GetCorrectAsStructure(listener.AsList, listener.TableNames[i]));
             }
 
             textBox3.Clear();
@@ -317,6 +317,7 @@ namespace MySQL_Clear_standart
 
             return outTable;
         }
+
         private void DefaultOutput()
         {
 
@@ -404,6 +405,18 @@ namespace MySQL_Clear_standart
             }
             return outList;
         }
-        
+
+        private List<AsStructure> GetCorrectAsStructure(List<AsStructure> asStructures, string tableName)
+        {
+            List<AsStructure> outList = new List<AsStructure>();
+            foreach (var asStructure in asStructures)
+            {
+                if (asStructure.Table == tableName)
+                {
+                    outList.Add(asStructure);
+                }
+            }
+            return outList;
+        }
     }
 }

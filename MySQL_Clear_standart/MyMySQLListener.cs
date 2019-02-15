@@ -15,9 +15,13 @@ namespace MySQL_Clear_standart
         public List<string> ColumnNames = new List<string>();
         public List<string> ExprColumnNames = new List<string>();
         public List<WhereStructure> WhereList = new List<WhereStructure>();
-        private List<string> _asColumnList;
         public List<AsStructure> AsList = new List<AsStructure>();
+
+        private List<string> _asColumnList;
+
         private bool _triggerAggregateWindowedFunction = false;
+        private string _asArg = "";
+
         public string _return = "Return:\r\n";
 
         public override void EnterUid([NotNull] MySqlParser.UidContext context) {
@@ -40,7 +44,7 @@ namespace MySQL_Clear_standart
         }
         public override void ExitSelectFunctionElement([NotNull] MySqlParser.SelectFunctionElementContext context)
         {
-            AsList.Add(new AsStructure(_asColumnList, context.functionCall().GetText()));
+            AsList.Add(new AsStructure(_asColumnList, _asArg, context.uid().GetText()));
         }
        
         public override void EnterBinaryComparasionPredicate([NotNull] MySqlParser.BinaryComparasionPredicateContext context)
@@ -79,7 +83,10 @@ namespace MySQL_Clear_standart
             //AsList.Add(new AsStructure(_asColumnList, context.functionCall().GetText()));
            // _return += context.functionCall().GetText();
         }
-        
 
+        public override void EnterFunctionArg([NotNull] MySqlParser.FunctionArgContext context)
+        {
+            _asArg = context.GetText();
+        }
     }
 }

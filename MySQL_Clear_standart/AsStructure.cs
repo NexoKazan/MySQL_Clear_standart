@@ -9,16 +9,18 @@ namespace MySQL_Clear_standart
 {
     class AsStructure
     {
+        private string _asRightName;
         private string _table;
         private string _string; //переименовать
         private bool _isSelectPart = false;
         private List<string> _asColumnList;
         private List<TableStructure> _asTables;
 
-        public AsStructure(List<string> asColumns, string asString)
+        public AsStructure(List<string> asColumns, string asString, string asRightName)
         {
             _asColumnList = asColumns;
             _string = asString;
+            _asRightName = asRightName;
         }
 
         public string Table
@@ -30,6 +32,11 @@ namespace MySQL_Clear_standart
         public string GetAsString
         {
             get { return _string; }
+        }
+
+        public string GetAsRightName
+        {
+            get { return _asRightName; }
         }
 
         public bool IsSelectPart

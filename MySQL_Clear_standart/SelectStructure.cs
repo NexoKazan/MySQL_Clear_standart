@@ -46,6 +46,11 @@ namespace MySQL_Clear_standart
                 _output +="\r\n\t" + s + " ";
             }
 
+            foreach (var asStructure in _asList)
+            {
+                _output += "\r\n\t" + asStructure.GetAsString + " AS " +asStructure.GetAsRightName;
+            }
+
             _output += "\r\n" + "FROM " + "\r\n\t" + _tableName + "\r\n" + "WHERE ";
             foreach (WhereStructure whereStructure in _whereList)
             {
