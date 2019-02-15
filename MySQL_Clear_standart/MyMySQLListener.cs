@@ -15,9 +15,10 @@ namespace MySQL_Clear_standart
         public List<string> ColumnNames = new List<string>();
         public List<string> ExprColumnNames = new List<string>();
         public List<WhereStructure> WhereList = new List<WhereStructure>();
+        private List<string> _asColumnList;
+        public List<AsStructure> AsList = new List<AsStructure>();
         private bool _triggerAggregateWindowedFunction = false;
         public string _return = "Return:\r\n";
-        public string _asString;
 
         public override void EnterUid([NotNull] MySqlParser.UidContext context) {
             //nodeText += context.GetText() + " ";
@@ -39,7 +40,7 @@ namespace MySQL_Clear_standart
         }
         public override void ExitSelectFunctionElement([NotNull] MySqlParser.SelectFunctionElementContext context)
         {
-            _asString += context.uid().GetText();
+            AsList.Add(new AsStructure(_asColumnList, context.functionCall().GetText()));
         }
        
         public override void EnterBinaryComparasionPredicate([NotNull] MySqlParser.BinaryComparasionPredicateContext context)
@@ -54,6 +55,7 @@ namespace MySQL_Clear_standart
 
         public override void EnterAggregateFunctionCall([NotNull] MySqlParser.AggregateFunctionCallContext context)
         {
+            _asColumnList = new List<string>();
             _triggerAggregateWindowedFunction = true;
         }
 
@@ -67,13 +69,17 @@ namespace MySQL_Clear_standart
         {
             if (_triggerAggregateWindowedFunction)
             {
+                _asColumnList.Add(context.GetText());
                 ExprColumnNames.Add(context.GetText());
             }
         }
 
         public override void EnterSelectFunctionElement([NotNull] MySqlParser.SelectFunctionElementContext context)
         {
-            _return += context.functionCall().GetText();
+            //AsList.Add(new AsStructure(_asColumnList, context.functionCall().GetText()));
+           // _return += context.functionCall().GetText();
         }
+        
+
     }
 }
