@@ -17,25 +17,11 @@ namespace MySQL_Clear_standart
         public List<string> ExprColumnNames = new List<string>();
         public List<WhereStructure> WhereList = new List<WhereStructure>();
         public List<AsStructure> AsList = new List<AsStructure>();
-
-        private List<string> _asColumnList;
-
-        private bool _triggerAggregateWindowedFunction = false;
+        
         private bool _triggerEnterSelectFunctionElemenAsExist = false;
-        private string _asArg = "";
 
         public string _return = "Return:\r\n";
 
-        public override void EnterUid([NotNull] MySqlParser.UidContext context) {
-            //nodeText += context.GetText() + " ";
-            //_return += context.Stop.Text + "!! \r\n";
-        }
-
-        public override void EnterQuerySpecification([NotNull] MySqlParser.QuerySpecificationContext context)
-        {
-            //_return += context.Start.Text + " " + context.Start.Type + "!! \r\n";
-            //_return += context.getAltNumber() + "!! \r\n";
-        }
         public override void EnterFullColumnName([NotNull] MySqlParser.FullColumnNameContext context)
         {
             ColumnNames.Add(context.GetText());
@@ -52,31 +38,17 @@ namespace MySQL_Clear_standart
                 AsListener asl = new AsListener();
                 ParseTreeWalker wlk = new ParseTreeWalker();
                 wlk.Walk(asl, context);
-                AsList.Add(new AsStructure(asl.AsColumnList, asl._output, context.uid().GetText()));
+                AsList.Add(new AsStructure(asl.AsColumnList, asl._output, asl._functionOutput, context.uid().GetText()));
                 ExprColumnNames.AddRange(asl.AsColumnList);
-                _triggerEnterSelectFunctionElemenAsExist = true;
-            }
-            else
-            {
-                _triggerEnterSelectFunctionElemenAsExist = false;
             }
         }
 
-        public override void ExitSelectFunctionElement([NotNull] MySqlParser.SelectFunctionElementContext context)
-        {
-            if (_triggerEnterSelectFunctionElemenAsExist)
-            {
-                _triggerEnterSelectFunctionElemenAsExist = false;
-            }
-        }
-       
         public override void EnterBinaryComparasionPredicate([NotNull] MySqlParser.BinaryComparasionPredicateContext context)
         {
-            //_return += context.Stop.Text + context.Stop.Type + "!! \r\n";
             if (context.Stop.Type != 968)
             {
                 ExprColumnNames.Add(context.left.GetText());
-                WhereList.Add(new WhereStructure(context.Payload.GetText(), context.left.GetText()));
+                WhereList.Add(new WhereStructure(context.GetText(), context.left.GetText()));
             }
         }
         

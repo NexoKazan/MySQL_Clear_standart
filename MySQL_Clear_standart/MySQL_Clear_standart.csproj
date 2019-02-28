@@ -56,7 +56,6 @@
     <Compile Include="DataBaseSchemeStructure\TableStructure.cs" />
     <Compile Include="Listeners\AsListener.cs" />
     <Compile Include="Listeners\MyMySQLListener.cs" />
-    <Compile Include="MySQLFunctionListener.cs" />
     <Compile Include="SelectStructure.cs" />
     <Compile Include="Visual\CommonNode.cs" />
     <Compile Include="Form1.cs">

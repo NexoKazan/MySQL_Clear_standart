@@ -11,16 +11,22 @@ namespace MySQL_Clear_standart
     {
         private string _asRightName;
         private string _table;
-        private string _string; //переименовать
+        private string _clearString; //переименовать
+        private string _asString;
+        private string _functionString;
         private bool _isSelectPart = false;
+        private bool _isSingleColumn = false;
+        private bool _isSortPart = false;
         private List<string> _asColumnList;
         private List<TableStructure> _asTables;
 
-        public AsStructure(List<string> asColumns, string asString, string asRightName)
+        public AsStructure(List<string> asColumns, string asString, string functionString, string asRightName)
         {
             _asColumnList = asColumns;
-            _string = asString;
+            _clearString = asString;
             _asRightName = asRightName;
+            _functionString = functionString;
+            _asString = asString;
         }
 
         public string Table
@@ -29,9 +35,9 @@ namespace MySQL_Clear_standart
             set { _table = value; }
         }
 
-        public string GetAsString
+        public string AsString
         {
-            get { return _string; }
+            get { return _asString; }
         }
 
         public string GetAsRightName
@@ -43,6 +49,12 @@ namespace MySQL_Clear_standart
         {
             get { return _isSelectPart; }
             set { _isSelectPart = value; }
+        }
+
+        public bool IsSingleColumn
+        {
+            get { return _isSingleColumn; }
+            set { _isSingleColumn = value; }
         }
 
         public void FindeTable(DataBaseStructure db)
@@ -73,6 +85,13 @@ namespace MySQL_Clear_standart
             {
                 _isSelectPart = false;
                 _table = "Error! _asTables.Count";
+            }
+
+            if (_asColumnList.Count == 1)
+            {
+                _asString = _functionString;
+                _isSelectPart = true;
+                _isSingleColumn = true;
             }
         }
     }

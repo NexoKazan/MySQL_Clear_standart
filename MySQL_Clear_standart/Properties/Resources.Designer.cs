@@ -59,23 +59,5 @@ namespace MySQL_Clear_standart.Properties {
                 resourceCulture = value;
             }
         }
-        
-        /// <summary>
-        ///   Ищет локализованную строку, похожую на &lt;?xml version=&quot;1.0&quot;?&gt;
-        ///&lt;DataBaseStructure xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot; xmlns:xsd=&quot;http://www.w3.org/2001/XMLSchema&quot; Name=&quot;TPCH&quot;&gt;
-        ///  &lt;Tables&gt;
-        ///    &lt;TableStructure Name=&quot;CUSTOMER&quot;&gt;
-        ///      &lt;Columns&gt;
-        ///        &lt;ColumnStructure IsPrimary=&quot;false&quot; Name=&quot;C_CUSTKEY&quot; /&gt;
-        ///        &lt;ColumnStructure IsPrimary=&quot;false&quot; Name=&quot;C_NAME&quot; /&gt;
-        ///        &lt;ColumnStructure IsPrimary=&quot;false&quot; Name=&quot;C_ADDRESS&quot; /&gt;
-        ///        &lt;ColumnStructure IsPrimary=&quot;false&quot; Name=&quot;C_NATIONKEY&quot; /&gt;
-        ///        &lt;ColumnStructure IsPrimary= [остаток строки не уместился]&quot;;.
-        /// </summary>
-        internal static string dbr {
-            get {
-                return ResourceManager.GetString("dbr", resourceCulture);
-            }
-        }
     }
 }

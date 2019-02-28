@@ -10,6 +10,7 @@ namespace MySQL_Clear_standart.Listeners
     class AsListener: MySqlParserBaseListener
     {
         public string _output;
+        public string _functionOutput;
 
         public List<string> AsColumnList= new List<string>();
 
@@ -22,5 +23,11 @@ namespace MySQL_Clear_standart.Listeners
         {
             AsColumnList.Add(context.GetText());
         }
+
+        public override void EnterAggregateFunctionCall([NotNull] MySqlParser.AggregateFunctionCallContext context)
+        {
+            _functionOutput = context.GetText();
+        }
+
     }
 }
