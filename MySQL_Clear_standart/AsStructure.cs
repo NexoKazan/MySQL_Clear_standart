@@ -67,6 +67,7 @@ namespace MySQL_Clear_standart
             {
                 _isSelectPart = true;
                 _table = _asTables[0].Name;
+                _asRightName = _asTables[0].ShortName + _asRightName;
             }
             else
             {

@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Antlr4.Runtime.Tree;
+using MySQL_Clear_standart.Listeners;
 
 namespace MySQL_Clear_standart
 {
@@ -20,6 +21,7 @@ namespace MySQL_Clear_standart
         private List<string> _asColumnList;
 
         private bool _triggerAggregateWindowedFunction = false;
+        private bool _triggerEnterSelectFunctionElemenAsExist = false;
         private string _asArg = "";
 
         public string _return = "Return:\r\n";
@@ -42,9 +44,30 @@ namespace MySQL_Clear_standart
         {
             TableNames.Add(context.GetText());
         }
+
+        public override void EnterSelectFunctionElement([NotNull] MySqlParser.SelectFunctionElementContext context)
+        {
+            if (context.AS() != null)
+            {
+                AsListener asl = new AsListener();
+                ParseTreeWalker wlk = new ParseTreeWalker();
+                wlk.Walk(asl, context);
+                AsList.Add(new AsStructure(asl.AsColumnList, asl._output, context.uid().GetText()));
+                ExprColumnNames.AddRange(asl.AsColumnList);
+                _triggerEnterSelectFunctionElemenAsExist = true;
+            }
+            else
+            {
+                _triggerEnterSelectFunctionElemenAsExist = false;
+            }
+        }
+
         public override void ExitSelectFunctionElement([NotNull] MySqlParser.SelectFunctionElementContext context)
         {
-            AsList.Add(new AsStructure(_asColumnList, _asArg, context.uid().GetText()));
+            if (_triggerEnterSelectFunctionElemenAsExist)
+            {
+                _triggerEnterSelectFunctionElemenAsExist = false;
+            }
         }
        
         public override void EnterBinaryComparasionPredicate([NotNull] MySqlParser.BinaryComparasionPredicateContext context)
@@ -56,37 +79,6 @@ namespace MySQL_Clear_standart
                 WhereList.Add(new WhereStructure(context.Payload.GetText(), context.left.GetText()));
             }
         }
-
-        public override void EnterAggregateFunctionCall([NotNull] MySqlParser.AggregateFunctionCallContext context)
-        {
-            _asColumnList = new List<string>();
-            _triggerAggregateWindowedFunction = true;
-        }
-
-        public override void ExitAggregateFunctionCall([NotNull] MySqlParser.AggregateFunctionCallContext context)
-        {
-            _triggerAggregateWindowedFunction = false;
-        }
-
-        public override void EnterFullColumnNameExpressionAtom(
-            [NotNull] MySqlParser.FullColumnNameExpressionAtomContext context)
-        {
-            if (_triggerAggregateWindowedFunction)
-            {
-                _asColumnList.Add(context.GetText());
-                ExprColumnNames.Add(context.GetText());
-            }
-        }
-
-        public override void EnterSelectFunctionElement([NotNull] MySqlParser.SelectFunctionElementContext context)
-        {
-            //AsList.Add(new AsStructure(_asColumnList, context.functionCall().GetText()));
-           // _return += context.functionCall().GetText();
-        }
-
-        public override void EnterFunctionArg([NotNull] MySqlParser.FunctionArgContext context)
-        {
-            _asArg = context.GetText();
-        }
+        
     }
 }

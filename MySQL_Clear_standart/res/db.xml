@@ -1,0 +1,94 @@
+<?xml version="1.0"?>
+<DataBaseStructure xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Name="TPCH">
+  <Tables>
+    <TableStructure Name="CUSTOMER" ShortName="C_">
+      <Columns>
+        <ColumnStructure IsPrimary="false" Name="C_CUSTKEY" />
+        <ColumnStructure IsPrimary="false" Name="C_NAME" />
+        <ColumnStructure IsPrimary="false" Name="C_ADDRESS" />
+        <ColumnStructure IsPrimary="false" Name="C_NATIONKEY" />
+        <ColumnStructure IsPrimary="false" Name="C_PHONE" />
+        <ColumnStructure IsPrimary="false" Name="C_ACCTBAL" />
+        <ColumnStructure IsPrimary="false" Name="C_MKTSEGMENT" />
+        <ColumnStructure IsPrimary="false" Name="C_COMMENT" />
+      </Columns>
+    </TableStructure>
+    <TableStructure Name="LINEITEM" ShortName="L_">
+      <Columns>
+        <ColumnStructure IsPrimary="false" Name="L_ORDERKEY" />
+        <ColumnStructure IsPrimary="false" Name="L_PARTKEY" />
+        <ColumnStructure IsPrimary="false" Name="L_SUPPKEY" />
+        <ColumnStructure IsPrimary="false" Name="L_LINENUMBER" />
+        <ColumnStructure IsPrimary="false" Name="L_QUANTITY" />
+        <ColumnStructure IsPrimary="false" Name="L_EXTENDEDPRICE" />
+        <ColumnStructure IsPrimary="false" Name="L_DISCOUNT" />
+        <ColumnStructure IsPrimary="false" Name="L_TAX" />
+        <ColumnStructure IsPrimary="false" Name="L_RETURNFLAG" />
+        <ColumnStructure IsPrimary="false" Name="L_LINESTATUS" />
+        <ColumnStructure IsPrimary="false" Name="L_SHIPDATE" />
+        <ColumnStructure IsPrimary="false" Name="L_COMMITDATE" />
+        <ColumnStructure IsPrimary="false" Name="L_RECEIPTDATE" />
+        <ColumnStructure IsPrimary="false" Name="L_SHIPINSTRUCT" />
+        <ColumnStructure IsPrimary="false" Name="L_SHIPMODE" />
+        <ColumnStructure IsPrimary="false" Name="L_COMMENT" />
+      </Columns>
+    </TableStructure>
+    <TableStructure Name="ORDERS" ShortName="O_">
+      <Columns>
+        <ColumnStructure IsPrimary="false" Name="O_ORDERKEY" />
+        <ColumnStructure IsPrimary="false" Name="O_CUSTKEY" />
+        <ColumnStructure IsPrimary="false" Name="O_ORDERSTATUS" />
+        <ColumnStructure IsPrimary="false" Name="O_TOTALPRICE" />
+        <ColumnStructure IsPrimary="false" Name="O_ORDERDATE" />
+        <ColumnStructure IsPrimary="false" Name="O_ORDERPRIORITY" />
+        <ColumnStructure IsPrimary="false" Name="O_CLERK" />
+        <ColumnStructure IsPrimary="false" Name="O_SHIPPRIORITY" />
+		    <ColumnStructure IsPrimary="false" Name="O_COMMENT" />
+      </Columns>
+    </TableStructure>
+	<TableStructure Name="REGION" ShortName="R_">
+      <Columns>
+        <ColumnStructure IsPrimary="false" Name="R_REGIONKEY" />
+        <ColumnStructure IsPrimary="false" Name="R_NAME" />
+        <ColumnStructure IsPrimary="false" Name="R_COMMENT" />
+      </Columns>
+    </TableStructure><TableStructure Name="NATION" ShortName="N_">
+      <Columns>
+        <ColumnStructure IsPrimary="false" Name="N_NATIONKEY" />
+        <ColumnStructure IsPrimary="false" Name="N_NAME" />
+        <ColumnStructure IsPrimary="false" Name="N_REGIONKEY" />
+        <ColumnStructure IsPrimary="false" Name="N_COMMENT" />
+      </Columns>
+    </TableStructure><TableStructure Name="PARTSUPP" ShortName="PS_">
+      <Columns>
+        <ColumnStructure IsPrimary="false" Name="PS_PARTKEY" />
+        <ColumnStructure IsPrimary="false" Name="PS_SUPPKEY" />
+        <ColumnStructure IsPrimary="false" Name="PS_AVAILQTY" />
+        <ColumnStructure IsPrimary="false" Name="PS_SUPPLYCOST" />
+        <ColumnStructure IsPrimary="false" Name="PS_COMMENT" />
+      </Columns>
+    </TableStructure><TableStructure Name="SUPPLIER" ShortName="S_">
+      <Columns>
+        <ColumnStructure IsPrimary="false" Name="S_CUSTKEY" />
+        <ColumnStructure IsPrimary="false" Name="S_NAME" />
+        <ColumnStructure IsPrimary="false" Name="S_ADDRESS" />
+        <ColumnStructure IsPrimary="false" Name="S_NATIONKEY" />
+        <ColumnStructure IsPrimary="false" Name="S_PHONE" />
+        <ColumnStructure IsPrimary="false" Name="S_ACCTBAL" />
+        <ColumnStructure IsPrimary="false" Name="S_COMMENT" />
+      </Columns>
+    </TableStructure><TableStructure Name="PART" ShortName="P_">
+      <Columns>
+        <ColumnStructure IsPrimary="false" Name="P_PARTKEY" />
+        <ColumnStructure IsPrimary="false" Name="P_NAME" />
+        <ColumnStructure IsPrimary="false" Name="P_MFGR" />
+        <ColumnStructure IsPrimary="false" Name="P_BRAND" />
+        <ColumnStructure IsPrimary="false" Name="P_TYPE" />
+        <ColumnStructure IsPrimary="false" Name="P_SIZE" />
+        <ColumnStructure IsPrimary="false" Name="P_CONTAINER" />
+        <ColumnStructure IsPrimary="false" Name="P_RETAILPRICE" />
+        <ColumnStructure IsPrimary="false" Name="P_COMMENT" />
+      </Columns>
+    </TableStructure>
+  </Tables>
+</DataBaseStructure>

@@ -72,9 +72,9 @@ namespace MySQL_Clear_standart.Properties {
         ///        &lt;ColumnStructure IsPrimary=&quot;false&quot; Name=&quot;C_NATIONKEY&quot; /&gt;
         ///        &lt;ColumnStructure IsPrimary= [остаток строки не уместился]&quot;;.
         /// </summary>
-        internal static string db {
+        internal static string dbr {
             get {
-                return ResourceManager.GetString("db", resourceCulture);
+                return ResourceManager.GetString("dbr", resourceCulture);
             }
         }
     }

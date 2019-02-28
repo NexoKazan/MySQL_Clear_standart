@@ -54,7 +54,8 @@
     <Compile Include="DataBaseSchemeStructure\ColumnStructure.cs" />
     <Compile Include="DataBaseSchemeStructure\DataBaseStructure.cs" />
     <Compile Include="DataBaseSchemeStructure\TableStructure.cs" />
-    <Compile Include="MyMySQLListener.cs" />
+    <Compile Include="Listeners\AsListener.cs" />
+    <Compile Include="Listeners\MyMySQLListener.cs" />
     <Compile Include="MySQLFunctionListener.cs" />
     <Compile Include="SelectStructure.cs" />
     <Compile Include="Visual\CommonNode.cs" />
@@ -116,6 +117,14 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="bin\Debug\db.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="bin\Debug\dbr.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="res\db.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
