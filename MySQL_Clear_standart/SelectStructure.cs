@@ -41,9 +41,13 @@ namespace MySQL_Clear_standart
         private void CreateQuerry()
         {
             _output = "SELECT ";
-            foreach (string s in _columnsList)
+            for (int i = 0; i < _columnsList.Count; i++)
             {
-                _output +="\r\n\t" + s + " ";
+                _output += "\r\n\t" + _columnsList[i] + " ";
+                if (i!= _columnsList.Count-1)
+                {
+                    _output += ",";
+                }
             }
 
             foreach (var asStructure in _asList)

@@ -238,12 +238,16 @@ namespace MySQL_Clear_standart
 
         private void button5_Click(object sender, EventArgs e)
         {
+            //GetQuerryTreesScreens(@"D:\!Studing\Скриншоты деревьев\Originals\",12,14);
             //отладка
             pictureBox1.Visible = false;
             textBox1.Width = Width - 8;
             GetTree();
             output = "\r\n========Return================\r\n";
-            output += listener._return;
+            foreach (ColumnStructure columnStructure in _dbName.Tables[0].Columns)
+            {
+                output += columnStructure.Name + " " + columnStructure.Type + "\r\n";
+            }
             textBox1.Text = output;
         }
 
@@ -315,7 +319,7 @@ namespace MySQL_Clear_standart
             }
             if (Convert.ToInt16(comboBox1.Text) < 14)
             {
-                comboBox2.Text = (Convert.ToInt16(comboBox1.Text) + 1).ToString();
+                comboBox2.Text = (Convert.ToInt16(comboBox2.Text) + 1).ToString();
             }
             else
             {

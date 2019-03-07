@@ -47,11 +47,11 @@ namespace MySQL_Clear_standart.DataBaseSchemeStructure
             set { _name = value; }
         }
 
-
+        [XmlAttribute]
         public string Type
         {
             get { return _type; }
-            set { value = _type; }
+            set { _type = value; }
         }
     }
 }

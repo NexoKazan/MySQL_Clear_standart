@@ -86,13 +86,6 @@ namespace MySQL_Clear_standart
                 _isSelectPart = false;
                 _table = "Error! _asTables.Count";
             }
-
-            if (_asColumnList.Count == 1)
-            {
-                _asString = _functionString;
-                _isSelectPart = true;
-                _isSingleColumn = true;
-            }
         }
     }
 }
