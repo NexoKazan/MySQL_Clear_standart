@@ -1,0 +1,4 @@
+[submodule "ClusterixN"]
+	path = ClusterixN
+	url = https://bitbucket.org/rozh/clusterixn.git
+	branch = v1.10
