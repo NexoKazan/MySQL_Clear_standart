@@ -56,6 +56,7 @@
     <Compile Include="DataBaseSchemeStructure\TableStructure.cs" />
     <Compile Include="Listeners\AsListener.cs" />
     <Compile Include="Listeners\MyMySQLListener.cs" />
+    <Compile Include="Network\ClusterixClient.cs" />
     <Compile Include="SchemeCreator.cs" />
     <Compile Include="SelectStructure.cs" />
     <Compile Include="Visual\CommonNode.cs" />
@@ -126,6 +127,16 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <SubType>Designer</SubType>
     </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ClusterixN\ClusterixN.Common\ClusterixN.Common.csproj">
+      <Project>{82242b68-e565-456d-8fc4-14d97c041f90}</Project>
+      <Name>ClusterixN.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ClusterixN\ClusterixN.Network\ClusterixN.Network.csproj">
+      <Project>{11498144-c913-4946-81af-0b5e92c2fc05}</Project>
+      <Name>ClusterixN.Network</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Content Include="res\Types.xml" />
