@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using MySQL_Clear_standart.DataBaseSchemeStructure;
 
 namespace MySQL_Clear_standart
 {
@@ -13,8 +15,11 @@ namespace MySQL_Clear_standart
         private string _tableName;
         private static int _id = 0;
         private List<string> _columnsList;
+        private List<string> _outColumnNamesList;
         private List<WhereStructure> _whereList;
         private List<AsStructure> _asList;
+        private TableStructure[] _outTable;
+        private ColumnStructure[] _outColumn;
         
         public SelectStructure(string name, string tableName, List<string> columnsList, List<WhereStructure> whereList, List<AsStructure> asList)
         {
@@ -23,6 +28,21 @@ namespace MySQL_Clear_standart
             _columnsList = columnsList;
             _whereList = whereList;
             _asList = asList;
+            _outColumn = new ColumnStructure[columnsList.Count + asList.Count];
+            for (int i = 0; i < columnsList.Count + asList.Count;)
+            {
+                foreach (string column in columnsList)
+                {
+                    _outColumn[i] = new ColumnStructure(column);
+                    i++;
+                }
+
+                foreach (AsStructure structure in asList)
+                {
+                    _outColumn[i] = new ColumnStructure(structure.GetAsRightName);
+                    i++;
+                }
+            } 
         }
 
         public string Output
@@ -38,6 +58,17 @@ namespace MySQL_Clear_standart
         {
             get { return _name; }
         }
+
+        public string TableName
+        {
+            get { return _tableName; }
+        }
+
+        public ColumnStructure[] OutColumn
+        {
+            get { return _outColumn; }
+        }
+
         private void CreateQuerry()
         {
             _output = "SELECT ";

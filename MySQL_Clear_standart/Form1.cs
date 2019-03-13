@@ -244,9 +244,15 @@ namespace MySQL_Clear_standart
             textBox1.Width = Width - 8;
             GetTree();
             output = "\r\n========Return================\r\n";
-            foreach (ColumnStructure columnStructure in _dbName.Tables[0].Columns)
+            button4.PerformClick();
+
+            foreach (var selectStructure in _selectQuerry)
             {
-                output += columnStructure.Name + " " + columnStructure.Type + "\r\n";
+                output += selectStructure.Name + " " + selectStructure.OutColumn.Length;
+                for (int i = 0; i < selectStructure.OutColumn.Length; i++)
+                {
+                    output += selectStructure.OutColumn[i].Name + "\r\n";
+                }
             }
             textBox1.Text = output;
         }

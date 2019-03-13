@@ -30,6 +30,11 @@ namespace MySQL_Clear_standart
             get { return _string; }
         }
 
+        public string getLeftColumn
+        {
+            get { return _column; }
+        }
+
         public void FindeTable(DataBaseStructure db)
         {
             foreach (TableStructure table in db.Tables)
