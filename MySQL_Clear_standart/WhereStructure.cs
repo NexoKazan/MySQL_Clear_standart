@@ -34,19 +34,5 @@ namespace MySQL_Clear_standart
         {
             get { return _column; }
         }
-
-        public void FindeTable(DataBaseStructure db)
-        {
-            foreach (TableStructure table in db.Tables)
-            {
-                foreach (ColumnStructure column in table.Columns)
-                {
-                    if (column.Name == _column)
-                    {
-                        _table = table.Name;
-                    }
-                }
-            }
-        }
     }
 }

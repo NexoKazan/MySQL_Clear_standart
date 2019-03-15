@@ -16,7 +16,7 @@ namespace MySQL_Clear_standart
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new Form1());
+            Application.Run(new MySQL_Clear_standart.Form1());
         }
     }
 }

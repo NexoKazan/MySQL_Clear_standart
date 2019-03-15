@@ -210,22 +210,28 @@ namespace MySQL_Clear_standart
             //составление запросов SELECT
             GetTree();
             _selectQuerry = new SelectStructure[listener.TableNames.Count];
-            foreach (WhereStructure ws in listener.WhereList)
-            {
-                ws.FindeTable(_dbName);
-            }
-
+           
             foreach (AsStructure asStructure in listener.AsList)
             {
                 asStructure.FindeTable(_dbName);
             }
 
+            FindeWhereStructureTable(listener.WhereList, _dbName);
             for (int i = 0; i < listener.TableNames.Count; i++)
             {
-                _selectQuerry[i] = new SelectStructure("s" + i.ToString(), listener.TableNames[i],
-                                       GetClearColumns(listener.ColumnNames, listener.ExprColumnNames,
-                                           GetCorrectTable(listener.TableNames[i], _dbName)),
-                                            listener.WhereList, GetCorrectAsStructure(listener.AsList, listener.TableNames[i]));
+                _selectQuerry[i] = new SelectStructure
+                (
+                    "s" + i.ToString(),         //name(s)
+                    listener.TableNames[i],     //TableName(s)
+                    GetClearColumns             //Columns (s)
+                    (
+                        listener.ColumnNames,       //goodColumns(s)
+                        listener.ExprColumnNames,   //wrongColums(s)
+                        GetCorrectTable(listener.TableNames[i], _dbName)  // TableName(TableStructure) нужно для нахождения существующих столбцов и сопоставления
+                    ),
+                    GetCorrectWhereStructure(listener.WhereList, listener.TableNames[i]), //WhereStructure(WhereStructure)
+                    GetCorrectAsStructure(listener.AsList, listener.TableNames[i]) //asStructure(asStructure)
+                );
             }
 
             textBox3.Clear();
@@ -244,15 +250,17 @@ namespace MySQL_Clear_standart
             textBox1.Width = Width - 8;
             GetTree();
             output = "\r\n========Return================\r\n";
-            button4.PerformClick();
 
+            List<TableStructure> outTablesList = new List<TableStructure>();
             foreach (var selectStructure in _selectQuerry)
             {
-                output += selectStructure.Name + " " + selectStructure.OutColumn.Length;
-                for (int i = 0; i < selectStructure.OutColumn.Length; i++)
-                {
-                    output += selectStructure.OutColumn[i].Name + "\r\n";
-                }
+                outTablesList.Add(selectStructure.OutTable);
+            }
+            DataBaseStructure outDB = new DataBaseStructure("OUT_DB",outTablesList.ToArray());
+            using (FileStream fs = new FileStream("OutDB.xml", FileMode.Create, FileAccess.ReadWrite))
+            {
+                XmlSerializer dbSerializer = new XmlSerializer(typeof(DataBaseStructure));
+                dbSerializer.Serialize(fs, outDB);
             }
             textBox1.Text = output;
         }
@@ -377,6 +385,23 @@ namespace MySQL_Clear_standart
 
             return outTable;
         }
+        private void FindeWhereStructureTable(List<WhereStructure> whereList, DataBaseStructure dataBase)
+        {
+            foreach (WhereStructure ws in whereList)
+            {
+                foreach (TableStructure dataBaseTable in dataBase.Tables)
+                {
+                    foreach (ColumnStructure column in dataBaseTable.Columns)
+                    {
+                        if (column.Name == ws.getLeftColumn)
+                        {
+                            ws.Table = dataBaseTable.Name;
+                        }
+                    }
+
+                }
+            }
+        }
 
         private void DefaultOutput()
         {
@@ -491,5 +516,17 @@ namespace MySQL_Clear_standart
             return outList;
         }
 
+        private List<WhereStructure> GetCorrectWhereStructure(List<WhereStructure> whereList, string tableName)
+        {
+            List<WhereStructure> outList = new List<WhereStructure>();
+            foreach (var ws in whereList)
+            {
+                if (ws.Table == tableName)
+                {
+                    outList.Add(ws);
+                }
+            }
+            return outList;
+        }
     }
 }

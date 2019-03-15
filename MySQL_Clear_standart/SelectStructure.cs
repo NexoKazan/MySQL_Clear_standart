@@ -15,10 +15,9 @@ namespace MySQL_Clear_standart
         private string _tableName;
         private static int _id = 0;
         private List<string> _columnsList;
-        private List<string> _outColumnNamesList;
         private List<WhereStructure> _whereList;
         private List<AsStructure> _asList;
-        private TableStructure[] _outTable;
+        private TableStructure _outTable;
         private ColumnStructure[] _outColumn;
         
         public SelectStructure(string name, string tableName, List<string> columnsList, List<WhereStructure> whereList, List<AsStructure> asList)
@@ -28,7 +27,7 @@ namespace MySQL_Clear_standart
             _columnsList = columnsList;
             _whereList = whereList;
             _asList = asList;
-            _outColumn = new ColumnStructure[columnsList.Count + asList.Count];
+            _outColumn = new ColumnStructure[columnsList.Count + asList.Count + whereList.Count];
             for (int i = 0; i < columnsList.Count + asList.Count;)
             {
                 foreach (string column in columnsList)
@@ -42,7 +41,13 @@ namespace MySQL_Clear_standart
                     _outColumn[i] = new ColumnStructure(structure.GetAsRightName);
                     i++;
                 }
+                foreach (WhereStructure whereStructure in whereList)
+                {
+                    _outColumn[i] = new ColumnStructure(whereStructure.getLeftColumn);
+                    i++;
+                }
             } 
+            _outTable = new TableStructure(_name+"_TB", _outColumn);
         }
 
         public string Output
@@ -67,6 +72,11 @@ namespace MySQL_Clear_standart
         public ColumnStructure[] OutColumn
         {
             get { return _outColumn; }
+        }
+
+        public TableStructure OutTable
+        {
+            get { return _outTable; }
         }
 
         private void CreateQuerry()
