@@ -3,91 +3,91 @@
   <Tables>
     <TableStructure Name="CUSTOMER" ShortName="C_">
       <Columns>
-        <ColumnStructure IsPrimary="true" Name="C_CUSTKEY" Type="Identifier" />
-        <ColumnStructure IsPrimary="false" Name="C_NAME" Type="variable text, size 25"/>
-        <ColumnStructure IsPrimary="false" Name="C_ADDRESS" Type="variable text, size 40"/>
-        <ColumnStructure IsPrimary="false" Name="C_NATIONKEY" Type="Identifier"/>
-        <ColumnStructure IsPrimary="false" Name="C_PHONE" Type="fixed text, size 15"/>
-        <ColumnStructure IsPrimary="false" Name="C_ACCTBAL" Type="Decimal"/>
-        <ColumnStructure IsPrimary="false" Name="C_MKTSEGMENT" Type="fixed text, size 10"/>
-        <ColumnStructure IsPrimary="false" Name="C_COMMENT" Type="variable text, size 117"/>
+        <ColumnStructure IsPrimary="true" Name="C_CUSTKEY" TypeID="Identifier" />
+        <ColumnStructure IsPrimary="false" Name="C_NAME" TypeID="variable text, size 25"/>
+        <ColumnStructure IsPrimary="false" Name="C_ADDRESS" TypeID="variable text, size 40"/>
+        <ColumnStructure IsPrimary="false" Name="C_NATIONKEY" TypeID="Identifier"/>
+        <ColumnStructure IsPrimary="false" Name="C_PHONE" TypeID="fixed text, size 15"/>
+        <ColumnStructure IsPrimary="false" Name="C_ACCTBAL" TypeID="Decimal"/>
+        <ColumnStructure IsPrimary="false" Name="C_MKTSEGMENT" TypeID="fixed text, size 10"/>
+        <ColumnStructure IsPrimary="false" Name="C_COMMENT" TypeID="variable text, size 117"/>
       </Columns>
     </TableStructure>
     <TableStructure Name="LINEITEM" ShortName="L_">
       <Columns>
-        <ColumnStructure IsPrimary="true" Name="L_ORDERKEY" Type="Identifier"/>
-        <ColumnStructure IsPrimary="false" Name="L_PARTKEY" Type="Identifier"/>
-        <ColumnStructure IsPrimary="false" Name="L_SUPPKEY" Type="Identifier"/>
-        <ColumnStructure IsPrimary="true" Name="L_LINENUMBER" Type="integer"/>
-        <ColumnStructure IsPrimary="false" Name="L_QUANTITY" Type="decimal"/>
-        <ColumnStructure IsPrimary="false" Name="L_EXTENDEDPRICE" Type="decimal"/>
-        <ColumnStructure IsPrimary="false" Name="L_DISCOUNT" Type="decimal"/>
-        <ColumnStructure IsPrimary="false" Name="L_TAX" Type="fixed text, size 1"/>
-        <ColumnStructure IsPrimary="false" Name="L_RETURNFLAG" Type="fixed text, size 1"/>
-        <ColumnStructure IsPrimary="false" Name="L_LINESTATUS" Type="date"/>
-        <ColumnStructure IsPrimary="false" Name="L_SHIPDATE" Type="date"/>
-        <ColumnStructure IsPrimary="false" Name="L_COMMITDATE" Type="date"/>
-        <ColumnStructure IsPrimary="false" Name="L_RECEIPTDATE" Type="fixed text, size 25"/>
-        <ColumnStructure IsPrimary="false" Name="L_SHIPINSTRUCT" Type="fixed text, size 10"/>
-        <ColumnStructure IsPrimary="false" Name="L_SHIPMODE" Type="variable text size 44"/>
-        <ColumnStructure IsPrimary="false" Name="L_COMMENT" Type="Identifier"/>
+        <ColumnStructure IsPrimary="true" Name="L_ORDERKEY" TypeID="Identifier"/>
+        <ColumnStructure IsPrimary="false" Name="L_PARTKEY" TypeID="Identifier"/>
+        <ColumnStructure IsPrimary="false" Name="L_SUPPKEY" TypeID="Identifier"/>
+        <ColumnStructure IsPrimary="true" Name="L_LINENUMBER" TypeID="integer"/>
+        <ColumnStructure IsPrimary="false" Name="L_QUANTITY" TypeID="decimal"/>
+        <ColumnStructure IsPrimary="false" Name="L_EXTENDEDPRICE" TypeID="decimal"/>
+        <ColumnStructure IsPrimary="false" Name="L_DISCOUNT" TypeID="decimal"/>
+        <ColumnStructure IsPrimary="false" Name="L_TAX" TypeID="fixed text, size 1"/>
+        <ColumnStructure IsPrimary="false" Name="L_RETURNFLAG" TypeID="fixed text, size 1"/>
+        <ColumnStructure IsPrimary="false" Name="L_LINESTATUS" TypeID="date"/>
+        <ColumnStructure IsPrimary="false" Name="L_SHIPDATE" TypeID="date"/>
+        <ColumnStructure IsPrimary="false" Name="L_COMMITDATE" TypeID="date"/>
+        <ColumnStructure IsPrimary="false" Name="L_RECEIPTDATE" TypeID="fixed text, size 25"/>
+        <ColumnStructure IsPrimary="false" Name="L_SHIPINSTRUCT" TypeID="fixed text, size 10"/>
+        <ColumnStructure IsPrimary="false" Name="L_SHIPMODE" TypeID="variable text size 44"/>
+        <ColumnStructure IsPrimary="false" Name="L_COMMENT" TypeID="Identifier"/>
       </Columns>
     </TableStructure>
     <TableStructure Name="ORDERS" ShortName="O_">
       <Columns>
-        <ColumnStructure IsPrimary="true" Name="O_ORDERKEY" Type="Identifier"/>
-        <ColumnStructure IsPrimary="false" Name="O_CUSTKEY" Type="Identifier"/>
-        <ColumnStructure IsPrimary="false" Name="O_ORDERSTATUS" Type="fixed text, size 1"/>
-        <ColumnStructure IsPrimary="false" Name="O_TOTALPRICE" Type="Decimal"/>
-        <ColumnStructure IsPrimary="false" Name="O_ORDERDATE" Type="Date"/>
-        <ColumnStructure IsPrimary="false" Name="O_ORDERPRIORITY" Type="fixed text, size 15"/>
-        <ColumnStructure IsPrimary="false" Name="O_CLERK" Type="fixed text, size 15"/>
-        <ColumnStructure IsPrimary="false" Name="O_SHIPPRIORITY" Type="Integer"/>
-		    <ColumnStructure IsPrimary="false" Name="O_COMMENT" Type="variable text, size 79"/>
+        <ColumnStructure IsPrimary="true" Name="O_ORDERKEY" TypeID="Identifier"/>
+        <ColumnStructure IsPrimary="false" Name="O_CUSTKEY" TypeID="Identifier"/>
+        <ColumnStructure IsPrimary="false" Name="O_ORDERSTATUS" TypeID="fixed text, size 1"/>
+        <ColumnStructure IsPrimary="false" Name="O_TOTALPRICE" TypeID="Decimal"/>
+        <ColumnStructure IsPrimary="false" Name="O_ORDERDATE" TypeID="Date"/>
+        <ColumnStructure IsPrimary="false" Name="O_ORDERPRIORITY" TypeID="fixed text, size 15"/>
+        <ColumnStructure IsPrimary="false" Name="O_CLERK" TypeID="fixed text, size 15"/>
+        <ColumnStructure IsPrimary="false" Name="O_SHIPPRIORITY" TypeID="Integer"/>
+		    <ColumnStructure IsPrimary="false" Name="O_COMMENT" TypeID="variable text, size 79"/>
       </Columns>
     </TableStructure>
 	<TableStructure Name="REGION" ShortName="R_">
       <Columns>
-        <ColumnStructure IsPrimary="true" Name="R_REGIONKEY" Type="Identifier"/>
-        <ColumnStructure IsPrimary="false" Name="R_NAME" Type="fixed text, size 25"/>
-        <ColumnStructure IsPrimary="false" Name="R_COMMENT" Type="variable text, size 152"/>
+        <ColumnStructure IsPrimary="true" Name="R_REGIONKEY" TypeID="Identifier"/>
+        <ColumnStructure IsPrimary="false" Name="R_NAME" TypeID="fixed text, size 25"/>
+        <ColumnStructure IsPrimary="false" Name="R_COMMENT" TypeID="variable text, size 152"/>
       </Columns>
     </TableStructure><TableStructure Name="NATION" ShortName="N_">
       <Columns>
-        <ColumnStructure IsPrimary="true" Name="N_NATIONKEY" Type="Identifier"/>
-        <ColumnStructure IsPrimary="false" Name="fixed text, size 25" Type="Identifier"/>
-        <ColumnStructure IsPrimary="false" Name="N_REGIONKEY" Type="Identifier"/>
-        <ColumnStructure IsPrimary="false" Name="N_COMMENT" Type="variable text, size 152"/>
+        <ColumnStructure IsPrimary="true" Name="N_NATIONKEY" TypeID="Identifier"/>
+        <ColumnStructure IsPrimary="false" Name="fixed text, size 25" TypeID="Identifier"/>
+        <ColumnStructure IsPrimary="false" Name="N_REGIONKEY" TypeID="Identifier"/>
+        <ColumnStructure IsPrimary="false" Name="N_COMMENT" TypeID="variable text, size 152"/>
       </Columns>
     </TableStructure><TableStructure Name="PARTSUPP" ShortName="PS_">
       <Columns>
-        <ColumnStructure IsPrimary="true" Name="PS_PARTKEY" Type="Identifier"/>
-        <ColumnStructure IsPrimary="true" Name="PS_SUPPKEY" Type="Identifier"/>
-        <ColumnStructure IsPrimary="false" Name="PS_AVAILQTY" Type="integer"/>
-        <ColumnStructure IsPrimary="false" Name="PS_SUPPLYCOST" Type="Decimal"/>
-        <ColumnStructure IsPrimary="false" Name="PS_COMMENT" Type="variable text, size 199"/>
+        <ColumnStructure IsPrimary="true" Name="PS_PARTKEY" TypeID="Identifier"/>
+        <ColumnStructure IsPrimary="true" Name="PS_SUPPKEY" TypeID="Identifier"/>
+        <ColumnStructure IsPrimary="false" Name="PS_AVAILQTY" TypeID="integer"/>
+        <ColumnStructure IsPrimary="false" Name="PS_SUPPLYCOST" TypeID="Decimal"/>
+        <ColumnStructure IsPrimary="false" Name="PS_COMMENT" TypeID="variable text, size 199"/>
       </Columns>
     </TableStructure><TableStructure Name="SUPPLIER" ShortName="S_">
       <Columns>
-        <ColumnStructure IsPrimary="true" Name="S_CUSTKEY" Type="Identifier"/>
-        <ColumnStructure IsPrimary="false" Name="S_NAME" Type="fixed text, size 25"/>
-        <ColumnStructure IsPrimary="false" Name="S_ADDRESS" Type="variable text, size 40"/>
-        <ColumnStructure IsPrimary="false" Name="S_NATIONKEY" Type="Identifier"/>
-        <ColumnStructure IsPrimary="false" Name="S_PHONE" Type="fixed text, size 15"/>
-        <ColumnStructure IsPrimary="false" Name="S_ACCTBAL" Type="decimal"/>
-        <ColumnStructure IsPrimary="false" Name="S_COMMENT" Type="variable text, size 101"/>
+        <ColumnStructure IsPrimary="true" Name="S_CUSTKEY" TypeID="Identifier"/>
+        <ColumnStructure IsPrimary="false" Name="S_NAME" TypeID="fixed text, size 25"/>
+        <ColumnStructure IsPrimary="false" Name="S_ADDRESS" TypeID="variable text, size 40"/>
+        <ColumnStructure IsPrimary="false" Name="S_NATIONKEY" TypeID="Identifier"/>
+        <ColumnStructure IsPrimary="false" Name="S_PHONE" TypeID="fixed text, size 15"/>
+        <ColumnStructure IsPrimary="false" Name="S_ACCTBAL" TypeID="decimal"/>
+        <ColumnStructure IsPrimary="false" Name="S_COMMENT" TypeID="variable text, size 101"/>
       </Columns>
     </TableStructure><TableStructure Name="PART" ShortName="P_">
       <Columns>
-        <ColumnStructure IsPrimary="true" Name="P_PARTKEY" Type="Identifier"/>
-        <ColumnStructure IsPrimary="false" Name="P_NAME" Type="variable text, size 55"/>
-        <ColumnStructure IsPrimary="false" Name="P_MFGR" Type="fixed text, size 25"/>
-        <ColumnStructure IsPrimary="false" Name="P_BRAND" Type="fixed text, size 10"/>
-        <ColumnStructure IsPrimary="false" Name="P_TYPE" Type="variable text, size 25"/>
-        <ColumnStructure IsPrimary="false" Name="P_SIZE" Type="integer"/>
-        <ColumnStructure IsPrimary="false" Name="P_CONTAINER" Type="fixed text, size 10"/>
-        <ColumnStructure IsPrimary="false" Name="P_RETAILPRICE" Type="decimal"/>
-        <ColumnStructure IsPrimary="false" Name="P_COMMENT" Type="variable text, size 23"/>
+        <ColumnStructure IsPrimary="true" Name="P_PARTKEY" TypeID="Identifier"/>
+        <ColumnStructure IsPrimary="false" Name="P_NAME" TypeID="variable text, size 55"/>
+        <ColumnStructure IsPrimary="false" Name="P_MFGR" TypeID="fixed text, size 25"/>
+        <ColumnStructure IsPrimary="false" Name="P_BRAND" TypeID="fixed text, size 10"/>
+        <ColumnStructure IsPrimary="false" Name="P_TypeID" TypeID="variable text, size 25"/>
+        <ColumnStructure IsPrimary="false" Name="P_SIZE" TypeID="integer"/>
+        <ColumnStructure IsPrimary="false" Name="P_CONTAINER" TypeID="fixed text, size 10"/>
+        <ColumnStructure IsPrimary="false" Name="P_RETAILPRICE" TypeID="decimal"/>
+        <ColumnStructure IsPrimary="false" Name="P_COMMENT" TypeID="variable text, size 23"/>
       </Columns>
     </TableStructure>
   </Tables>

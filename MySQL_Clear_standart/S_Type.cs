@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace MySQL_Clear_standart
 {
-    class S_Type
+    public class S_Type
     {
         private string _name;
         private int _size;

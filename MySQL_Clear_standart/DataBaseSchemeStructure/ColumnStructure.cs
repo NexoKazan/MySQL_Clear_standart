@@ -11,23 +11,24 @@ namespace MySQL_Clear_standart.DataBaseSchemeStructure
     public class ColumnStructure
     {
         private string _name;
-        private string _type;
+        private string _typeID;
         private bool _isPrimary;
+        private S_Type _type;
 
         public ColumnStructure() {}
 
-        public ColumnStructure(string name, string type, bool isPrimary)
+        public ColumnStructure(string name, string typeID, bool isPrimary)
         {
             _isPrimary = isPrimary;
             _name = name;
-            _type = type;
+            _typeID = typeID;
         }
 
-        public ColumnStructure(string name, string type)
+        public ColumnStructure(string name, string typeID)
         {
             _isPrimary = false;
             _name = name;
-            _type = type;
+            _typeID = typeID;
         }
         
         public ColumnStructure(string name)
@@ -48,7 +49,14 @@ namespace MySQL_Clear_standart.DataBaseSchemeStructure
         }
 
         [XmlAttribute]
-        public string Type
+        public string TypeID
+        {
+            get { return _typeID; }
+            set { _typeID = value; }
+        }
+
+        [XmlIgnore]
+        public S_Type Type
         {
             get { return _type; }
             set { _type = value; }
