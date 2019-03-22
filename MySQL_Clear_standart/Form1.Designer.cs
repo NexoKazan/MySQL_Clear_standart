@@ -298,8 +298,7 @@
             this.textBox4.Name = "textBox4";
             this.textBox4.Size = new System.Drawing.Size(545, 406);
             this.textBox4.TabIndex = 0;
-            this.textBox4.Text = "Обсудить передачу схеммы базы данных между классами. Убрать из структур.\r\nДжойны " +
-    "с полями S1 S2.\r\nТайпы отдельной таблицей, метод соединения.\r\n\r\n\r\n";
+            this.textBox4.Text = resources.GetString("textBox4.Text");
             // 
             // Form1
             // 

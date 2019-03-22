@@ -13,7 +13,7 @@ namespace MySQL_Clear_standart.DataBaseSchemeStructure
     public class DataBaseStructure
     {
         private TableStructure[] _tables;
-        private S_Type[] _Types;
+        private S_Type[] _types;
         private string _name;
 
         public DataBaseStructure()
@@ -23,6 +23,13 @@ namespace MySQL_Clear_standart.DataBaseSchemeStructure
         {
             _tables = tables;
             _name = name;
+        }
+
+        public DataBaseStructure(string name, TableStructure[] tables, S_Type[] types)
+        {
+            _tables = tables;
+            _name = name;
+            _types = types;
         }
 
         [XmlArray]
@@ -35,8 +42,8 @@ namespace MySQL_Clear_standart.DataBaseSchemeStructure
         [XmlArray]
         public S_Type[] Types
         {
-            get { return _Types; }
-            set { _Types = value; }
+            get { return _types; }
+            set { _types = value; }
         }
         [XmlAttribute]
         public string Name {

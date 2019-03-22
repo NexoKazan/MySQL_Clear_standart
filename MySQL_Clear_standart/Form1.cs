@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics.PerformanceData;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -14,6 +15,7 @@ using System.Drawing.Imaging;
 using System.Xml.Serialization;
 using MySQL_Clear_standart.DataBaseSchemeStructure;
 using System.IO;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using MySQL_Clear_standart.Properties;
 
@@ -57,6 +59,7 @@ namespace MySQL_Clear_standart
                 XmlSerializer dbCreateSerializer = new XmlSerializer(typeof(DataBaseStructure));
                 _dbName = (DataBaseStructure) dbCreateSerializer.Deserialize(dbCreateFileStream);
             }
+            SetID(_dbName);
         }
         #endregion
         private SelectStructure[] _selectQuerry;
@@ -251,12 +254,33 @@ namespace MySQL_Clear_standart
             GetTree();
             output = "\r\n========Return================\r\n";
 
+            #region Test DB create
+            //S_Type[] testTypes = new S_Type[1];
+            //testTypes[0] = new S_Type("testType",1024, "1");
+
+            //ColumnStructure[] testColumns = new ColumnStructure[1];
+            //testColumns[0] = new ColumnStructure("TestColumn", "1", false);
+
+            //TableStructure[] testTables = new TableStructure[1];
+            //testTables[0] = new TableStructure("testTable", testColumns);
+
+            //DataBaseStructure testDB = new DataBaseStructure("testDB",testTables,testTypes);
+            //using (FileStream fs = new FileStream("testDB.xml", FileMode.Create, FileAccess.ReadWrite))
+            //{
+            //    XmlSerializer dbSerializer = new XmlSerializer(typeof(DataBaseStructure));
+            //    dbSerializer.Serialize(fs, testDB);
+            //}
+            #endregion
+
+
+            button4_Click(sender, e);
             List<TableStructure> outTablesList = new List<TableStructure>();
             foreach (var selectStructure in _selectQuerry)
             {
                 outTablesList.Add(selectStructure.OutTable);
             }
             DataBaseStructure outDB = new DataBaseStructure("OUT_DB",outTablesList.ToArray());
+            MatchColumns(_dbName,outDB);
             using (FileStream fs = new FileStream("OutDB.xml", FileMode.Create, FileAccess.ReadWrite))
             {
                 XmlSerializer dbSerializer = new XmlSerializer(typeof(DataBaseStructure));
@@ -385,6 +409,7 @@ namespace MySQL_Clear_standart
 
             return outTable;
         }
+
         private void FindeWhereStructureTable(List<WhereStructure> whereList, DataBaseStructure dataBase)
         {
             foreach (WhereStructure ws in whereList)
@@ -527,6 +552,43 @@ namespace MySQL_Clear_standart
                 }
             }
             return outList;
+        }
+
+        //Сопоставление типов столбцов с типами из базы данных.
+        private void SetID(DataBaseStructure inDB)
+        {
+            foreach (TableStructure dbTable in inDB.Tables)
+            {
+                foreach (ColumnStructure dbColumn in dbTable.Columns)
+                {
+                    foreach (S_Type dbType in inDB.Types)
+                    {
+                        if (dbColumn.TypeID == dbType.ID)
+                            dbColumn.Type = dbType;
+                    }
+                }
+            }
+        }
+
+        //Присвоение типов полученной схемы после запроса(саб т) известным столбцам.
+        private void MatchColumns(DataBaseStructure mainDataBase, DataBaseStructure subDataBase)
+        {
+            foreach (TableStructure subTable in subDataBase.Tables)
+            {
+                foreach (ColumnStructure subColumn in subTable.Columns)
+                {
+                    foreach (TableStructure mainTable in mainDataBase.Tables)
+                    {
+                        foreach (ColumnStructure mainColumn in mainTable.Columns)
+                        {
+                            if (subColumn.Name == mainColumn.Name)
+                            {
+                                subColumn.Type = mainColumn.Type;
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }
