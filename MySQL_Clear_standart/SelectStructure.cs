@@ -46,7 +46,7 @@ namespace MySQL_Clear_standart
                     _outColumn[i] = new ColumnStructure(whereStructure.getLeftColumn);
                     i++;
                 }
-            } 
+            }
             _outTable = new TableStructure(_name+"_TB", _outColumn);
         }
 

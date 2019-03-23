@@ -564,7 +564,10 @@ namespace MySQL_Clear_standart
                     foreach (S_Type dbType in inDB.Types)
                     {
                         if (dbColumn.TypeID == dbType.ID)
+                        {
                             dbColumn.Type = dbType;
+                            break;
+                        }
                     }
                 }
             }
@@ -584,6 +587,7 @@ namespace MySQL_Clear_standart
                             if (subColumn.Name == mainColumn.Name)
                             {
                                 subColumn.Type = mainColumn.Type;
+                                break;
                             }
                         }
                     }
