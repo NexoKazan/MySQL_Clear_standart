@@ -76,6 +76,7 @@ namespace MySQL_Clear_standart
         private TreeVisitor vTree;
         private ParseTreeWalker walker;
         private MyMySQLListener listener;
+        bool pictureSize = false;
         #endregion 
 
         public Form1()
@@ -96,7 +97,7 @@ namespace MySQL_Clear_standart
             MessageBox.Show("Unknown attribute " + attr.Name + "='" + attr.Value + "'");
         }
         #endregion
-        private void button1_Click(object sender, EventArgs e)
+        private void btn_CreateTree_Click(object sender, EventArgs e)
         {
             //Кнопка для картинки(построить дерево)
             GetTree();
@@ -105,7 +106,7 @@ namespace MySQL_Clear_standart
             textBox1.Text = output;
         }
 
-        private void button2_Click(object sender, EventArgs e)
+        private void btn_SaveTree_Click(object sender, EventArgs e)
         {
             //кнопка для сохранения картинки
             saveFileDialog1.Filter = "Images|*.png;*.bmp;*.jpg";
@@ -126,7 +127,7 @@ namespace MySQL_Clear_standart
             }
         }
 
-        private void button3_Click(object sender, EventArgs e)
+        private void btn_SelectQuerry_tab1_Click(object sender, EventArgs e)
         {
             //выбрать запрос
             pictureBox1.Visible = true;
@@ -208,7 +209,7 @@ namespace MySQL_Clear_standart
 
         }
 
-        private void button4_Click(object sender, EventArgs e)
+        private void btn_CreateSelect_Click(object sender, EventArgs e)
         {
             //составление запросов SELECT
             GetTree();
@@ -243,9 +244,10 @@ namespace MySQL_Clear_standart
                 textBox3.Text += "\r\n========" + _selectQuerry[i].Name + "=========\r\n";
                 textBox3.Text += _selectQuerry[i].Output + "\r\n";
             }
+            CreateScheme();
         }
 
-        private void button5_Click(object sender, EventArgs e)
+        private void btn_Debug_Click(object sender, EventArgs e)
         {
             //GetQuerryTreesScreens(@"D:\!Studing\Скриншоты деревьев\Originals\",12,14);
             //отладка
@@ -273,23 +275,13 @@ namespace MySQL_Clear_standart
             #endregion
 
 
-            button4_Click(sender, e);
-            List<TableStructure> outTablesList = new List<TableStructure>();
-            foreach (var selectStructure in _selectQuerry)
-            {
-                outTablesList.Add(selectStructure.OutTable);
-            }
-            DataBaseStructure outDB = new DataBaseStructure("OUT_DB",outTablesList.ToArray());
-            MatchColumns(_dbName,outDB);
-            using (FileStream fs = new FileStream("OutDB.xml", FileMode.Create, FileAccess.ReadWrite))
-            {
-                XmlSerializer dbSerializer = new XmlSerializer(typeof(DataBaseStructure));
-                dbSerializer.Serialize(fs, outDB);
-            }
+            btn_CreateSelect_Click(sender, e);
             textBox1.Text = output;
         }
 
-        private void button6_Click(object sender, EventArgs e)
+        
+
+        private void btn_SelectQuerry_tab2_Click(object sender, EventArgs e)
         {
             //Выбрать запрос на 2й вкладке
             switch (Convert.ToInt16(comboBox2.Text))
@@ -487,14 +479,31 @@ namespace MySQL_Clear_standart
             textBox3.Location = new Point(textBox2.Location.X + 200 + textBox2.Width, textBox3.Location.Y);
         }
 
+        private void CreateScheme()
+        {
+            List<TableStructure> outTablesList = new List<TableStructure>();
+            foreach (var selectStructure in _selectQuerry)
+            {
+                outTablesList.Add(selectStructure.OutTable);
+            }
+            DataBaseStructure outDB = new DataBaseStructure("OUT_DB", outTablesList.ToArray());
+            MatchColumns(_dbName, outDB);
+            outDB.Name = _dbName.Name + "_Select";
+            using (FileStream fs = new FileStream("OutDB.xml", FileMode.Create, FileAccess.ReadWrite))
+            {
+                XmlSerializer dbSerializer = new XmlSerializer(typeof(DataBaseStructure));
+                dbSerializer.Serialize(fs, outDB);
+            }
+        }
+
         private void GetQuerryTreesScreens(string path, int start, int end)
         {
             for (int i = start; i < end+1; i++)
             {
                 string pt = path + i.ToString() + ".bmp";
                 comboBox1.Text = i.ToString();
-                button3.PerformClick();
-                button1.PerformClick();
+                btn_SelectQuerry_tab1.PerformClick();
+                btn_CreateTree.PerformClick();
                 pictureBox1.Image.Save(pt, ImageFormat.Bmp);
             }
         }
@@ -594,5 +603,7 @@ namespace MySQL_Clear_standart
                 }
             }
         }
+
+       
     }
 }

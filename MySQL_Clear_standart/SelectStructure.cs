@@ -27,27 +27,6 @@ namespace MySQL_Clear_standart
             _columnsList = columnsList;
             _whereList = whereList;
             _asList = asList;
-            _outColumn = new ColumnStructure[columnsList.Count + asList.Count + whereList.Count];
-            for (int i = 0; i < columnsList.Count + asList.Count;)
-            {
-                foreach (string column in columnsList)
-                {
-                    _outColumn[i] = new ColumnStructure(column);
-                    i++;
-                }
-
-                foreach (AsStructure structure in asList)
-                {
-                    _outColumn[i] = new ColumnStructure(structure.GetAsRightName);
-                    i++;
-                }
-                foreach (WhereStructure whereStructure in whereList)
-                {
-                    _outColumn[i] = new ColumnStructure(whereStructure.getLeftColumn);
-                    i++;
-                }
-            }
-            _outTable = new TableStructure(_name+"_TB", _outColumn);
         }
 
         public string Output
@@ -76,7 +55,50 @@ namespace MySQL_Clear_standart
 
         public TableStructure OutTable
         {
-            get { return _outTable; }
+            get
+            {
+                List<string> tempList = new List<string>();
+                foreach (string column in _columnsList)
+                {
+                    tempList.Add(column);
+                }
+                foreach (WhereStructure whereStructure in _whereList)
+                {
+                    tempList.Add(whereStructure.getLeftColumn);
+                }
+
+                foreach (AsStructure asStructure in _asList)
+                {
+                    tempList.Add(asStructure.GetAsRightName);
+                }
+
+                tempList.Distinct();
+                //List<string> tempColumnsList = _columnsList.Distinct().ToList();
+                //List<WhereStructure> tempWhereList = _whereList.Distinct().ToList();
+                //List<AsStructure> tempAsList = _asList.Distinct().ToList();
+                //_outColumn = new ColumnStructure[tempColumnsList.Count + tempWhereList.Count + tempAsList.Count];
+                //for (int i = 0; i < tempColumnsList.Count + tempAsList.Count;)
+                //{
+                //    foreach (string column in tempColumnsList)
+                //    {
+                //        _outColumn[i] = new ColumnStructure(column);
+                //        i++;
+                //    }
+
+                //    foreach (AsStructure structure in tempAsList)
+                //    {
+                //        _outColumn[i] = new ColumnStructure(structure.GetAsRightName);
+                //        i++;
+                //    }
+                //    foreach (WhereStructure whereStructure in tempWhereList)
+                //    {
+                //        _outColumn[i] = new ColumnStructure(whereStructure.getLeftColumn);
+                //        i++;
+                //    }
+                //}
+                _outTable = new TableStructure(_name + "_TB", _outColumn);
+                return _outTable;
+            }
         }
 
         private void CreateQuerry()
