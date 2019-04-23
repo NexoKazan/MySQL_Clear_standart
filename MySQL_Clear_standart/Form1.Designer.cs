@@ -49,6 +49,7 @@
             this.btn_CreateTree = new System.Windows.Forms.Button();
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.tabControl1 = new System.Windows.Forms.TabControl();
+            this.btn_CreateJoin = new System.Windows.Forms.Button();
             this.tabPage3.SuspendLayout();
             this.tabPage2.SuspendLayout();
             this.tabPage1.SuspendLayout();
@@ -82,6 +83,7 @@
             // 
             // tabPage2
             // 
+            this.tabPage2.Controls.Add(this.btn_CreateJoin);
             this.tabPage2.Controls.Add(this.comboBox2);
             this.tabPage2.Controls.Add(this.btn_SelectQuerry_tab2);
             this.tabPage2.Controls.Add(this.textBox3);
@@ -133,11 +135,11 @@
             // 
             this.textBox3.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.textBox3.Location = new System.Drawing.Point(345, 85);
+            this.textBox3.Location = new System.Drawing.Point(345, 83);
             this.textBox3.Multiline = true;
             this.textBox3.Name = "textBox3";
             this.textBox3.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.textBox3.Size = new System.Drawing.Size(204, 324);
+            this.textBox3.Size = new System.Drawing.Size(204, 326);
             this.textBox3.TabIndex = 2;
             // 
             // textBox2
@@ -301,6 +303,16 @@
             this.tabControl1.Size = new System.Drawing.Size(565, 441);
             this.tabControl1.TabIndex = 5;
             // 
+            // btn_CreateJoin
+            // 
+            this.btn_CreateJoin.Location = new System.Drawing.Point(188, 6);
+            this.btn_CreateJoin.Name = "btn_CreateJoin";
+            this.btn_CreateJoin.Size = new System.Drawing.Size(75, 71);
+            this.btn_CreateJoin.TabIndex = 9;
+            this.btn_CreateJoin.Text = "Составить запросы JOIN";
+            this.btn_CreateJoin.UseVisualStyleBackColor = true;
+            this.btn_CreateJoin.Click += new System.EventHandler(this.btn_CreateJoin_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -348,6 +360,7 @@
         private System.Windows.Forms.Button btn_CreateTree;
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.TabControl tabControl1;
+        private System.Windows.Forms.Button btn_CreateJoin;
     }
 }
 

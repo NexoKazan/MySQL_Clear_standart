@@ -62,7 +62,8 @@ namespace MySQL_Clear_standart
             SetID(_dbName);
         }
         #endregion
-        private SelectStructure[] _selectQuerry;
+        private SelectStructure[] _selectQuery;
+        private List<JoinStructure> _joinQuery;
        
         #region baseDefinition объявляются переменный для построения дерева
         private string output = " "; 
@@ -213,7 +214,7 @@ namespace MySQL_Clear_standart
         {
             //составление запросов SELECT
             GetTree();
-            _selectQuerry = new SelectStructure[listener.TableNames.Count];
+            _selectQuery = new SelectStructure[listener.TableNames.Count];
            
             foreach (AsStructure asStructure in listener.AsList)
             {
@@ -223,7 +224,7 @@ namespace MySQL_Clear_standart
             FindeWhereStructureTable(listener.WhereList, _dbName);
             for (int i = 0; i < listener.TableNames.Count; i++)
             {
-                _selectQuerry[i] = new SelectStructure
+                _selectQuery[i] = new SelectStructure
                 (
                     "s" + i.ToString(),         //name(s)
                     listener.TableNames[i],     //TableName(s)
@@ -239,10 +240,10 @@ namespace MySQL_Clear_standart
             }
 
             textBox3.Clear();
-            for (int i = 0; i < _selectQuerry.Length; i++)
+            for (int i = 0; i < _selectQuery.Length; i++)
             {
-                textBox3.Text += "\r\n========" + _selectQuerry[i].Name + "=========\r\n";
-                textBox3.Text += _selectQuerry[i].Output + "\r\n";
+                textBox3.Text += "\r\n========" + _selectQuery[i].Name + "=========\r\n";
+                textBox3.Text += _selectQuery[i].Output + "\r\n";
             }
             CreateScheme();
         }
@@ -255,7 +256,6 @@ namespace MySQL_Clear_standart
             textBox1.Width = Width - 8;
             GetTree();
             output = "\r\n========Return================\r\n";
-
             #region Test DB create
             //S_Type[] testTypes = new S_Type[1];
             //testTypes[0] = new S_Type("testType",1024, "1");
@@ -273,14 +273,12 @@ namespace MySQL_Clear_standart
             //    dbSerializer.Serialize(fs, testDB);
             //}
             #endregion
-
-
+            btn_CreateSelect_Click(sender, e);
+            
             btn_CreateSelect_Click(sender, e);
             textBox1.Text = output;
         }
-
         
-
         private void btn_SelectQuerry_tab2_Click(object sender, EventArgs e)
         {
             //Выбрать запрос на 2й вкладке
@@ -482,7 +480,7 @@ namespace MySQL_Clear_standart
         private void CreateScheme()
         {
             List<TableStructure> outTablesList = new List<TableStructure>();
-            foreach (var selectStructure in _selectQuerry)
+            foreach (var selectStructure in _selectQuery)
             {
                 outTablesList.Add(selectStructure.OutTable);
             }
@@ -603,7 +601,59 @@ namespace MySQL_Clear_standart
                 }
             }
         }
+        //"Филл Джонс"
+        private void FillJoins(List<JoinStructure> joinList, DataBaseStructure dataBase, List<SelectStructure> selectQueries)
+        {
+            int i = 1;
+            foreach (JoinStructure join in joinList)
+            {
+                join.Name = "J_" + i;
+                i++;
+                foreach (TableStructure table in dataBase.Tables)
+                {
+                    foreach (ColumnStructure column in table.Columns)
+                    {
+                        if (join.LeftColumnString == column.Name)
+                        {
+                            join.LeftColumn = column;
+                            foreach (SelectStructure select in selectQueries)
+                            {
+                                if (select.TableName == table.Name)
+                                {
+                                    join.LeftSelect = select;
+                                    break;
+                                }
+                            }
+                            break;
+                        }
+                        if (join.RightColumnString == column.Name)
+                        {
+                            join.RightColumn = column;
+                            foreach (SelectStructure select in selectQueries)
+                            {
+                                if (select.TableName == table.Name)
+                                {
+                                    join.RightSelect = select;
+                                    break;
+                                }
+                            }
+                            break;
+                        }
+                    }
+                }
+            }
+        }
 
-       
+        private void btn_CreateJoin_Click(object sender, EventArgs e)
+        {
+            btn_CreateSelect_Click(sender, e);//УБРАТЬ! ВЫНЕСТИ В МЕТОД
+            _joinQuery = listener.JoinStructures;
+            FillJoins(_joinQuery, _dbName, _selectQuery.ToList());
+            foreach (var join in _joinQuery)
+            {
+                join.CreateQuerry();
+                textBox3.Text += "\r\n========" + join.Name + "========\r\n" + join.Output + "\r\n";
+            }
+        }
     }
 }

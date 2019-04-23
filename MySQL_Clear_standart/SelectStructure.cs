@@ -72,30 +72,12 @@ namespace MySQL_Clear_standart
                     tempList.Add(asStructure.GetAsRightName);
                 }
 
-                tempList.Distinct();
-                //List<string> tempColumnsList = _columnsList.Distinct().ToList();
-                //List<WhereStructure> tempWhereList = _whereList.Distinct().ToList();
-                //List<AsStructure> tempAsList = _asList.Distinct().ToList();
-                //_outColumn = new ColumnStructure[tempColumnsList.Count + tempWhereList.Count + tempAsList.Count];
-                //for (int i = 0; i < tempColumnsList.Count + tempAsList.Count;)
-                //{
-                //    foreach (string column in tempColumnsList)
-                //    {
-                //        _outColumn[i] = new ColumnStructure(column);
-                //        i++;
-                //    }
-
-                //    foreach (AsStructure structure in tempAsList)
-                //    {
-                //        _outColumn[i] = new ColumnStructure(structure.GetAsRightName);
-                //        i++;
-                //    }
-                //    foreach (WhereStructure whereStructure in tempWhereList)
-                //    {
-                //        _outColumn[i] = new ColumnStructure(whereStructure.getLeftColumn);
-                //        i++;
-                //    }
-                //}
+                tempList = tempList.Distinct().ToList();
+                _outColumn = new ColumnStructure[tempList.Count];
+                for (int i = 0; i < _outColumn.Length; i++)
+                {
+                    _outColumn[i] = new ColumnStructure(tempList[i]);
+                }
                 _outTable = new TableStructure(_name + "_TB", _outColumn);
                 return _outTable;
             }

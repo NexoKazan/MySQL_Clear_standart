@@ -53,6 +53,7 @@
     <Compile Include="DataBaseSchemeStructure\ColumnStructure.cs" />
     <Compile Include="DataBaseSchemeStructure\DataBaseStructure.cs" />
     <Compile Include="DataBaseSchemeStructure\TableStructure.cs" />
+    <Compile Include="JoinStructure.cs" />
     <Compile Include="Listeners\AsListener.cs" />
     <Compile Include="Listeners\MyMySQLListener.cs" />
     <Compile Include="Network\ClusterixClient.cs" />
