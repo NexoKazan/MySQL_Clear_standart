@@ -98,6 +98,7 @@ namespace MySQL_Clear_standart
             MessageBox.Show("Unknown attribute " + attr.Name + "='" + attr.Value + "'");
         }
         #endregion
+        //TAB_1//
         private void btn_CreateTree_Click(object sender, EventArgs e)
         {
             //Кнопка для картинки(построить дерево)
@@ -210,12 +211,43 @@ namespace MySQL_Clear_standart
 
         }
 
+        private void btn_Debug_Click(object sender, EventArgs e)
+        {
+            //GetQuerryTreesScreens(@"D:\!Studing\Скриншоты деревьев\Originals\",12,14);
+            //отладка
+            pictureBox1.Visible = false;
+            textBox1.Width = Width - 8;
+            GetTree();
+            output = "\r\n========Return================\r\n";
+            #region Test DB create
+            //S_Type[] testTypes = new S_Type[1];
+            //testTypes[0] = new S_Type("testType",1024, "1");
+
+            //ColumnStructure[] testColumns = new ColumnStructure[1];
+            //testColumns[0] = new ColumnStructure("TestColumn", "1", false);
+
+            //TableStructure[] testTables = new TableStructure[1];
+            //testTables[0] = new TableStructure("testTable", testColumns);
+
+            //DataBaseStructure testDB = new DataBaseStructure("testDB",testTables,testTypes);
+            //using (FileStream fs = new FileStream("testDB.xml", FileMode.Create, FileAccess.ReadWrite))
+            //{
+            //    XmlSerializer dbSerializer = new XmlSerializer(typeof(DataBaseStructure));
+            //    dbSerializer.Serialize(fs, testDB);
+            //}
+            #endregion
+            btn_CreateSelect_Click(sender, e);
+            
+            btn_CreateSelect_Click(sender, e);
+            textBox1.Text = output;
+        }
+        //TAB_2///
         private void btn_CreateSelect_Click(object sender, EventArgs e)
         {
             //составление запросов SELECT
             GetTree();
             _selectQuery = new SelectStructure[listener.TableNames.Count];
-           
+
             foreach (AsStructure asStructure in listener.AsList)
             {
                 asStructure.FindeTable(_dbName);
@@ -248,37 +280,18 @@ namespace MySQL_Clear_standart
             CreateScheme();
         }
 
-        private void btn_Debug_Click(object sender, EventArgs e)
+        private void btn_CreateJoin_Click(object sender, EventArgs e)
         {
-            //GetQuerryTreesScreens(@"D:\!Studing\Скриншоты деревьев\Originals\",12,14);
-            //отладка
-            pictureBox1.Visible = false;
-            textBox1.Width = Width - 8;
-            GetTree();
-            output = "\r\n========Return================\r\n";
-            #region Test DB create
-            //S_Type[] testTypes = new S_Type[1];
-            //testTypes[0] = new S_Type("testType",1024, "1");
-
-            //ColumnStructure[] testColumns = new ColumnStructure[1];
-            //testColumns[0] = new ColumnStructure("TestColumn", "1", false);
-
-            //TableStructure[] testTables = new TableStructure[1];
-            //testTables[0] = new TableStructure("testTable", testColumns);
-
-            //DataBaseStructure testDB = new DataBaseStructure("testDB",testTables,testTypes);
-            //using (FileStream fs = new FileStream("testDB.xml", FileMode.Create, FileAccess.ReadWrite))
-            //{
-            //    XmlSerializer dbSerializer = new XmlSerializer(typeof(DataBaseStructure));
-            //    dbSerializer.Serialize(fs, testDB);
-            //}
-            #endregion
-            btn_CreateSelect_Click(sender, e);
-            
-            btn_CreateSelect_Click(sender, e);
-            textBox1.Text = output;
+            btn_CreateSelect_Click(sender, e);//УБРАТЬ! ВЫНЕСТИ В МЕТОД
+            _joinQuery = listener.JoinStructures;
+            FillJoins(_joinQuery, _dbName, _selectQuery.ToList());
+            foreach (var join in _joinQuery)
+            {
+                join.CreateQuerry();
+                textBox3.Text += "\r\n========" + join.Name + "========\r\n" + join.Output + "\r\n";
+            }
         }
-        
+
         private void btn_SelectQuerry_tab2_Click(object sender, EventArgs e)
         {
             //Выбрать запрос на 2й вкладке
@@ -644,16 +657,5 @@ namespace MySQL_Clear_standart
             }
         }
 
-        private void btn_CreateJoin_Click(object sender, EventArgs e)
-        {
-            btn_CreateSelect_Click(sender, e);//УБРАТЬ! ВЫНЕСТИ В МЕТОД
-            _joinQuery = listener.JoinStructures;
-            FillJoins(_joinQuery, _dbName, _selectQuery.ToList());
-            foreach (var join in _joinQuery)
-            {
-                join.CreateQuerry();
-                textBox3.Text += "\r\n========" + join.Name + "========\r\n" + join.Output + "\r\n";
-            }
-        }
     }
 }

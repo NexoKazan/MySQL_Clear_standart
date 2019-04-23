@@ -53,7 +53,10 @@ namespace MySQL_Clear_standart
             }
             else
             {
-                JoinStructures.Add(new JoinStructure(context.Start.Text, context.Stop.Text));
+                if (context.Stop.Type == 968)
+                {
+                    JoinStructures.Add(new JoinStructure(context.Start.Text, context.Stop.Text));
+                }
             }
         }
         

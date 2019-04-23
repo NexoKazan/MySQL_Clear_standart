@@ -33,6 +33,7 @@
             this.tabPage3 = new System.Windows.Forms.TabPage();
             this.textBox4 = new System.Windows.Forms.TextBox();
             this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.btn_CreateJoin = new System.Windows.Forms.Button();
             this.comboBox2 = new System.Windows.Forms.ComboBox();
             this.btn_SelectQuerry_tab2 = new System.Windows.Forms.Button();
             this.textBox3 = new System.Windows.Forms.TextBox();
@@ -49,7 +50,6 @@
             this.btn_CreateTree = new System.Windows.Forms.Button();
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.tabControl1 = new System.Windows.Forms.TabControl();
-            this.btn_CreateJoin = new System.Windows.Forms.Button();
             this.tabPage3.SuspendLayout();
             this.tabPage2.SuspendLayout();
             this.tabPage1.SuspendLayout();
@@ -96,6 +96,16 @@
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "tabPage2";
             this.tabPage2.UseVisualStyleBackColor = true;
+            // 
+            // btn_CreateJoin
+            // 
+            this.btn_CreateJoin.Location = new System.Drawing.Point(188, 6);
+            this.btn_CreateJoin.Name = "btn_CreateJoin";
+            this.btn_CreateJoin.Size = new System.Drawing.Size(75, 71);
+            this.btn_CreateJoin.TabIndex = 9;
+            this.btn_CreateJoin.Text = "Составить запросы JOIN";
+            this.btn_CreateJoin.UseVisualStyleBackColor = true;
+            this.btn_CreateJoin.Click += new System.EventHandler(this.btn_CreateJoin_Click);
             // 
             // comboBox2
             // 
@@ -302,16 +312,6 @@
             this.tabControl1.SelectedIndex = 0;
             this.tabControl1.Size = new System.Drawing.Size(565, 441);
             this.tabControl1.TabIndex = 5;
-            // 
-            // btn_CreateJoin
-            // 
-            this.btn_CreateJoin.Location = new System.Drawing.Point(188, 6);
-            this.btn_CreateJoin.Name = "btn_CreateJoin";
-            this.btn_CreateJoin.Size = new System.Drawing.Size(75, 71);
-            this.btn_CreateJoin.TabIndex = 9;
-            this.btn_CreateJoin.Text = "Составить запросы JOIN";
-            this.btn_CreateJoin.UseVisualStyleBackColor = true;
-            this.btn_CreateJoin.Click += new System.EventHandler(this.btn_CreateJoin_Click);
             // 
             // Form1
             // 

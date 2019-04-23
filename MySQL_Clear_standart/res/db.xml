@@ -72,7 +72,7 @@
     </TableStructure>
     <TableStructure Name="SUPPLIER" ShortName="S_">
       <Columns>
-        <ColumnStructure IsPrimary="true" Name="S_CUSTKEY" TypeID="2"/>
+        <ColumnStructure IsPrimary="true" Name="S_SUPPKEY" TypeID="2"/>
         <ColumnStructure IsPrimary="false" Name="S_NAME" TypeID="1"/>
         <ColumnStructure IsPrimary="false" Name="S_ADDRESS" TypeID="10"/>
         <ColumnStructure IsPrimary="false" Name="S_NATIONKEY" TypeID="2"/>
