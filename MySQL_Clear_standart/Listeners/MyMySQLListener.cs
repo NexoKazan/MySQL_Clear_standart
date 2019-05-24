@@ -45,7 +45,7 @@ namespace MySQL_Clear_standart
         }
 
         public override void EnterBinaryComparasionPredicate([NotNull] MySqlParser.BinaryComparasionPredicateContext context)
-        {
+        {//обернуть в два листенера
             if (context.Stop.Type != 968)
             {
                 ExprColumnNames.Add(context.left.GetText());
@@ -55,7 +55,10 @@ namespace MySQL_Clear_standart
             {
                 if (context.Stop.Type == 968)
                 {
-                    JoinStructures.Add(new JoinStructure(context.Start.Text, context.Stop.Text));
+                    JoinListener tmpJoinListener = new JoinListener();
+                    ParseTreeWalker wlk = new ParseTreeWalker();
+                    wlk.Walk(tmpJoinListener, context);
+                    JoinStructures.Add(new JoinStructure(context.Start.Text, context.Stop.Text, tmpJoinListener.Output));
                 }
             }
         }

@@ -14,13 +14,13 @@ namespace MySQL_Clear_standart
         private string _output = "error";
         private string _tableName;
         private static int _id = 0;
-        private List<string> _columnsList;
+        private List<ColumnStructure> _columnsList;
         private List<WhereStructure> _whereList;
         private List<AsStructure> _asList;
         private TableStructure _outTable;
         private ColumnStructure[] _outColumn;
         
-        public SelectStructure(string name, string tableName, List<string> columnsList, List<WhereStructure> whereList, List<AsStructure> asList)
+        public SelectStructure(string name, string tableName, List<ColumnStructure> columnsList, List<WhereStructure> whereList, List<AsStructure> asList)
         {
             _name = name;
             _tableName = tableName;
@@ -58,13 +58,9 @@ namespace MySQL_Clear_standart
             get
             {
                 List<string> tempList = new List<string>();
-                foreach (string column in _columnsList)
+                foreach (ColumnStructure column in _columnsList)
                 {
-                    tempList.Add(column);
-                }
-                foreach (WhereStructure whereStructure in _whereList)
-                {
-                    tempList.Add(whereStructure.getLeftColumn);
+                    tempList.Add(column.Name);
                 }
 
                 foreach (AsStructure asStructure in _asList)
@@ -88,7 +84,7 @@ namespace MySQL_Clear_standart
             _output = "SELECT ";
             for (int i = 0; i < _columnsList.Count; i++)
             {
-                _output += "\r\n\t" + _columnsList[i] + " ";
+                _output += "\r\n\t" + _columnsList[i].Name + " ";
                 if (i!= _columnsList.Count-1)
                 {
                     _output += ",";
@@ -100,14 +96,19 @@ namespace MySQL_Clear_standart
                 _output += "\r\n\t" + asStructure.AsString + " AS " + asStructure.GetAsRightName;
             }
 
-            _output += "\r\n" + "FROM " + "\r\n\t" + _tableName + "\r\n" + "WHERE ";
-            foreach (WhereStructure whereStructure in _whereList)
+            _output += "\r\n" + "FROM " + "\r\n\t" + _tableName + "\r\n" ;
+            if (_whereList.Count != 0)
             {
-                if (whereStructure.Table == _tableName)
-                {
-                    _output += "\r\n\t" + whereStructure.getWhereString;
-                }
+                _output += "WHERE ";
 
+                foreach (WhereStructure whereStructure in _whereList)
+                {
+                    if (whereStructure.Table == _tableName)
+                    {
+                        _output += "\r\n\t" + whereStructure.getWhereString;
+                    }
+
+                }
             }
 
         }

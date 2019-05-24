@@ -245,31 +245,7 @@ namespace MySQL_Clear_standart
         private void btn_CreateSelect_Click(object sender, EventArgs e)
         {
             //составление запросов SELECT
-            GetTree();
-            _selectQuery = new SelectStructure[listener.TableNames.Count];
-
-            foreach (AsStructure asStructure in listener.AsList)
-            {
-                asStructure.FindeTable(_dbName);
-            }
-
-            FindeWhereStructureTable(listener.WhereList, _dbName);
-            for (int i = 0; i < listener.TableNames.Count; i++)
-            {
-                _selectQuery[i] = new SelectStructure
-                (
-                    "s" + i.ToString(),         //name(s)
-                    listener.TableNames[i],     //TableName(s)
-                    GetClearColumns             //Columns (s)
-                    (
-                        listener.ColumnNames,       //goodColumns(s)
-                        listener.ExprColumnNames,   //wrongColums(s)
-                        GetCorrectTable(listener.TableNames[i], _dbName)  // TableName(TableStructure) нужно для нахождения существующих столбцов и сопоставления
-                    ),
-                    GetCorrectWhereStructure(listener.WhereList, listener.TableNames[i]), //WhereStructure(WhereStructure)
-                    GetCorrectAsStructure(listener.AsList, listener.TableNames[i]) //asStructure(asStructure)
-                );
-            }
+            MakeSelect();
 
             textBox3.Clear();
             for (int i = 0; i < _selectQuery.Length; i++)
@@ -277,14 +253,16 @@ namespace MySQL_Clear_standart
                 textBox3.Text += "\r\n========" + _selectQuery[i].Name + "=========\r\n";
                 textBox3.Text += _selectQuery[i].Output + "\r\n";
             }
-            CreateScheme();
         }
+        
 
         private void btn_CreateJoin_Click(object sender, EventArgs e)
         {
-            btn_CreateSelect_Click(sender, e);//УБРАТЬ! ВЫНЕСТИ В МЕТОД
+            //btn_CreateSelect_Click(sender, e);//УБРАТЬ! ВЫНЕСТИ В МЕТОД
+            MakeSelect();
             _joinQuery = listener.JoinStructures;
             FillJoins(_joinQuery, _dbName, _selectQuery.ToList());
+            textBox3.Clear();
             foreach (var join in _joinQuery)
             {
                 join.CreateQuerry();
@@ -507,6 +485,37 @@ namespace MySQL_Clear_standart
             }
         }
 
+        private void MakeSelect()
+        {
+            GetTree();
+            _selectQuery = new SelectStructure[listener.TableNames.Count];
+
+            foreach (AsStructure asStructure in listener.AsList)
+            {
+                asStructure.FindeTable(_dbName);
+            }
+
+            FindeWhereStructureTable(listener.WhereList, _dbName);
+            for (int i = 0; i < listener.TableNames.Count; i++)
+            {
+                _selectQuery[i] = new SelectStructure
+                (
+                    "S_" + i.ToString(), //name(s)
+                    listener.TableNames[i], //TableName(s)
+                    GetClearColumns //Columns (s)
+                    (
+                        listener.ColumnNames, //goodColumns(s)
+                        listener.ExprColumnNames, //wrongColums(s)
+                        GetCorrectTable(listener.TableNames[i],
+                            _dbName) // TableName(TableStructure) нужно для нахождения существующих столбцов и сопоставления
+                    ),
+                    GetCorrectWhereStructure(listener.WhereList, listener.TableNames[i]), //WhereStructure(WhereStructure)
+                    GetCorrectAsStructure(listener.AsList, listener.TableNames[i]) //asStructure(asStructure)
+                );
+            }
+            CreateScheme();
+        }
+
         private void GetQuerryTreesScreens(string path, int start, int end)
         {
             for (int i = start; i < end+1; i++)
@@ -519,10 +528,10 @@ namespace MySQL_Clear_standart
             }
         }
 
-        private List<string> GetClearColumns(List<string> allColumns, List<string> removeColumns, TableStructure table)
+        private List<ColumnStructure> GetClearColumns(List<string> allColumns, List<string> removeColumns, TableStructure table)
         {
             List<string> inList = allColumns;
-            List<string> outList = new List<string>();
+            List<ColumnStructure> outList = new List<ColumnStructure>();
             int j = 0;
             for (int i = 0; i < inList.Count; i++)
             {
@@ -540,7 +549,7 @@ namespace MySQL_Clear_standart
                 {
                     if (allColumn == table.Columns[i].Name)
                     {
-                        outList.Add(allColumn);
+                        outList.Add(table.Columns[i]);
                         break;
                     }
                 }
@@ -639,6 +648,13 @@ namespace MySQL_Clear_standart
                             }
                             break;
                         }
+                    }
+                }
+
+                foreach (TableStructure table in dataBase.Tables)
+                {
+                    foreach (ColumnStructure column in table.Columns)
+                    {
                         if (join.RightColumnString == column.Name)
                         {
                             join.RightColumn = column;

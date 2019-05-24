@@ -11,17 +11,20 @@ namespace MySQL_Clear_standart
     {
         private string _leftColumnString;
         private string _rightColumnString;
+        private List<ColumnStructure> _columns = new List<ColumnStructure>();
         private string _name;
+        private string _comparisonOperator;
         private ColumnStructure _leftColumn;
         private ColumnStructure _rightColumn;
         private SelectStructure _leftSelect;
         private SelectStructure _rightSelect;
         private string _output;
 
-        public JoinStructure(string leftColumn, string rightColumn)
+        public JoinStructure(string leftColumn, string rightColumn, string comparisonOperator)
         {
             _leftColumnString = leftColumn;
             _rightColumnString = rightColumn;
+            _comparisonOperator = comparisonOperator;
         }
 
         public string Name
@@ -62,6 +65,15 @@ namespace MySQL_Clear_standart
             set { _rightSelect = value; }
         }
 
+        public List<ColumnStructure> Columns
+        {
+            get
+            {
+                return _columns;
+            }
+            set { _columns = value; }
+        }
+
         public string Output
         {
             get { return _output; }
@@ -70,7 +82,37 @@ namespace MySQL_Clear_standart
 
         public void CreateQuerry()
         {
-            _output = "Left: " + _leftColumn.Name + " Right: " + _rightColumn.Name + "\r\nLeft_Select: " + LeftSelect.Name + " Right_Select: "+RightSelect.Name;
+            foreach (ColumnStructure column in LeftSelect.OutColumn.ToList()) _columns.Add(column);
+            foreach (ColumnStructure column in RightSelect.OutColumn.ToList()) _columns.Add(column);
+            //foreach (ColumnStructure columnStructure in LeftSelect.OutColumn)
+            //{
+            //    if (columnStructure.Name != LeftColumn.Name && columnStructure.Name != RightColumn.Name)
+            //    {
+            //        _columns.Add(columnStructure);
+            //    }
+            //}
+
+            //foreach (ColumnStructure columnStructure in RightSelect.OutColumn)
+            //{
+            //    if (columnStructure.Name != LeftColumn.Name && columnStructure.Name != RightColumn.Name)
+            //    {
+            //        _columns.Add(columnStructure);
+            //    }
+            //}
+            _output = "SELECT\r\n\t";
+            for (int i = 0; i < _columns.Count; i++)
+            {
+                if (i < _columns.Count - 1)
+                {
+                    _output += _columns[i].Name + ",\r\n\t";
+                }
+                else
+                {
+                    _output += Columns[i].Name + "\r\n";
+                }
+            }
+            _output += "FROM\r\n\t" + LeftSelect.Name + ",\r\n\t" + RightSelect.Name + "\r\n" +
+                       "WHERE\r\n\t" + _leftColumn.Name + " " + _comparisonOperator + " " + _rightColumn.Name;
         }
     }
 }
