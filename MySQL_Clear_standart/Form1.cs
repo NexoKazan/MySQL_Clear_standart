@@ -18,6 +18,7 @@ using System.IO;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using MySQL_Clear_standart.Properties;
+using MySQL_Clear_standart.TEST;
 
 
 namespace MySQL_Clear_standart
@@ -236,9 +237,31 @@ namespace MySQL_Clear_standart
             //    dbSerializer.Serialize(fs, testDB);
             //}
             #endregion
-            btn_CreateSelect_Click(sender, e);
+            Pare j1 = new Pare("S1", "S2");
+            Pare j2 = new Pare("S2", "S4");
+            Pare j3 = new Pare("S3", "S4");
+            Pare j4 = new Pare("S1", "S3");
+            List<Pare> pares = new List<Pare>() {j1,j2,j3,j4};
+            List<List<string>> tmp = new List<List<string>>()
+            {
+                new List<string>(){j1.Left, j1.Right},
+                new List<string>(){j2.Left, j2.Right},
+                new List<string>(){j3.Left, j3.Right},
+                new List<string>(){j4.Left, j4.Right}
+            };
+            for (int i = 0; i < 4; i++)
+            {
+                List<List<string>> t2 = new List<List<string>>(); 
+                foreach (List<string> list in tmp)
+                {
+                    Seq tmpSeq = new Seq(list);
+                    t2.AddRange(tmpSeq.MakeSequence(pares));
+                }
+
+                tmp = t2;
+            }
             
-            btn_CreateSelect_Click(sender, e);
+
             textBox1.Text = output;
         }
         //TAB_2///

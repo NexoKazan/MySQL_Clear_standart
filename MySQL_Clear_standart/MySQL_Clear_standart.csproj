@@ -62,6 +62,8 @@
     <Compile Include="SelectStructure.cs" />
     <Compile Include="SortStructure.cs" />
     <Compile Include="S_Type.cs" />
+    <Compile Include="TEST\Pare.cs" />
+    <Compile Include="TEST\Seq.cs" />
     <Compile Include="Visual\CommonNode.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
