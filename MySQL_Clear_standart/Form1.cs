@@ -254,7 +254,92 @@ namespace MySQL_Clear_standart
 
             #endregion
 
+            #region Тесты очереди джойн
+
+            List<Pares> j_list = new List<Pares>()
+            {
+                new Pares("S1", "S2"),
+                new Pares("S2", "S3"),
+                //new Pares("S1", "S3"),
+                new Pares("S3", "S4")
+        };
             
+            bool razriv = true;
+            List<List<string>> containers = new List<List<string>>();
+            List<string> cont = new List<string>()
+            {
+                j_list[0].Left,
+            };
+            for (int j = 0; j < cont.Count;)
+            {
+                razriv = true;
+                for (int i = 0; i < j_list.Count; i++)
+                {
+                    if (cont[j] == j_list[i].Left)
+                    {
+                        cont.Add(j_list[i].Right);
+                        j_list[i].IsForDelete = true;
+                        razriv = false;
+                    }
+
+                    if (cont[j] == j_list[i].Right)
+                    {
+                        cont.Add(j_list[i].Left);
+                        j_list[i].IsForDelete = true;
+                        razriv = false;
+                    }
+                }
+
+                foreach (Pares pares in j_list)
+                {
+                    bool haveLeft = false;
+                    bool haveRight = false;
+                    foreach (string s in cont)
+                    {
+                        if (pares.Left == s)
+                        {
+                            haveLeft = true;
+                        }
+
+                        if (pares.Right == s)
+                        {
+                            haveRight = true;
+                        }
+                    }
+
+                    if (haveRight && haveLeft)
+                    {
+                        pares.IsForDelete = true;
+                    }
+                }
+
+                List<Pares> tmp = new List<Pares>();
+                for (int i = 0; i < j_list.Count; i++)
+                {
+                    if (!j_list[i].IsForDelete)
+                    {
+                        tmp.Add(j_list[i]);
+                    }
+                }
+
+                j_list = tmp;
+                j++;
+                if (razriv && j_list.Count > 0 && j == cont.Count)
+                {
+                    containers.Add(cont);
+                    cont = new List<string>();
+                    cont.Add(j_list[0].Left);
+                    j = 0;
+                }
+            }
+
+            if (j_list.Count == 0)
+            {
+                containers.Add(cont);
+            }
+            #endregion
+
+
             textBox1.Text = output;
         }
     
@@ -617,7 +702,7 @@ namespace MySQL_Clear_standart
 
                 j_list = tmp;
                 j++;
-                if (razriv && j_list.Count > 0)
+                if (razriv && j_list.Count > 0 && j == cont.Count)
                 {
                     containers.Add(cont);
                     cont = new List<string>();
