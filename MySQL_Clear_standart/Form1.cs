@@ -18,7 +18,6 @@ using System.IO;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using MySQL_Clear_standart.Properties;
-using MySQL_Clear_standart.TEST;
 
 
 namespace MySQL_Clear_standart
@@ -26,12 +25,14 @@ namespace MySQL_Clear_standart
     public partial class Form1 : Form
     {
         #region Создание схемы БД
-       
+
 
         private DataBaseStructure _dbName;
+
         private void FillScheme()
         {
             #region Устаревший метод заполнения схемы БД.
+
             //_orderColumns = new ColumnStructure[4];
             //_orderColumns[0] = new ColumnStructure("O_CUSTKEY");
             //_orderColumns[1] = new ColumnStructure("O_ORDERDATE");
@@ -54,21 +55,28 @@ namespace MySQL_Clear_standart
             //_table[2] = new TableStructure("ORDERS", _orderColumns);
 
             //_dbName = new DataBaseStructure("TPCH", _table); 
+
             #endregion
-            using (FileStream dbCreateFileStream = new FileStream("res//db.xml", FileMode.Open, FileAccess.ReadWrite))  // Заполнение БД из XML
+
+            using (FileStream dbCreateFileStream = new FileStream("res//db.xml", FileMode.Open, FileAccess.ReadWrite)
+            ) // Заполнение БД из XML
             {
                 XmlSerializer dbCreateSerializer = new XmlSerializer(typeof(DataBaseStructure));
                 _dbName = (DataBaseStructure) dbCreateSerializer.Deserialize(dbCreateFileStream);
             }
+
             SetID(_dbName);
         }
+
         #endregion
+
         private SelectStructure[] _selectQuery;
         private List<JoinStructure> _joinQuery;
-       
+
         #region baseDefinition объявляются переменный для построения дерева
-        private string output = " "; 
-        private string inputString; 
+
+        private string output = " ";
+        private string inputString;
         private ICharStream inputStream;
         private ITokenSource mySqlLexer;
         private CommonTokenStream commonTokenStream;
@@ -79,7 +87,8 @@ namespace MySQL_Clear_standart
         private ParseTreeWalker walker;
         private MyMySQLListener listener;
         bool pictureSize = false;
-        #endregion 
+
+        #endregion
 
         public Form1()
         {
@@ -88,6 +97,7 @@ namespace MySQL_Clear_standart
         }
 
         #region чек сериализации
+
         protected void serializer_UnknownNode(object sender, XmlNodeEventArgs e)
         {
             MessageBox.Show("Unknown Node:" + e.Name + "\t" + e.Text);
@@ -98,7 +108,9 @@ namespace MySQL_Clear_standart
             System.Xml.XmlAttribute attr = e.Attr;
             MessageBox.Show("Unknown attribute " + attr.Name + "='" + attr.Value + "'");
         }
+
         #endregion
+
         //TAB_1//
         private void btn_CreateTree_Click(object sender, EventArgs e)
         {
@@ -126,6 +138,7 @@ namespace MySQL_Clear_standart
                         format = ImageFormat.Bmp;
                         break;
                 }
+
                 pictureBox1.Image.Save(saveFileDialog1.FileName, format);
             }
         }
@@ -220,7 +233,9 @@ namespace MySQL_Clear_standart
             textBox1.Width = Width - 8;
             GetTree();
             output = "\r\n========Return================\r\n";
+
             #region Test DB create
+
             //S_Type[] testTypes = new S_Type[1];
             //testTypes[0] = new S_Type("testType",1024, "1");
 
@@ -236,35 +251,15 @@ namespace MySQL_Clear_standart
             //    XmlSerializer dbSerializer = new XmlSerializer(typeof(DataBaseStructure));
             //    dbSerializer.Serialize(fs, testDB);
             //}
+
             #endregion
-            Pare j1 = new Pare("S1", "S2");
-            Pare j2 = new Pare("S2", "S4");
-            Pare j3 = new Pare("S3", "S4");
-            Pare j4 = new Pare("S1", "S3");
-            List<Pare> pares = new List<Pare>() {j1,j2,j3,j4};
-            List<List<string>> tmp = new List<List<string>>()
-            {
-                new List<string>(){j1.Left, j1.Right},
-                new List<string>(){j2.Left, j2.Right},
-                new List<string>(){j3.Left, j3.Right},
-                new List<string>(){j4.Left, j4.Right}
-            };
-            for (int i = 0; i < 4; i++)
-            {
-                List<List<string>> t2 = new List<List<string>>(); 
-                foreach (List<string> list in tmp)
-                {
-                    Seq tmpSeq = new Seq(list);
-                    t2.AddRange(tmpSeq.MakeSequence(pares));
-                }
 
-                tmp = t2;
-            }
             
-
             textBox1.Text = output;
         }
-        //TAB_2///
+    
+
+    //TAB_2///
         private void btn_CreateSelect_Click(object sender, EventArgs e)
         {
             //составление запросов SELECT
@@ -551,6 +546,97 @@ namespace MySQL_Clear_standart
             }
         }
 
+        private void GetJoinSequence(List<JoinStructure> joinStructures)
+        {
+
+            List<Pares> j_list = new List<Pares>();
+
+            #region Magic
+
+            foreach (JoinStructure joinStructure in joinStructures)
+            {
+                Pares pr = new Pares(joinStructure.LeftSelect.Name, joinStructure.RightSelect.Name);
+            }
+            bool razriv = true;
+            List<List<string>> containers = new List<List<string>>();
+            List<string> cont = new List<string>()
+            {
+                j_list[0].Left,
+            };
+            for (int j = 0; j < cont.Count;)
+            {
+                razriv = true;
+                for (int i = 0; i < j_list.Count; i++)
+                {
+                    if (cont[j] == j_list[i].Left)
+                    {
+                        cont.Add(j_list[i].Right);
+                        j_list[i].IsForDelete = true;
+                        razriv = false;
+                    }
+
+                    if (cont[j] == j_list[i].Right)
+                    {
+                        cont.Add(j_list[i].Left);
+                        j_list[i].IsForDelete = true;
+                        razriv = false;
+                    }
+                }
+
+                foreach (Pares pares in j_list)
+                {
+                    bool haveLeft = false;
+                    bool haveRight = false;
+                    foreach (string s in cont)
+                    {
+                        if (pares.Left == s)
+                        {
+                            haveLeft = true;
+                        }
+
+                        if (pares.Right == s)
+                        {
+                            haveRight = true;
+                        }
+                    }
+
+                    if (haveRight && haveLeft)
+                    {
+                        pares.IsForDelete = true;
+                    }
+                }
+
+                List<Pares> tmp = new List<Pares>();
+                for (int i = 0; i < j_list.Count; i++)
+                {
+                    if (!j_list[i].IsForDelete)
+                    {
+                        tmp.Add(j_list[i]);
+                    }
+                }
+
+                j_list = tmp;
+                j++;
+                if (razriv && j_list.Count > 0)
+                {
+                    containers.Add(cont);
+                    cont = new List<string>();
+                    cont.Add(j_list[0].Left);
+                    j = 0;
+                }
+            }
+
+            if (j_list.Count == 0)
+            {
+                containers.Add(cont);
+            }
+            #endregion
+            //в containers поледовательности конвейров джойн, даже если они разделяются.
+            //алгоритм помог придумать выпускник КАИ Алексей Казнаецев.
+            for (int i = 0; i < joinStructures.Count; i++)
+            {
+            }
+        }
         private List<ColumnStructure> GetClearColumns(List<string> allColumns, List<string> removeColumns, TableStructure table)
         {
             List<string> inList = allColumns;
