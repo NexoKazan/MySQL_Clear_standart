@@ -13,6 +13,7 @@ namespace MySQL_Clear_standart.DataBaseSchemeStructure
         private string _name;
         private string _typeID;
         private bool _isPrimary;
+        private bool _isForSelect;
         private S_Type _type;
 
         public ColumnStructure() {}
@@ -60,6 +61,13 @@ namespace MySQL_Clear_standart.DataBaseSchemeStructure
         {
             get { return _type; }
             set { _type = value; }
+        }
+
+        [XmlIgnore]
+        public bool IsForSelect
+        {
+            get { return _isForSelect; }
+            set { _isForSelect = value; }
         }
     }
 }

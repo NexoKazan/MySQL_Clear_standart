@@ -57,24 +57,24 @@ namespace MySQL_Clear_standart
         {
             get
             {
-                List<string> tempList = new List<string>();
+                List<ColumnStructure> tempList = new List<ColumnStructure>();
                 foreach (ColumnStructure column in _columnsList)
                 {
-                    tempList.Add(column.Name);
+                    tempList.Add(column);
                 }
 
                 foreach (AsStructure asStructure in _asList)
-                {
-                    tempList.Add(asStructure.GetAsRightName);
+                {//Сосздать конструктор для новых столбцов
+                  tempList.Add(new ColumnStructure(asStructure.GetAsRightName));
                 }
 
-                tempList = tempList.Distinct().ToList();
+                //tempList = tempList.Distinct().ToList();
                 _outColumn = new ColumnStructure[tempList.Count];
                 for (int i = 0; i < _outColumn.Length; i++)
                 {
-                    _outColumn[i] = new ColumnStructure(tempList[i]);
+                    _outColumn[i] = tempList[i];
                 }
-                _outTable = new TableStructure(_name + "_TB", _outColumn);
+                _outTable = new TableStructure(_name + "_TB", _outColumn.ToArray());
                 return _outTable;
             }
         }

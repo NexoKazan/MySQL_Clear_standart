@@ -11,14 +11,17 @@ namespace MySQL_Clear_standart
     {
         private string _leftColumnString;
         private string _rightColumnString;
-        private List<ColumnStructure> _columns = new List<ColumnStructure>();
         private string _name;
+        private string _output;
         private string _comparisonOperator;
+        private bool _isFirst = false;
+        private bool _switched = false;
         private ColumnStructure _leftColumn;
         private ColumnStructure _rightColumn;
         private SelectStructure _leftSelect;
         private SelectStructure _rightSelect;
-        private string _output;
+        private JoinStructure _leftJoin;
+        private List<ColumnStructure> _columns = new List<ColumnStructure>();
 
         public JoinStructure(string leftColumn, string rightColumn, string comparisonOperator)
         {
@@ -67,10 +70,7 @@ namespace MySQL_Clear_standart
 
         public List<ColumnStructure> Columns
         {
-            get
-            {
-                return _columns;
-            }
+            get { return _columns; }
             set { _columns = value; }
         }
 
@@ -80,25 +80,40 @@ namespace MySQL_Clear_standart
             set { _output = value; }
         }
 
+        public JoinStructure LeftJoin {
+            get { return _leftJoin; } set => _leftJoin = value; }
+
+        public bool IsFirst
+        {
+            get { return _isFirst; }
+            set { _isFirst = value; }
+        }
+        public bool Switched
+        {
+            get { return _switched; }
+            set { _switched = value; }
+        }
         public void CreateQuerry()
         {
-            foreach (ColumnStructure column in LeftSelect.OutColumn.ToList()) _columns.Add(column);
-            foreach (ColumnStructure column in RightSelect.OutColumn.ToList()) _columns.Add(column);
-            //foreach (ColumnStructure columnStructure in LeftSelect.OutColumn)
-            //{
-            //    if (columnStructure.Name != LeftColumn.Name && columnStructure.Name != RightColumn.Name)
-            //    {
-            //        _columns.Add(columnStructure);
-            //    }
-            //}
+            if (_leftJoin != null)
+            {
+                _columns.AddRange(_leftJoin.Columns);
+                if (Switched)
+                {
+                    _columns.AddRange(_leftSelect.OutColumn);
+                }
+                else
+                {
+                    _columns.AddRange(_rightSelect.OutColumn);
+                }
+            }
+            else
+            {
+                _columns.AddRange(_leftSelect.OutColumn);
+                _columns.AddRange(_rightSelect.OutColumn);
+            }
 
-            //foreach (ColumnStructure columnStructure in RightSelect.OutColumn)
-            //{
-            //    if (columnStructure.Name != LeftColumn.Name && columnStructure.Name != RightColumn.Name)
-            //    {
-            //        _columns.Add(columnStructure);
-            //    }
-            //}
+
             _output = "SELECT\r\n\t";
             for (int i = 0; i < _columns.Count; i++)
             {
