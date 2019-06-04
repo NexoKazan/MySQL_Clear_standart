@@ -16,6 +16,7 @@ namespace MySQL_Clear_standart
         private string _comparisonOperator;
         private bool _isFirst = false;
         private bool _switched = false;
+        private bool _isJoined = false;
         private ColumnStructure _leftColumn;
         private ColumnStructure _rightColumn;
         private SelectStructure _leftSelect;
@@ -80,8 +81,11 @@ namespace MySQL_Clear_standart
             set { _output = value; }
         }
 
-        public JoinStructure LeftJoin {
-            get { return _leftJoin; } set => _leftJoin = value; }
+        public JoinStructure LeftJoin
+        {
+            get { return _leftJoin; }
+            set { _leftJoin = value; }
+        }
 
         public bool IsFirst
         {
@@ -93,27 +97,60 @@ namespace MySQL_Clear_standart
             get { return _switched; }
             set { _switched = value; }
         }
+
+        public bool IsJoined
+        {
+            get { return _isJoined; }
+            set { _isJoined = value; }
+        }
+
+
         public void CreateQuerry()
         {
             if (_leftJoin != null)
             {
                 _columns.AddRange(_leftJoin.Columns);
-                if (Switched)
+                if (_switched)
                 {
+                    if(_leftSelect!=null)
                     _columns.AddRange(_leftSelect.OutColumn);
                 }
                 else
                 {
+                    if(_rightSelect!=null)
                     _columns.AddRange(_rightSelect.OutColumn);
                 }
             }
             else
             {
-                _columns.AddRange(_leftSelect.OutColumn);
-                _columns.AddRange(_rightSelect.OutColumn);
+                if (_leftSelect != null)
+                {
+                    _columns.AddRange(_leftSelect.OutColumn);
+                }
+
+                if (_rightSelect != null)
+                {
+                    _columns.AddRange(_rightSelect.OutColumn);
+
+                }
             }
-
-
+            List<ColumnStructure> tmpColumns = new List<ColumnStructure>();
+            foreach (ColumnStructure column in _columns)
+            {
+                if (column.IsForSelect)
+                {
+                    tmpColumns.Add(column);
+                }
+                else
+                {
+                    if (column.Name != LeftColumn.Name && column.Name != RightColumn.Name )
+                    {
+                        tmpColumns.Add(column);
+                    }   
+                }
+            }
+            _columns = tmpColumns;
+            
             _output = "SELECT\r\n\t";
             for (int i = 0; i < _columns.Count; i++)
             {
@@ -126,8 +163,56 @@ namespace MySQL_Clear_standart
                     _output += Columns[i].Name + "\r\n";
                 }
             }
-            _output += "FROM\r\n\t" + LeftSelect.Name + ",\r\n\t" + RightSelect.Name + "\r\n" +
-                       "WHERE\r\n\t" + _leftColumn.Name + " " + _comparisonOperator + " " + _rightColumn.Name;
+
+            _output += "FROM\r\n\t";
+
+            if (_leftJoin != null)
+            {
+                if (_leftSelect != null || _rightSelect != null)
+                {
+                    _output += _leftJoin.Name + ",\r\n\t";
+                }
+                else
+                {
+                    _output += _leftJoin.Name + "\r\n";
+                }
+                if (_switched)
+                {
+                    if(_leftSelect!=null)
+                    {
+                        _output += _leftSelect.Name + "\r\n";
+                    }
+                }
+                else
+                {
+                    if (_rightSelect != null)
+                    {
+                        _output += _rightSelect.Name + "\r\n";
+                    }
+                }
+            }
+            else
+            {
+                if (_leftSelect != null)
+                {
+                    _output += _leftSelect.Name + "\r\n\t";
+                }
+                else
+                {
+                    _output +=  "\r\n";
+                }
+                
+                if (_rightSelect != null)
+                {
+                    _output += _rightSelect.Name + "\r\n";
+                }
+                else
+                {
+                    _output +=  "\r\n";
+                }
+            }
+
+            _output += "WHERE\r\n\t" + _leftColumn.Name + " " + _comparisonOperator + " " + _rightColumn.Name;
         }
     }
 }

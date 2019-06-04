@@ -254,62 +254,11 @@ namespace MySQL_Clear_standart
 
             #endregion
 
-            btn_CreateJoin_Click(sender,e);
-            GetJoinSequence(_joinQuery);
-            //for (int i = 0; i < _joinQuery.Count; i++)
-            //{
-            //    if (!_joinQuery[i].IsFirst)
-            //    {
-            //        output += "NAME: " + _joinQuery[i].Name + "\r\n";
-            //        output += "Left:  " + _joinQuery[i].RightJoin.Name + "\r\n";
-            //        if (!_joinQuery[i].Switched)
-            //        {
-            //            output += "Right: " + _joinQuery[i].RightSelect.Name + "\r\n";
-            //        }
-            //        else
-            //        {
-            //            output += "Right: " + _joinQuery[i].LeftSelect.Name + "\r\n";
-            //        }
-
-            //        output += "=============\r\n";
-            //    }
-            //    else
-            //    {
-            //        output += "NAME: " + _joinQuery[i].Name + "\r\n";
-            //        output += "Left:  " + _joinQuery[i].LeftSelect.Name + "\r\n";
-            //        output += "Right:  " + _joinQuery[i].RightSelect.Name + "\r\n";
-            //        output += "=============\r\n";
-            //    }
-
-            //}
-
-            //foreach (var selectStructure in _selectQuery)
-            //{
-            //    output += "\r\n============\r\n";
-            //    output += "S_NAME: " + selectStructure.Name + "\r\n";
-            //    foreach (var columnStructure in selectStructure.OutColumn)
-            //    {
-            //       // if (columnStructure.IsForSelect)
-            //        {
-            //            output += columnStructure.Name + "\r\n";
-            //        }
-            //    }
-            //}
-
-            foreach (var selectStructure in _joinQuery)
-            {
-                output += "\r\n============\r\n";
-                output += "j_NAME: " + selectStructure.Name + "\r\n";
-                foreach (var columnStructure in selectStructure.Columns)
-                {
-                    // if (columnStructure.IsForSelect)
-                    {
-                        output += columnStructure.Name + "\r\n";
-                    }
-                }
-            }
-
-                textBox1.Text = output;
+            comboBox2.Text = "5";
+            btn_SelectQuerry_tab2_Click(sender, e);
+            btn_CreateJoin_Click(sender, e);
+            
+            textBox1.Text = output;
         }
 
         
@@ -337,11 +286,12 @@ namespace MySQL_Clear_standart
             _joinQuery = listener.JoinStructures;
             FillJoins(_joinQuery, _dbName, _selectQuery.ToList());
             GetJoinSequence(_joinQuery);
-            textBox3.Clear();
+            _joinQuery = SortJoin(_joinQuery);
+            textBox5.Clear();
             foreach (var join in _joinQuery)
             {
                 join.CreateQuerry();
-                textBox3.Text += "\r\n========" + join.Name + "========\r\n" + join.Output + "\r\n";
+                textBox5.Text += "\r\n========" + join.Name + "========\r\n" + join.Output + "\r\n";
             }
         }
 
@@ -539,8 +489,9 @@ namespace MySQL_Clear_standart
 
         private void ReSize()
         {
-            textBox2.Width = textBox3.Width = (tabPage2.Width - 212) / 2;
-            textBox3.Location = new Point(textBox2.Location.X + 200 + textBox2.Width, textBox3.Location.Y);
+            textBox2.Width = textBox3.Width = textBox5.Width = (tabPage2.Width - 212) / 3;
+            textBox3.Location = new Point(textBox2.Location.X + 150 + textBox2.Width, textBox3.Location.Y);
+            textBox5.Location = new Point(textBox3.Location.X + 20 + textBox3.Width, textBox3.Location.Y);
         }
 
         private void CreateScheme()
@@ -605,136 +556,180 @@ namespace MySQL_Clear_standart
 
         private void GetJoinSequence(List<JoinStructure> joinStructures)
         {
+            if (joinStructures.Count != 0)
+            {
+                List<Pares> j_list = new List<Pares>();
 
-            List<Pares> j_list = new List<Pares>();
+                #region Magic
 
-            #region Magic
+                foreach (JoinStructure joinStructure in joinStructures)
+                {
+                    Pares pr = new Pares(joinStructure.LeftSelect.Name, joinStructure.RightSelect.Name);
+                    j_list.Add(pr);
+                }
+
+                bool razriv = true;
+                List<List<string>> containers = new List<List<string>>();
+                List<string> cont = new List<string>()
+                {
+                    j_list[0].Left,
+                };
+                for (int j = 0; j < cont.Count;)
+                {
+                    razriv = true;
+                    for (int i = 0; i < j_list.Count; i++)
+                    {
+                        if (cont[j] == j_list[i].Left)
+                        {
+                            cont.Add(j_list[i].Right);
+                            j_list[i].IsForDelete = true;
+                            razriv = false;
+                        }
+
+                        if (cont[j] == j_list[i].Right)
+                        {
+                            cont.Add(j_list[i].Left);
+                            j_list[i].IsForDelete = true;
+                            razriv = false;
+                        }
+                    }
+
+                    foreach (Pares pares in j_list)
+                    {
+                        bool haveLeft = false;
+                        bool haveRight = false;
+                        foreach (string s in cont)
+                        {
+                            if (pares.Left == s)
+                            {
+                                haveLeft = true;
+                            }
+
+                            if (pares.Right == s)
+                            {
+                                haveRight = true;
+                            }
+                        }
+
+                        if (haveRight && haveLeft)
+                        {
+                            pares.IsForDelete = true;
+                        }
+                    }
+
+                    List<Pares> tmp = new List<Pares>();
+                    for (int i = 0; i < j_list.Count; i++)
+                    {
+                        if (!j_list[i].IsForDelete)
+                        {
+                            tmp.Add(j_list[i]);
+                        }
+                    }
+
+                    j_list = tmp;
+                    j++;
+                    if (razriv && j_list.Count > 0 && j == cont.Count)
+                    {
+                        containers.Add(cont);
+                        cont = new List<string>();
+                        cont.Add(j_list[0].Left);
+                        j = 0;
+                    }
+                }
+
+                if (j_list.Count == 0)
+                {
+                    containers.Add(cont);
+                }
+
+                #endregion //создан контейнер селектов(s1,s3,s2,s5)
+
+                //в containers поледовательности конвейров джойн, даже если они разделяются.
+                //алгоритм помог придумать выпускник КАИ Алексей Казнаецев.
+                foreach (List<string> container in containers)
+                {
+                    int i = 0;
+                    List<JoinStructure> j_sequence = new List<JoinStructure>();
+                    for (; i < container.Count;)
+                    {
+                        if (i == 0)
+                        {
+                            JoinStructure tmp = FindeJoin(container[0], container[1], joinStructures);
+                            tmp.IsFirst = true;
+                            j_sequence.Add(tmp);
+                            i = 2;
+                        }
+                        else
+                        {
+                            int stopper = j_sequence.Count;
+                            for (int j = 0; j < i; j++)
+                            {
+                                JoinStructure tmp = FindeJoin(container[j], container[i], joinStructures);
+                                if (tmp.Name != "ERROR")
+                                {
+                                    j_sequence.Add(tmp);
+                                }
+
+                                if (j_sequence.Count == stopper + 1)
+                                {
+                                    break;
+                                }
+                            }
+
+                            i++;
+                        }
+
+                        for (int j = 1; j < j_sequence.Count; j++)
+                        {
+                            j_sequence[j].LeftJoin = j_sequence[j - 1];
+                            for (int k = 0; k < j; k++)
+                            {
+                                if (j_sequence[j].RightSelect == j_sequence[k].LeftSelect ||
+                                    j_sequence[j].RightSelect == j_sequence[k].RightSelect)
+                                {
+                                    j_sequence[j].Switched = true;
+                                }
+                            }
+                        }
+                    }
+
+                    for (int j = 0; j < j_sequence.Count; j++)
+                    {
+                        j_sequence[j].Name = "J_" + j;
+                    }
+                }
+            }
+        }
+
+        private List<JoinStructure> SortJoin(List<JoinStructure> joinStructures)
+        {
+            List<JoinStructure> tmp = new List<JoinStructure>();
+            int notJoinedCount = 0;
+            for (int i = 0; i < joinStructures.Count; i++)
+            {
+                string s = "J_" + i;
+                foreach (JoinStructure joinStructure in joinStructures)
+                {
+                    if (joinStructure.Name == s)
+                    {
+                        tmp.Add(joinStructure);
+                    }
+                }
+            }
 
             foreach (JoinStructure joinStructure in joinStructures)
             {
-                Pares pr = new Pares(joinStructure.LeftSelect.Name, joinStructure.RightSelect.Name);
-                j_list.Add(pr);
-            }
-            bool razriv = true;
-            List<List<string>> containers = new List<List<string>>();
-            List<string> cont = new List<string>()
-            {
-                j_list[0].Left,
-            };
-            for (int j = 0; j < cont.Count;)
-            {
-                razriv = true;
-                for (int i = 0; i < j_list.Count; i++)
+                if (joinStructure.Name == null)
                 {
-                    if (cont[j] == j_list[i].Left)
-                    {
-                        cont.Add(j_list[i].Right);
-                        j_list[i].IsForDelete = true;
-                        razriv = false;
-                    }
-
-                    if (cont[j] == j_list[i].Right)
-                    {
-                        cont.Add(j_list[i].Left);
-                        j_list[i].IsForDelete = true;
-                        razriv = false;
-                    }
-                }
-
-                foreach (Pares pares in j_list)
-                {
-                    bool haveLeft = false;
-                    bool haveRight = false;
-                    foreach (string s in cont)
-                    {
-                        if (pares.Left == s)
-                        {
-                            haveLeft = true;
-                        }
-
-                        if (pares.Right == s)
-                        {
-                            haveRight = true;
-                        }
-                    }
-
-                    if (haveRight && haveLeft)
-                    {
-                        pares.IsForDelete = true;
-                    }
-                }
-
-                List<Pares> tmp = new List<Pares>();
-                for (int i = 0; i < j_list.Count; i++)
-                {
-                    if (!j_list[i].IsForDelete)
-                    {
-                        tmp.Add(j_list[i]);
-                    }
-                }
-
-                j_list = tmp;
-                j++;
-                if (razriv && j_list.Count > 0 && j == cont.Count)
-                {
-                    containers.Add(cont);
-                    cont = new List<string>();
-                    cont.Add(j_list[0].Left);
-                    j = 0;
+                    joinStructure.Name = "J_" + tmp.Count.ToString();
+                    joinStructure.LeftJoin = tmp.Last();
+                    joinStructure.LeftSelect = null;
+                    joinStructure.RightSelect = null;
+                    tmp.Add(joinStructure);
                 }
             }
-
-            if (j_list.Count == 0)
-            {
-                containers.Add(cont);
-            }
-            #endregion
-            //в containers поледовательности конвейров джойн, даже если они разделяются.
-            //алгоритм помог придумать выпускник КАИ Алексей Казнаецев.
-            foreach (List<string> container in containers)
-            {
-                int i = 0;
-                List<JoinStructure> j_sequence = new List<JoinStructure>();
-                for (; i < container.Count;)
-                {
-                    if (i == 0)
-                    {
-                        JoinStructure tmp = FindeJoin(container[0], container[1], joinStructures);
-                        tmp.IsFirst = true;
-                        j_sequence.Add(tmp);
-                        i = 2;
-                    }
-                    else
-                    {
-                        int stopper = j_sequence.Count;
-                        for (int j = 0; j < i; j++)
-                        {
-                            JoinStructure tmp = FindeJoin(container[j], container[i], joinStructures);
-                            if (tmp.Name != "ERROR")
-                            {
-                                j_sequence.Add(FindeJoin(container[j], container[i], joinStructures));
-                            }
-
-                            if (j_sequence.Count == stopper+1)
-                            {
-                                break;
-                            }
-                        }
-
-                        i++;
-                    }
-
-                    for (int j = 1; j < j_sequence.Count; j++)
-                    {
-                        j_sequence[j].LeftJoin = j_sequence[j - 1];
-                        if (j_sequence[j].RightSelect == j_sequence[j - 1].LeftSelect ||
-                            j_sequence[j].RightSelect == j_sequence[j - 1].RightSelect)
-                        {
-                            j_sequence[j].Switched = true;
-                        }
-                    }
-                }
-            }
+            output += notJoinedCount;
+            return tmp;
         }
         
         private JoinStructure FindeJoin(string j1, string j2, List<JoinStructure> joinList)
@@ -755,42 +750,51 @@ namespace MySQL_Clear_standart
 
         private List<ColumnStructure> GetClearColumns(List<string> allColumns, List<string> removeColumns, TableStructure table)
         {
-            List<string> inList = allColumns;
-            List<ColumnStructure> outList = new List<ColumnStructure>();
-            int j = 0;
-            for (int i = 0; i < inList.Count; i++)
+            try
             {
-                if (j < removeColumns.Count && inList[i] == removeColumns[j])
+                List<string> inList = allColumns;
+                List<ColumnStructure> outList = new List<ColumnStructure>();
+                int j = 0;
+                for (int i = 0; i < inList.Count; i++)
                 {
-                    inList.Remove(inList[i]);
-                    i = 0;
-                    j++;
-                }
-            }
-            inList = inList.Distinct().ToList();
-            foreach (string allColumn in inList)
-            {
-                for (int i = 0; i < table.Columns.Length; i++)
-                {
-                    if (allColumn == table.Columns[i].Name)
+                    if (j < removeColumns.Count && inList[i] == removeColumns[j])
                     {
-                        outList.Add(table.Columns[i]);
-                        break;
+                        inList.Remove(inList[i]);
+                        i = 0;
+                        j++;
                     }
                 }
-            }
+                inList = inList.Distinct().ToList();
+                foreach (string allColumn in inList)
+                {
+                    for (int i = 0; i < table.Columns.Length; i++)
+                    {
+                        if (allColumn == table.Columns[i].Name)
+                        {
+                            outList.Add(table.Columns[i]);
+                            break;
+                        }
+                    }
+                }
 
-            foreach (ColumnStructure column in outList)
-            {
-                foreach (string selectColumn in listener.SelectColumns)
+                foreach (ColumnStructure column in outList)
                 {
-                    if (column.Name == selectColumn)
+                    foreach (string selectColumn in listener.SelectColumns)
                     {
-                        column.IsForSelect = true;
+                        if (column.Name == selectColumn)
+                        {
+                            column.IsForSelect = true;
+                        }
                     }
                 }
+                return outList;
             }
-            return outList;
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                MessageBox.Show(e.Message);
+                throw;
+            }
         }
 
         private List<AsStructure> GetCorrectAsStructure(List<AsStructure> asStructures, string tableName)
@@ -865,7 +869,6 @@ namespace MySQL_Clear_standart
             int i = 1;
             foreach (JoinStructure join in joinList)
             {
-                join.Name = "J_" + i;
                 i++;
                 foreach (TableStructure table in dataBase.Tables)
                 {
