@@ -12,8 +12,11 @@ namespace MySQL_Clear_standart.DataBaseSchemeStructure
     {
         private string _name;
         private string _typeID;
+        private string _oldName;
+        private int _size;
         private bool _isPrimary;
         private bool _isForSelect;
+        private bool _isRenamed = false;
         private S_Type _type;
 
         public ColumnStructure() {}
@@ -68,6 +71,27 @@ namespace MySQL_Clear_standart.DataBaseSchemeStructure
         {
             get { return _isForSelect; }
             set { _isForSelect = value; }
+        }
+
+        [XmlIgnore]
+        public bool IsRenamed
+        {
+            get { return _isRenamed; }
+            set { _isRenamed = value; }
+        }
+
+        [XmlIgnore]
+        public int Size
+        {
+            get { return _size; }
+            set { _size = value; }
+        }
+
+        [XmlIgnore]
+        public string OldName
+        {
+            get { return _oldName; }
+            set { _oldName = value; }
         }
     }
 }

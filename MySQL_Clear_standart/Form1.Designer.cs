@@ -81,6 +81,7 @@
             this.textBox4.Size = new System.Drawing.Size(545, 406);
             this.textBox4.TabIndex = 0;
             this.textBox4.Text = resources.GetString("textBox4.Text");
+            this.textBox4.TextChanged += new System.EventHandler(this.textBox4_TextChanged);
             // 
             // tabPage2
             // 

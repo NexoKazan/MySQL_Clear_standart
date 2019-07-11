@@ -11,6 +11,7 @@ namespace MySQL_Clear_standart.Listeners
     {
         public string _output;
         public string _functionOutput;
+        public List<string> _selectFunctions;
 
         public List<string> AsColumnList= new List<string>();
 

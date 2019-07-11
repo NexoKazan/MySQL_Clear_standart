@@ -19,6 +19,7 @@ namespace MySQL_Clear_standart
         private bool _isJoined = false;
         private ColumnStructure _leftColumn;
         private ColumnStructure _rightColumn;
+        private TableStructure _outTable;
         private SelectStructure _leftSelect;
         private SelectStructure _rightSelect;
         private JoinStructure _leftJoin;
@@ -31,6 +32,8 @@ namespace MySQL_Clear_standart
             _comparisonOperator = comparisonOperator;
         }
 
+        #region Свойства
+
         public string Name
         {
             get { return _name; }
@@ -41,10 +44,12 @@ namespace MySQL_Clear_standart
         {
             get { return _leftColumnString; }
         }
+        
         public string RightColumnString
         {
             get { return _rightColumnString; }
         }
+        
         public ColumnStructure LeftColumn
         {
             get { return _leftColumn; }
@@ -56,7 +61,11 @@ namespace MySQL_Clear_standart
             get { return _rightColumn; }
             set { _rightColumn = value; }
         }
-
+       
+        public TableStructure OutTable
+        {
+            get { return _outTable; }
+        }
         public SelectStructure LeftSelect
         {
             get { return _leftSelect; }
@@ -92,6 +101,7 @@ namespace MySQL_Clear_standart
             get { return _isFirst; }
             set { _isFirst = value; }
         }
+        
         public bool Switched
         {
             get { return _switched; }
@@ -103,8 +113,9 @@ namespace MySQL_Clear_standart
             get { return _isJoined; }
             set { _isJoined = value; }
         }
-
-
+        
+        #endregion
+        
         public void CreateQuerry()
         {
             if (_leftJoin != null)
@@ -150,7 +161,7 @@ namespace MySQL_Clear_standart
                 }
             }
             _columns = tmpColumns;
-            
+            _outTable = new TableStructure(_name + "_TB", _columns.ToArray());
             _output = "SELECT\r\n\t";
             for (int i = 0; i < _columns.Count; i++)
             {
@@ -160,7 +171,7 @@ namespace MySQL_Clear_standart
                 }
                 else
                 {
-                    _output += Columns[i].Name + "\r\n";
+                    _output += _columns[i].Name + "\r\n";
                 }
             }
 

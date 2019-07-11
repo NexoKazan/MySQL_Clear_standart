@@ -17,6 +17,7 @@ namespace MySQL_Clear_standart
         private bool _isSelectPart = false;
         private bool _isSingleColumn = false;
         private bool _isSortPart = false;
+        private ColumnStructure _asRightColumn;
         private List<string> _asColumnList;
         private List<TableStructure> _asTables;
 
@@ -57,9 +58,16 @@ namespace MySQL_Clear_standart
             set { _isSingleColumn = value; }
         }
 
+        public ColumnStructure GetAsRightColumn
+        {
+            get { return _asRightColumn; }
+        }
+
         public void FindeTable(DataBaseStructure db)
         {//кривой цикл продумать лучше. Попробовать сделать через Column.Table
             _asTables = new List<TableStructure>();
+            _asRightColumn = new ColumnStructure(_asRightName);
+            _asRightColumn.Size = -1;
             foreach (var col in _asColumnList)
             {
                 foreach (var tb in db.Tables)
@@ -69,6 +77,12 @@ namespace MySQL_Clear_standart
                         if (col == cl.Name)
                         {
                             _asTables.Add(tb);
+                            if (_asRightColumn.Size < cl.Size)
+                            {
+                                _asRightColumn.Size = cl.Size;
+                                _asRightColumn.TypeID = cl.TypeID;
+                                _asRightColumn.Type = cl.Type;
+                            }
                         }                        
                     }
                 }
@@ -79,7 +93,9 @@ namespace MySQL_Clear_standart
             {
                 _isSelectPart = true;
                 _table = _asTables[0].Name;
-                _asRightName = _asTables[0].ShortName + _asRightName;
+                _asRightColumn.IsRenamed = true;
+                _asRightColumn.OldName = _asRightColumn.Name;
+                _asRightColumn.Name = _asTables[0].ShortName + _asRightName;
             }
             else
             {

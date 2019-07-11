@@ -65,7 +65,7 @@ namespace MySQL_Clear_standart
 
                 foreach (AsStructure asStructure in _asList)
                 {//Сосздать конструктор для новых столбцов
-                  tempList.Add(new ColumnStructure(asStructure.GetAsRightName));
+                  tempList.Add(asStructure.GetAsRightColumn);
                 }
 
                 //tempList = tempList.Distinct().ToList();
@@ -93,7 +93,7 @@ namespace MySQL_Clear_standart
 
             foreach (var asStructure in _asList)
             {
-                _output += "\r\n\t" + asStructure.AsString + " AS " + asStructure.GetAsRightName;
+                _output += "\r\n\t" + asStructure.AsString + " AS " + asStructure.GetAsRightColumn.Name;
             }
 
             _output += "\r\n" + "FROM " + "\r\n\t" + _tableName + "\r\n" ;

@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Reflection;
 using Antlr4;
 using Antlr4.Runtime;
 using Antlr4.Runtime.Tree;
@@ -72,6 +73,7 @@ namespace MySQL_Clear_standart
 
         private SelectStructure[] _selectQuery;
         private List<JoinStructure> _joinQuery;
+        private bool _toDoTextFlag;
 
         #region baseDefinition объявляются переменный для построения дерева
 
@@ -111,7 +113,8 @@ namespace MySQL_Clear_standart
 
         #endregion
 
-        //TAB_1//
+        #region TAB_1
+
         private void btn_CreateTree_Click(object sender, EventArgs e)
         {
             //Кнопка для картинки(построить дерево)
@@ -253,18 +256,26 @@ namespace MySQL_Clear_standart
             //}
 
             #endregion
-
-            comboBox2.Text = "5";
+            
             btn_SelectQuerry_tab2_Click(sender, e);
             btn_CreateJoin_Click(sender, e);
-            
+            foreach (var joinStructure in _joinQuery)
+            {
+                output += "\r\n========== " + joinStructure.Name + "==========\r\n";
+                foreach (ColumnStructure column in joinStructure.OutTable.Columns)
+                {
+                    output += column.Name + "\r\n";
+                }
+
+            }
+
             textBox1.Text = output;
         }
 
+        #endregion
         
+        #region TAB_2
 
-
-        //TAB_2///
         private void btn_CreateSelect_Click(object sender, EventArgs e)
         {
             //составление запросов SELECT
@@ -278,19 +289,14 @@ namespace MySQL_Clear_standart
             }
         }
         
-
         private void btn_CreateJoin_Click(object sender, EventArgs e)
         {
             //btn_CreateSelect_Click(sender, e);//УБРАТЬ! ВЫНЕСТИ В МЕТОД
             MakeSelect();
-            _joinQuery = listener.JoinStructures;
-            FillJoins(_joinQuery, _dbName, _selectQuery.ToList());
-            GetJoinSequence(_joinQuery);
-            _joinQuery = SortJoin(_joinQuery);
+            MakeJoin();
             textBox5.Clear();
             foreach (var join in _joinQuery)
             {
-                join.CreateQuerry();
                 textBox5.Text += "\r\n========" + join.Name + "========\r\n" + join.Output + "\r\n";
             }
         }
@@ -370,6 +376,10 @@ namespace MySQL_Clear_standart
                 comboBox2.Text = "0";
             }
         }
+        
+        #endregion
+
+        #region FormMethods
 
         private void Form1_SizeChanged(object sender, EventArgs e)
         {
@@ -381,7 +391,12 @@ namespace MySQL_Clear_standart
             FillScheme();
             ReSize();
             GetTree();
-            using (FileStream fs = new FileStream("db_result.xml", FileMode.Create, FileAccess.ReadWrite))
+            _toDoTextFlag = true;
+            StreamReader sr = new StreamReader(@"res\ToDO.txt", System.Text.Encoding.Default);
+            textBox4.Text = sr.ReadToEnd();
+            sr.Close();
+            _toDoTextFlag = false;
+            using (FileStream fs = new FileStream(Environment.CurrentDirectory + @"res\db_result.xml", FileMode.Create, FileAccess.ReadWrite))
             {
                 XmlSerializer dbSerializer = new XmlSerializer(typeof(DataBaseStructure));
                 dbSerializer.Serialize(fs, _dbName);
@@ -400,7 +415,22 @@ namespace MySQL_Clear_standart
             textBox1.Text = textBox2.Text;
         }
 
+        private void textBox4_TextChanged(object sender, EventArgs e)
+        {
+            if (!_toDoTextFlag)
+            {
+                using (StreamWriter sw = new StreamWriter(Environment.CurrentDirectory + @"res\ToDO.txt", false, System.Text.Encoding.Default))
+                {
+                    sw.WriteLine(textBox4.Text);
+                    sw.Close();
+                }
+            }
+        }
+        
+        #endregion
 
+        #region СлужебныеМетоды
+        
         private TableStructure GetCorrectTable(string listenerTable, DataBaseStructure db)
         {
             TableStructure outTable = new TableStructure();
@@ -493,24 +523,7 @@ namespace MySQL_Clear_standart
             textBox3.Location = new Point(textBox2.Location.X + 150 + textBox2.Width, textBox3.Location.Y);
             textBox5.Location = new Point(textBox3.Location.X + 20 + textBox3.Width, textBox3.Location.Y);
         }
-
-        private void CreateScheme()
-        {
-            List<TableStructure> outTablesList = new List<TableStructure>();
-            foreach (var selectStructure in _selectQuery)
-            {
-                outTablesList.Add(selectStructure.OutTable);
-            }
-            DataBaseStructure outDB = new DataBaseStructure("OUT_DB", outTablesList.ToArray());
-            MatchColumns(_dbName, outDB);
-            outDB.Name = _dbName.Name + "_Select";
-            using (FileStream fs = new FileStream("OutDB.xml", FileMode.Create, FileAccess.ReadWrite))
-            {
-                XmlSerializer dbSerializer = new XmlSerializer(typeof(DataBaseStructure));
-                dbSerializer.Serialize(fs, outDB);
-            }
-        }
-
+        
         private void MakeSelect()
         {
             GetTree();
@@ -539,9 +552,58 @@ namespace MySQL_Clear_standart
                     GetCorrectAsStructure(listener.AsList, listener.TableNames[i]) //asStructure(asStructure)
                 );
             }
-            CreateScheme();
+            CreateScheme(_selectQuery);
         }
-
+       
+        private void MakeJoin()
+        {
+            _joinQuery = listener.JoinStructures;
+            FillJoins(_joinQuery, _dbName, _selectQuery.ToList());
+            GetJoinSequence(_joinQuery);
+            _joinQuery = SortJoin(_joinQuery);
+            foreach (var join in _joinQuery)
+            {
+                join.CreateQuerry();
+            }
+            CreateScheme(_joinQuery);
+        }
+       
+        private void CreateScheme(SelectStructure[] selectQuery)
+        {
+            List<TableStructure> outTablesList = new List<TableStructure>();
+            foreach (var selectStructure in selectQuery)
+            {
+                outTablesList.Add(selectStructure.OutTable);
+            }
+            DataBaseStructure outDB = new DataBaseStructure("SELECT_OUT_DB", outTablesList.ToArray());
+            MatchColumns(_dbName, outDB);
+            outDB.Name = _dbName.Name + "_Select";
+            outDB.Types = _dbName.Types;
+            using (FileStream fs = new FileStream(Environment.CurrentDirectory + @"res\SelectOutDB.xml", FileMode.Create, FileAccess.ReadWrite))
+            {
+                XmlSerializer dbSerializer = new XmlSerializer(typeof(DataBaseStructure));
+                dbSerializer.Serialize(fs, outDB);
+            }
+        }
+        
+        private void CreateScheme(List<JoinStructure> joinQuerry)
+        {
+            List<TableStructure> outTablesList = new List<TableStructure>();
+            foreach (var joinStructure in joinQuerry)
+            {
+                outTablesList.Add(joinStructure.OutTable);
+            }
+            DataBaseStructure outDB = new DataBaseStructure("JOIN_OUT_DB", outTablesList.ToArray());
+            MatchColumns(_dbName, outDB);
+            outDB.Name = _dbName.Name + "_Join";
+            outDB.Types = _dbName.Types;
+            using (FileStream fs = new FileStream(Environment.CurrentDirectory + @"res\JoinOutDB.xml", FileMode.Create, FileAccess.ReadWrite))
+            {
+                XmlSerializer dbSerializer = new XmlSerializer(typeof(DataBaseStructure));
+                dbSerializer.Serialize(fs, outDB);
+            }
+        }
+        
         private void GetQuerryTreesScreens(string path, int start, int end)
         {
             for (int i = start; i < end+1; i++)
@@ -750,51 +812,41 @@ namespace MySQL_Clear_standart
 
         private List<ColumnStructure> GetClearColumns(List<string> allColumns, List<string> removeColumns, TableStructure table)
         {
-            try
+            List<string> inList = allColumns;
+            List<ColumnStructure> outList = new List<ColumnStructure>();
+            int j = 0;
+            for (int i = 0; i < inList.Count; i++)
             {
-                List<string> inList = allColumns;
-                List<ColumnStructure> outList = new List<ColumnStructure>();
-                int j = 0;
-                for (int i = 0; i < inList.Count; i++)
+                if (j < removeColumns.Count && inList[i] == removeColumns[j])
                 {
-                    if (j < removeColumns.Count && inList[i] == removeColumns[j])
-                    {
-                        inList.Remove(inList[i]);
-                        i = 0;
-                        j++;
-                    }
+                    inList.Remove(inList[i]);
+                    i = 0;
+                    j++;
                 }
-                inList = inList.Distinct().ToList();
-                foreach (string allColumn in inList)
-                {
-                    for (int i = 0; i < table.Columns.Length; i++)
-                    {
-                        if (allColumn == table.Columns[i].Name)
-                        {
-                            outList.Add(table.Columns[i]);
-                            break;
-                        }
-                    }
-                }
-
-                foreach (ColumnStructure column in outList)
-                {
-                    foreach (string selectColumn in listener.SelectColumns)
-                    {
-                        if (column.Name == selectColumn)
-                        {
-                            column.IsForSelect = true;
-                        }
-                    }
-                }
-                return outList;
             }
-            catch (Exception e)
+            inList = inList.Distinct().ToList();
+            foreach (string allColumn in inList)
             {
-                Console.WriteLine(e);
-                MessageBox.Show(e.Message);
-                throw;
+                for (int i = 0; i < table.Columns.Length; i++)
+                {
+                    if (allColumn == table.Columns[i].Name)
+                    {
+                        outList.Add(table.Columns[i]);
+                        break;
+                    }
+                }
             }
+            foreach (ColumnStructure column in outList)
+            {
+                foreach (string selectColumn in listener.SelectColumns)
+                {
+                    if (column.Name == selectColumn)
+                    {
+                        column.IsForSelect = true;
+                    }
+                }
+            }
+            return outList;
         }
 
         private List<AsStructure> GetCorrectAsStructure(List<AsStructure> asStructures, string tableName)
@@ -835,6 +887,7 @@ namespace MySQL_Clear_standart
                         if (dbColumn.TypeID == dbType.ID)
                         {
                             dbColumn.Type = dbType;
+                            dbColumn.Size = dbType.Size;
                             break;
                         }
                     }
@@ -911,6 +964,7 @@ namespace MySQL_Clear_standart
                 }
             }
         }
-
+        
+        #endregion
     }
 }
