@@ -206,7 +206,7 @@ namespace MySQL_Clear_standart
             {
                 if (_leftSelect != null)
                 {
-                    _output += _leftSelect.Name + "\r\n\t";
+                    _output += _leftSelect.Name + ",\r\n\t";
                 }
                 else
                 {

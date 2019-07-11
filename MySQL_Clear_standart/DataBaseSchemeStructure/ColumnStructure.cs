@@ -15,7 +15,7 @@ namespace MySQL_Clear_standart.DataBaseSchemeStructure
         private string _oldName;
         private int _size;
         private bool _isPrimary;
-        private bool _isForSelect;
+        private bool _isForSelect = false;
         private bool _isRenamed = false;
         private S_Type _type;
 

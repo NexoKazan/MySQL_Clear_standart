@@ -257,17 +257,34 @@ namespace MySQL_Clear_standart
 
             #endregion
             
-            btn_SelectQuerry_tab2_Click(sender, e);
-            btn_CreateJoin_Click(sender, e);
-            foreach (var joinStructure in _joinQuery)
+            output += "\r\n===до 3го===\r\n";
+            foreach (var tb  in _dbName.Tables)
             {
-                output += "\r\n========== " + joinStructure.Name + "==========\r\n";
-                foreach (ColumnStructure column in joinStructure.OutTable.Columns)
+                if (tb.Name == "LINEITEM")
                 {
-                    output += column.Name + "\r\n";
+                    output += "\r\n===" + tb.Name + "===\r\n";
+                    foreach (var column in tb.Columns)
+                    {
+                        output += column.Name + " => " + column.IsForSelect + "\r\n";
+                    }
                 }
-
             }
+            btn_CreateSelect_Click(sender, e);
+            btn_CreateJoin_Click(sender, e);
+            output += "\r\n===После 3го===\r\n";
+            foreach (var tb  in _dbName.Tables)
+            { 
+                if (tb.Name == "LINEITEM")
+                {
+                    output += "\r\n===" + tb.Name + "===\r\n";
+                    foreach (var column in tb.Columns)
+                    {
+                        output += column.Name + " => " + column.IsForSelect + "\r\n";
+                    }
+                }
+            }
+            comboBox1.Text = "5";
+            
 
             textBox1.Text = output;
         }
@@ -291,8 +308,6 @@ namespace MySQL_Clear_standart
         
         private void btn_CreateJoin_Click(object sender, EventArgs e)
         {
-            //btn_CreateSelect_Click(sender, e);//УБРАТЬ! ВЫНЕСТИ В МЕТОД
-            MakeSelect();
             MakeJoin();
             textBox5.Clear();
             foreach (var join in _joinQuery)
@@ -396,7 +411,7 @@ namespace MySQL_Clear_standart
             textBox4.Text = sr.ReadToEnd();
             sr.Close();
             _toDoTextFlag = false;
-            using (FileStream fs = new FileStream(Environment.CurrentDirectory + @"res\db_result.xml", FileMode.Create, FileAccess.ReadWrite))
+            using (FileStream fs = new FileStream(@"res\db_result.xml", FileMode.Create, FileAccess.ReadWrite))
             {
                 XmlSerializer dbSerializer = new XmlSerializer(typeof(DataBaseStructure));
                 dbSerializer.Serialize(fs, _dbName);
@@ -419,7 +434,7 @@ namespace MySQL_Clear_standart
         {
             if (!_toDoTextFlag)
             {
-                using (StreamWriter sw = new StreamWriter(Environment.CurrentDirectory + @"res\ToDO.txt", false, System.Text.Encoding.Default))
+                using (StreamWriter sw = new StreamWriter(@"res\ToDO.txt", false, System.Text.Encoding.Default))
                 {
                     sw.WriteLine(textBox4.Text);
                     sw.Close();
@@ -502,6 +517,7 @@ namespace MySQL_Clear_standart
 
         private void GetTree()
         {
+            FillScheme(); //странный баг.
             textBox2.Text = textBox1.Text;
             inputString = textBox1.Text;
             inputStream = new AntlrInputStream(inputString);
@@ -533,8 +549,6 @@ namespace MySQL_Clear_standart
             {
                 asStructure.FindeTable(_dbName);
             }
-
-            FindeWhereStructureTable(listener.WhereList, _dbName);
             for (int i = 0; i < listener.TableNames.Count; i++)
             {
                 _selectQuery[i] = new SelectStructure
@@ -545,8 +559,7 @@ namespace MySQL_Clear_standart
                     (
                         listener.ColumnNames, //goodColumns(s)
                         listener.ExprColumnNames, //wrongColums(s)
-                        GetCorrectTable(listener.TableNames[i],
-                            _dbName) // TableName(TableStructure) нужно для нахождения существующих столбцов и сопоставления
+                        GetCorrectTable(listener.TableNames[i],_dbName) // TableName(TableStructure) нужно для нахождения существующих столбцов и сопоставления
                     ),
                     GetCorrectWhereStructure(listener.WhereList, listener.TableNames[i]), //WhereStructure(WhereStructure)
                     GetCorrectAsStructure(listener.AsList, listener.TableNames[i]) //asStructure(asStructure)
@@ -557,6 +570,7 @@ namespace MySQL_Clear_standart
        
         private void MakeJoin()
         {
+            MakeSelect();
             _joinQuery = listener.JoinStructures;
             FillJoins(_joinQuery, _dbName, _selectQuery.ToList());
             GetJoinSequence(_joinQuery);
@@ -579,7 +593,7 @@ namespace MySQL_Clear_standart
             MatchColumns(_dbName, outDB);
             outDB.Name = _dbName.Name + "_Select";
             outDB.Types = _dbName.Types;
-            using (FileStream fs = new FileStream(Environment.CurrentDirectory + @"res\SelectOutDB.xml", FileMode.Create, FileAccess.ReadWrite))
+            using (FileStream fs = new FileStream(@"res\SelectOutDB.xml", FileMode.Create, FileAccess.ReadWrite))
             {
                 XmlSerializer dbSerializer = new XmlSerializer(typeof(DataBaseStructure));
                 dbSerializer.Serialize(fs, outDB);
@@ -597,7 +611,7 @@ namespace MySQL_Clear_standart
             MatchColumns(_dbName, outDB);
             outDB.Name = _dbName.Name + "_Join";
             outDB.Types = _dbName.Types;
-            using (FileStream fs = new FileStream(Environment.CurrentDirectory + @"res\JoinOutDB.xml", FileMode.Create, FileAccess.ReadWrite))
+            using (FileStream fs = new FileStream(@"res\JoinOutDB.xml", FileMode.Create, FileAccess.ReadWrite))
             {
                 XmlSerializer dbSerializer = new XmlSerializer(typeof(DataBaseStructure));
                 dbSerializer.Serialize(fs, outDB);
