@@ -51,6 +51,8 @@
             this.btn_CreateTree = new System.Windows.Forms.Button();
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.tabControl1 = new System.Windows.Forms.TabControl();
+            this.textBox6 = new System.Windows.Forms.TextBox();
+            this.btn_CreateSort = new System.Windows.Forms.Button();
             this.tabPage3.SuspendLayout();
             this.tabPage2.SuspendLayout();
             this.tabPage1.SuspendLayout();
@@ -85,6 +87,8 @@
             // 
             // tabPage2
             // 
+            this.tabPage2.Controls.Add(this.btn_CreateSort);
+            this.tabPage2.Controls.Add(this.textBox6);
             this.tabPage2.Controls.Add(this.textBox5);
             this.tabPage2.Controls.Add(this.btn_CreateJoin);
             this.tabPage2.Controls.Add(this.comboBox2);
@@ -104,7 +108,7 @@
             // 
             this.textBox5.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.textBox5.Location = new System.Drawing.Point(706, 83);
+            this.textBox5.Location = new System.Drawing.Point(215, 83);
             this.textBox5.Multiline = true;
             this.textBox5.Name = "textBox5";
             this.textBox5.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
@@ -159,7 +163,7 @@
             // 
             this.textBox3.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.textBox3.Location = new System.Drawing.Point(916, 83);
+            this.textBox3.Location = new System.Drawing.Point(425, 83);
             this.textBox3.Multiline = true;
             this.textBox3.Name = "textBox3";
             this.textBox3.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
@@ -227,6 +231,7 @@
             this.label1.Size = new System.Drawing.Size(47, 13);
             this.label1.TabIndex = 8;
             this.label1.Text = "Запрос:";
+            this.label1.Click += new System.EventHandler(this.label1_Click);
             // 
             // comboBox1
             // 
@@ -327,6 +332,27 @@
             this.tabControl1.Size = new System.Drawing.Size(1136, 583);
             this.tabControl1.TabIndex = 5;
             // 
+            // textBox6
+            // 
+            this.textBox6.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.textBox6.Location = new System.Drawing.Point(635, 83);
+            this.textBox6.Multiline = true;
+            this.textBox6.Name = "textBox6";
+            this.textBox6.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.textBox6.Size = new System.Drawing.Size(204, 468);
+            this.textBox6.TabIndex = 11;
+            // 
+            // btn_CreateSort
+            // 
+            this.btn_CreateSort.Location = new System.Drawing.Point(269, 6);
+            this.btn_CreateSort.Name = "btn_CreateSort";
+            this.btn_CreateSort.Size = new System.Drawing.Size(75, 71);
+            this.btn_CreateSort.TabIndex = 12;
+            this.btn_CreateSort.Text = "Составить запросы SORT";
+            this.btn_CreateSort.UseVisualStyleBackColor = true;
+            this.btn_CreateSort.Click += new System.EventHandler(this.btn_CreateSort_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -376,6 +402,8 @@
         private System.Windows.Forms.TabControl tabControl1;
         private System.Windows.Forms.Button btn_CreateJoin;
         private System.Windows.Forms.TextBox textBox5;
+        private System.Windows.Forms.TextBox textBox6;
+        private System.Windows.Forms.Button btn_CreateSort;
     }
 }
 

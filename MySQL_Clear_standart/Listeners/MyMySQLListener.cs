@@ -16,6 +16,7 @@ namespace MySQL_Clear_standart
         public List<string> ColumnNames = new List<string>();
         public List<string> ExprColumnNames = new List<string>();
         public List<string> SelectColumns = new List<string>();
+        public List<string> GroupByColumnsNames = new List<string>();
         public List<JoinStructure> JoinStructures = new List<JoinStructure>();
         public List<WhereStructure> WhereList = new List<WhereStructure>();
         public List<AsStructure> AsList = new List<AsStructure>();
@@ -40,7 +41,7 @@ namespace MySQL_Clear_standart
                 AsListener asl = new AsListener();
                 ParseTreeWalker wlk = new ParseTreeWalker();
                 wlk.Walk(asl, context);
-                AsList.Add(new AsStructure(asl.AsColumnList, asl._output, asl._functionOutput, context.uid().GetText()));
+                AsList.Add(new AsStructure(asl.AsColumnList, asl._output, asl._functionOutput, context.uid().GetText(), asl._functionName));
                 ExprColumnNames.AddRange(asl.AsColumnList);
             }
         }
@@ -67,6 +68,11 @@ namespace MySQL_Clear_standart
         public override void EnterSelectColumnElement([NotNull] MySqlParser.SelectColumnElementContext context)
         {
             SelectColumns.Add(context.GetText());
+        }
+
+        public override void EnterGroupByItem([NotNull] MySqlParser.GroupByItemContext context)
+        {
+            GroupByColumnsNames.Add(context.GetText());
         }
     }
 }

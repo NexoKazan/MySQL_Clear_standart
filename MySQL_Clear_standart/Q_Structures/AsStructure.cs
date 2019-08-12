@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using MySQL_Clear_standart.DataBaseSchemeStructure;
 
 namespace MySQL_Clear_standart
@@ -14,6 +15,7 @@ namespace MySQL_Clear_standart
         private string _clearString; //переименовать
         private string _asString;
         private string _functionString;
+        private string _aggregateFunctionName;
         private bool _isSelectPart = false;
         private bool _isSingleColumn = false;
         private bool _isSortPart = false;
@@ -21,13 +23,14 @@ namespace MySQL_Clear_standart
         private List<string> _asColumnList;
         private List<TableStructure> _asTables;
 
-        public AsStructure(List<string> asColumns, string asString, string functionString, string asRightName)
+        public AsStructure(List<string> asColumns, string asString, string functionString, string asRightName, string aggregateFunctionName)
         {
             _asColumnList = asColumns;
             _clearString = asString;
             _asRightName = asRightName;
             _functionString = functionString;
             _asString = asString;
+            _aggregateFunctionName = aggregateFunctionName;
         }
 
         public string Table
@@ -44,6 +47,11 @@ namespace MySQL_Clear_standart
         public string GetAsRightName
         {
             get { return _asRightName; }
+        }
+
+        public string AggregateFunctionName
+        {
+            get { return _aggregateFunctionName; }
         }
 
         public bool IsSelectPart

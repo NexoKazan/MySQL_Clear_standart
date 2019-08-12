@@ -66,6 +66,7 @@ namespace MySQL_Clear_standart
         {
             get { return _outTable; }
         }
+        
         public SelectStructure LeftSelect
         {
             get { return _leftSelect; }

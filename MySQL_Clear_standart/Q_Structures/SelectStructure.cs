@@ -93,7 +93,15 @@ namespace MySQL_Clear_standart
 
             foreach (var asStructure in _asList)
             {
-                _output += "\r\n\t" + asStructure.AsString + " AS " + asStructure.GetAsRightColumn.Name;
+                if (_output != "SELECT ")
+                {
+                    _output += ",";
+                    _output += "\r\n\t" + asStructure.AsString + " AS " + asStructure.GetAsRightColumn.Name;
+                }
+                else
+                {
+                    _output += "\r\n\t" + asStructure.AsString + " AS " + asStructure.GetAsRightColumn.Name;
+                }
             }
 
             _output += "\r\n" + "FROM " + "\r\n\t" + _tableName + "\r\n" ;

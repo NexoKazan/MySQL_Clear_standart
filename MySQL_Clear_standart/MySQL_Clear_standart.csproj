@@ -53,6 +53,7 @@
     <Compile Include="DataBaseSchemeStructure\ColumnStructure.cs" />
     <Compile Include="DataBaseSchemeStructure\DataBaseStructure.cs" />
     <Compile Include="DataBaseSchemeStructure\TableStructure.cs" />
+    <Compile Include="Q_Structures\GroupByStructure.cs" />
     <Compile Include="Q_Structures\JoinStructure.cs" />
     <Compile Include="Listeners\AsListener.cs" />
     <Compile Include="Listeners\JoinListener.cs" />
@@ -87,7 +88,7 @@
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
+      <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
     </EmbeddedResource>
@@ -144,7 +145,7 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="res\ToDO.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
     <EmbeddedResource Include="res\JoinOutDB.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
