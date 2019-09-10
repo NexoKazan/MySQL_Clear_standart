@@ -53,7 +53,7 @@
     <Compile Include="DataBaseSchemeStructure\ColumnStructure.cs" />
     <Compile Include="DataBaseSchemeStructure\DataBaseStructure.cs" />
     <Compile Include="DataBaseSchemeStructure\TableStructure.cs" />
-    <Compile Include="Q_Structures\GroupByStructure.cs" />
+    <Compile Include="Q_Structures\OrderByStructure.cs" />
     <Compile Include="Q_Structures\JoinStructure.cs" />
     <Compile Include="Listeners\AsListener.cs" />
     <Compile Include="Listeners\JoinListener.cs" />

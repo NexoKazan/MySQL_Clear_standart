@@ -33,6 +33,8 @@
             this.tabPage3 = new System.Windows.Forms.TabPage();
             this.textBox4 = new System.Windows.Forms.TextBox();
             this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.btn_CreateSort = new System.Windows.Forms.Button();
+            this.textBox6 = new System.Windows.Forms.TextBox();
             this.textBox5 = new System.Windows.Forms.TextBox();
             this.btn_CreateJoin = new System.Windows.Forms.Button();
             this.comboBox2 = new System.Windows.Forms.ComboBox();
@@ -42,6 +44,7 @@
             this.btn_CreateSelect = new System.Windows.Forms.Button();
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.radioButton1 = new System.Windows.Forms.RadioButton();
             this.label1 = new System.Windows.Forms.Label();
             this.comboBox1 = new System.Windows.Forms.ComboBox();
             this.btn_Debug = new System.Windows.Forms.Button();
@@ -51,8 +54,6 @@
             this.btn_CreateTree = new System.Windows.Forms.Button();
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.tabControl1 = new System.Windows.Forms.TabControl();
-            this.textBox6 = new System.Windows.Forms.TextBox();
-            this.btn_CreateSort = new System.Windows.Forms.Button();
             this.tabPage3.SuspendLayout();
             this.tabPage2.SuspendLayout();
             this.tabPage1.SuspendLayout();
@@ -104,6 +105,27 @@
             this.tabPage2.Text = "tabPage2";
             this.tabPage2.UseVisualStyleBackColor = true;
             // 
+            // btn_CreateSort
+            // 
+            this.btn_CreateSort.Location = new System.Drawing.Point(368, 6);
+            this.btn_CreateSort.Name = "btn_CreateSort";
+            this.btn_CreateSort.Size = new System.Drawing.Size(75, 71);
+            this.btn_CreateSort.TabIndex = 12;
+            this.btn_CreateSort.Text = "Составить запросы SORT";
+            this.btn_CreateSort.UseVisualStyleBackColor = true;
+            this.btn_CreateSort.Click += new System.EventHandler(this.btn_CreateSort_Click);
+            // 
+            // textBox6
+            // 
+            this.textBox6.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.textBox6.Location = new System.Drawing.Point(635, 83);
+            this.textBox6.Multiline = true;
+            this.textBox6.Name = "textBox6";
+            this.textBox6.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.textBox6.Size = new System.Drawing.Size(204, 468);
+            this.textBox6.TabIndex = 11;
+            // 
             // textBox5
             // 
             this.textBox5.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -117,7 +139,7 @@
             // 
             // btn_CreateJoin
             // 
-            this.btn_CreateJoin.Location = new System.Drawing.Point(188, 6);
+            this.btn_CreateJoin.Location = new System.Drawing.Point(287, 6);
             this.btn_CreateJoin.Name = "btn_CreateJoin";
             this.btn_CreateJoin.Size = new System.Drawing.Size(75, 71);
             this.btn_CreateJoin.TabIndex = 9;
@@ -143,15 +165,15 @@
             "12",
             "13",
             "14"});
-            this.comboBox2.Location = new System.Drawing.Point(89, 6);
+            this.comboBox2.Location = new System.Drawing.Point(8, 6);
             this.comboBox2.Name = "comboBox2";
-            this.comboBox2.Size = new System.Drawing.Size(67, 21);
+            this.comboBox2.Size = new System.Drawing.Size(33, 21);
             this.comboBox2.TabIndex = 8;
             this.comboBox2.Text = "0";
             // 
             // btn_SelectQuerry_tab2
             // 
-            this.btn_SelectQuerry_tab2.Location = new System.Drawing.Point(89, 37);
+            this.btn_SelectQuerry_tab2.Location = new System.Drawing.Point(8, 37);
             this.btn_SelectQuerry_tab2.Name = "btn_SelectQuerry_tab2";
             this.btn_SelectQuerry_tab2.Size = new System.Drawing.Size(93, 40);
             this.btn_SelectQuerry_tab2.TabIndex = 5;
@@ -186,7 +208,7 @@
             // 
             // btn_CreateSelect
             // 
-            this.btn_CreateSelect.Location = new System.Drawing.Point(8, 6);
+            this.btn_CreateSelect.Location = new System.Drawing.Point(206, 6);
             this.btn_CreateSelect.Name = "btn_CreateSelect";
             this.btn_CreateSelect.Size = new System.Drawing.Size(75, 71);
             this.btn_CreateSelect.TabIndex = 0;
@@ -209,6 +231,7 @@
             // 
             this.panel1.AutoScroll = true;
             this.panel1.AutoSize = true;
+            this.panel1.Controls.Add(this.radioButton1);
             this.panel1.Controls.Add(this.label1);
             this.panel1.Controls.Add(this.comboBox1);
             this.panel1.Controls.Add(this.btn_Debug);
@@ -222,6 +245,19 @@
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(1122, 551);
             this.panel1.TabIndex = 0;
+            // 
+            // radioButton1
+            // 
+            this.radioButton1.AutoCheck = false;
+            this.radioButton1.AutoSize = true;
+            this.radioButton1.Checked = true;
+            this.radioButton1.Location = new System.Drawing.Point(185, 30);
+            this.radioButton1.Name = "radioButton1";
+            this.radioButton1.Size = new System.Drawing.Size(66, 17);
+            this.radioButton1.TabIndex = 9;
+            this.radioButton1.TabStop = true;
+            this.radioButton1.Text = "NoSubQ";
+            this.radioButton1.UseVisualStyleBackColor = true;
             // 
             // label1
             // 
@@ -332,27 +368,6 @@
             this.tabControl1.Size = new System.Drawing.Size(1136, 583);
             this.tabControl1.TabIndex = 5;
             // 
-            // textBox6
-            // 
-            this.textBox6.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.textBox6.Location = new System.Drawing.Point(635, 83);
-            this.textBox6.Multiline = true;
-            this.textBox6.Name = "textBox6";
-            this.textBox6.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.textBox6.Size = new System.Drawing.Size(204, 468);
-            this.textBox6.TabIndex = 11;
-            // 
-            // btn_CreateSort
-            // 
-            this.btn_CreateSort.Location = new System.Drawing.Point(269, 6);
-            this.btn_CreateSort.Name = "btn_CreateSort";
-            this.btn_CreateSort.Size = new System.Drawing.Size(75, 71);
-            this.btn_CreateSort.TabIndex = 12;
-            this.btn_CreateSort.Text = "Составить запросы SORT";
-            this.btn_CreateSort.UseVisualStyleBackColor = true;
-            this.btn_CreateSort.Click += new System.EventHandler(this.btn_CreateSort_Click);
-            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -404,6 +419,7 @@
         private System.Windows.Forms.TextBox textBox5;
         private System.Windows.Forms.TextBox textBox6;
         private System.Windows.Forms.Button btn_CreateSort;
+        private System.Windows.Forms.RadioButton radioButton1;
     }
 }
 

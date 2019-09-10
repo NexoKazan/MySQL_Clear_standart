@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Antlr4.Runtime.Tree;
 using MySQL_Clear_standart.Listeners;
+using MySQL_Clear_standart.Q_Structures;
 
 namespace MySQL_Clear_standart
 {
@@ -20,6 +21,7 @@ namespace MySQL_Clear_standart
         public List<JoinStructure> JoinStructures = new List<JoinStructure>();
         public List<WhereStructure> WhereList = new List<WhereStructure>();
         public List<AsStructure> AsList = new List<AsStructure>();
+        public List<OrderByStructure> OrderByList = new List<OrderByStructure>();
         
         private bool _triggerEnterSelectFunctionElemenAsExist = false;
 
@@ -29,6 +31,7 @@ namespace MySQL_Clear_standart
         {
             ColumnNames.Add(context.GetText());
         }
+        
         public override void EnterTableSourceBase([NotNull] MySqlParser.TableSourceBaseContext context)
         {
             TableNames.Add(context.GetText());
@@ -73,6 +76,20 @@ namespace MySQL_Clear_standart
         public override void EnterGroupByItem([NotNull] MySqlParser.GroupByItemContext context)
         {
             GroupByColumnsNames.Add(context.GetText());
+        }
+
+        public override void EnterOrderByExpression([NotNull] MySqlParser.OrderByExpressionContext context)
+        {
+            OrderByStructure tmpOrder = new OrderByStructure();
+            tmpOrder.ColumnName = context.expression().GetText();
+            if (context.order != null)
+            {
+                if (context.order.Text == "DESC")
+                {
+                    tmpOrder.IsDESC = true;
+                }
+            }
+            OrderByList.Add(tmpOrder);
         }
     }
 }
