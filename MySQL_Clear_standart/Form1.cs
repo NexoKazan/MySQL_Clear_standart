@@ -537,6 +537,39 @@ namespace MySQL_Clear_standart
             textBox6.Clear();
             textBox6.Text = "\r\n========" + _sortQuery.Name + "========\r\n" + _sortQuery.Output + "\r\n";
         }
+
+
+        private void btn_CreateTest_Click(object sender, EventArgs e)
+        {
+            MakeSelect();
+            MakeJoin();
+            MakeSort();
+
+            string dropSyntax = "DROP TABLE {0};\r\n";
+            string createSyntax = "CREATE TABLE {0} ENGINE=MEMORY\r\n {1};\r\n";
+            var testQuery = new StringBuilder();
+
+            foreach (var select in _selectQuery)
+            {
+                testQuery.Append("\r\n -- ========" + select.Name + "=========\r\n");
+                //testQuery.Append(string.Format(dropSyntax, select.Name));
+                testQuery.Append(string.Format(createSyntax, select.Name, select.Output));
+            }
+
+            foreach (var join in _joinQuery)
+            {
+                testQuery.Append("\r\n -- ========" + join.Name + "=========\r\n");
+               // testQuery.Append(string.Format(dropSyntax, join.Name));
+                testQuery.Append(string.Format(createSyntax, join.Name, join.Output));
+            }
+
+            testQuery.Append("\r\n -- ========" + _sortQuery.Name + "=========\r\n");
+            //testQuery.Append(string.Format(dropSyntax, _sortQuery.Name));
+            testQuery.Append(string.Format(createSyntax, _sortQuery.Name, _sortQuery.Output));
+
+            testQueryTb.Text = testQuery.ToString();
+        }
+
         #endregion
 
         #region FormMethods
@@ -684,10 +717,11 @@ namespace MySQL_Clear_standart
 
         private void ReSize()
         {
-            textBox2.Width = textBox3.Width = textBox5.Width = textBox6.Width = (tabPage2.Width - 100) / 4;
+            textBox2.Width = textBox3.Width = textBox5.Width = textBox6.Width = testQueryTb.Width = (tabPage2.Width - 100) / 5;
             textBox3.Location = new Point(textBox2.Location.X + 40 + textBox2.Width, textBox3.Location.Y);
             textBox5.Location = new Point(textBox3.Location.X + 20 + textBox3.Width, textBox3.Location.Y);
             textBox6.Location = new Point(textBox5.Location.X + 20 + textBox3.Width, textBox3.Location.Y);
+            testQueryTb.Location = new Point(textBox6.Location.X + 20 + textBox3.Width, textBox3.Location.Y);
         }
 
         private void MakeSelect()

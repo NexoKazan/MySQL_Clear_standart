@@ -33,6 +33,8 @@
             this.tabPage3 = new System.Windows.Forms.TabPage();
             this.textBox4 = new System.Windows.Forms.TextBox();
             this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.testQueryTb = new System.Windows.Forms.TextBox();
+            this.button1 = new System.Windows.Forms.Button();
             this.btn_CreateSort = new System.Windows.Forms.Button();
             this.textBox6 = new System.Windows.Forms.TextBox();
             this.textBox5 = new System.Windows.Forms.TextBox();
@@ -88,6 +90,8 @@
             // 
             // tabPage2
             // 
+            this.tabPage2.Controls.Add(this.testQueryTb);
+            this.tabPage2.Controls.Add(this.button1);
             this.tabPage2.Controls.Add(this.btn_CreateSort);
             this.tabPage2.Controls.Add(this.textBox6);
             this.tabPage2.Controls.Add(this.textBox5);
@@ -104,6 +108,27 @@
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "tabPage2";
             this.tabPage2.UseVisualStyleBackColor = true;
+            // 
+            // testQueryTb
+            // 
+            this.testQueryTb.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.testQueryTb.Location = new System.Drawing.Point(845, 83);
+            this.testQueryTb.Multiline = true;
+            this.testQueryTb.Name = "testQueryTb";
+            this.testQueryTb.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.testQueryTb.Size = new System.Drawing.Size(204, 468);
+            this.testQueryTb.TabIndex = 14;
+            // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(449, 6);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(75, 71);
+            this.button1.TabIndex = 13;
+            this.button1.Text = "Составить запросы на проверку";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.btn_CreateTest_Click);
             // 
             // btn_CreateSort
             // 
@@ -420,6 +445,8 @@
         private System.Windows.Forms.TextBox textBox6;
         private System.Windows.Forms.Button btn_CreateSort;
         private System.Windows.Forms.RadioButton radioButton1;
+        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.TextBox testQueryTb;
     }
 }
 
