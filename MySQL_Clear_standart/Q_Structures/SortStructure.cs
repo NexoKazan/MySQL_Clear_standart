@@ -117,8 +117,16 @@ namespace MySQL_Clear_standart
                     asStructure.GetAsRightColumn.Name = asStructure.GetAsRightColumn.OldName;
                     asStructure.GetAsRightColumn.OldName = tmpHolder;
                 }
-                _output += asStructure.AggregateFunctionName + "(" + asStructure.GetAsRightColumn.OldName + ")" + " AS " +
+                if(asStructure.GetAsRightColumn.OldName!=null)
+                {
+                    _output += asStructure.AggregateFunctionName + "(" + asStructure.GetAsRightColumn.OldName + ")" + " AS " +
                            asStructure.GetAsRightColumn.Name;
+                }
+                else
+                {
+                    _output += asStructure.AggregateFunctionName + "(" + asStructure.AsString + ")" + " AS " +
+                               asStructure.GetAsRightColumn.Name;
+                }
                 tmpSelectColumns.Add(asStructure.GetAsRightColumn);
                 if (asStructure != _asSortList.Last())
                 {

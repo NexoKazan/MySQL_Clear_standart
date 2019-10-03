@@ -13,6 +13,7 @@ namespace MySQL_Clear_standart
 {
     class MyMySQLListener : MySqlParserBaseListener
     {
+        public IVocabulary voc;
         public List<string> TableNames = new List<string>();
         public List<string> ColumnNames = new List<string>();
         public List<string> ExprColumnNames = new List<string>();
@@ -51,6 +52,7 @@ namespace MySQL_Clear_standart
 
         public override void EnterBinaryComparasionPredicate([NotNull] MySqlParser.BinaryComparasionPredicateContext context)
         {//обернуть в два листенера
+            
             if (context.Stop.Type != 968)
             {
                 ExprColumnNames.Add(context.left.GetText());

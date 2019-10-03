@@ -728,7 +728,9 @@ namespace MySQL_Clear_standart
             vTree = new TreeVisitor(treeNodeDrawable);
             walker = new ParseTreeWalker();
             listener = new MyMySQLListener();
+            listener.voc = mySqlParser.Vocabulary;
             walker.Walk(listener, tree);
+
         }
 
         private void ReSize()
