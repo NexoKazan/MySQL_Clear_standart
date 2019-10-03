@@ -119,6 +119,7 @@
             this.testQueryTb.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.testQueryTb.Size = new System.Drawing.Size(204, 468);
             this.testQueryTb.TabIndex = 14;
+            this.testQueryTb.KeyDown += new System.Windows.Forms.KeyEventHandler(this.allow_SelectAl);
             // 
             // button1
             // 
@@ -150,6 +151,7 @@
             this.textBox6.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.textBox6.Size = new System.Drawing.Size(204, 468);
             this.textBox6.TabIndex = 11;
+            this.textBox6.KeyDown += new System.Windows.Forms.KeyEventHandler(this.allow_SelectAl);
             // 
             // textBox5
             // 
@@ -161,6 +163,7 @@
             this.textBox5.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.textBox5.Size = new System.Drawing.Size(204, 468);
             this.textBox5.TabIndex = 10;
+            this.textBox5.KeyDown += new System.Windows.Forms.KeyEventHandler(this.allow_SelectAl);
             // 
             // btn_CreateJoin
             // 
@@ -216,6 +219,7 @@
             this.textBox3.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.textBox3.Size = new System.Drawing.Size(204, 468);
             this.textBox3.TabIndex = 2;
+            this.textBox3.KeyDown += new System.Windows.Forms.KeyEventHandler(this.allow_SelectAl);
             // 
             // textBox2
             // 
@@ -230,6 +234,7 @@
             this.textBox2.Size = new System.Drawing.Size(204, 466);
             this.textBox2.TabIndex = 1;
             this.textBox2.TextChanged += new System.EventHandler(this.textBox2_TextChanged);
+            this.textBox2.KeyDown += new System.Windows.Forms.KeyEventHandler(this.allow_SelectAl);
             // 
             // btn_CreateSelect
             // 
@@ -380,6 +385,7 @@
             this.textBox1.TabIndex = 0;
             this.textBox1.Text = resources.GetString("textBox1.Text");
             this.textBox1.TextChanged += new System.EventHandler(this.textBox1_TextChanged);
+            this.textBox1.KeyDown += new System.Windows.Forms.KeyEventHandler(this.allow_SelectAl);
             // 
             // tabControl1
             // 

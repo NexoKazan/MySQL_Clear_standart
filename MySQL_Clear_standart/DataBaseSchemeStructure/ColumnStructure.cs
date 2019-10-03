@@ -14,14 +14,14 @@ namespace MySQL_Clear_standart.DataBaseSchemeStructure
         private string _typeID;
         private string _oldName;
         private int _size;
-        private bool _isPrimary;
+        private int _isPrimary; // 0-не ключ 1-единичный ключ, 2-составной ключ, 3-другое
         private bool _isForSelect = false;
         private bool _isRenamed = false;
         private S_Type _type;
 
         public ColumnStructure() {}
 
-        public ColumnStructure(string name, string typeID, bool isPrimary)
+        public ColumnStructure(string name, string typeID, int isPrimary)
         {
             _isPrimary = isPrimary;
             _name = name;
@@ -30,7 +30,7 @@ namespace MySQL_Clear_standart.DataBaseSchemeStructure
 
         public ColumnStructure(string name, string typeID)
         {
-            _isPrimary = false;
+            _isPrimary = 0;
             _name = name;
             _typeID = typeID;
         }
@@ -41,7 +41,7 @@ namespace MySQL_Clear_standart.DataBaseSchemeStructure
         }
 
         [XmlAttribute]
-        public bool IsPrimary {
+        public int IsPrimary {
             get { return _isPrimary; }
             set { _isPrimary = value; }
         }
