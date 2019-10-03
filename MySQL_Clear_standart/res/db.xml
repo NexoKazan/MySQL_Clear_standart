@@ -24,7 +24,7 @@
         <ColumnStructure IsPrimary="0" Name="L_DISCOUNT" TypeID="7"/>
         <ColumnStructure IsPrimary="0" Name="L_TAX" TypeID="14"/>
         <ColumnStructure IsPrimary="0" Name="L_RETURNFLAG" TypeID="14"/>
-        <ColumnStructure IsPrimary="0" Name="L_LINESTATUS" TypeID="15"/>
+        <ColumnStructure IsPrimary="0" Name="L_LINESTATUS" TypeID="14"/>
         <ColumnStructure IsPrimary="0" Name="L_SHIPDATE" TypeID="15"/>
         <ColumnStructure IsPrimary="0" Name="L_COMMITDATE" TypeID="15"/>
         <ColumnStructure IsPrimary="0" Name="L_RECEIPTDATE" TypeID="15"/>

@@ -542,32 +542,38 @@ namespace MySQL_Clear_standart
         private void btn_CreateTest_Click(object sender, EventArgs e)
         {
             MakeSelect();
-            MakeJoin();
-            MakeSort();
+            
+           
 
             string dropSyntax = "DROP TABLE {0};\r\n";
-            string createSyntax = "CREATE TABLE {0} ENGINE=MEMORY\r\n {1};\r\n";
+            string createSyntax = "CREATE TABLE {0} ( {1} ) ENGINE=MEMORY\r\n {2};\r\n";
+            var dropBuilder = new StringBuilder();
             var testQuery = new StringBuilder();
 
             foreach (var select in _selectQuery)
             {
                 testQuery.Append("\r\n -- ========" + select.Name + "=========\r\n");
                 //testQuery.Append(string.Format(dropSyntax, select.Name));
-                testQuery.Append(string.Format(createSyntax, select.Name, select.Output));
+                testQuery.Append(string.Format(createSyntax, select.Name, GetCreateTableColumnString(select.OutTable), select.Output));
+                dropBuilder.Append(string.Format(dropSyntax, select.Name));
             }
-
+            MakeJoin();
             foreach (var join in _joinQuery)
             {
                 testQuery.Append("\r\n -- ========" + join.Name + "=========\r\n");
                // testQuery.Append(string.Format(dropSyntax, join.Name));
-                testQuery.Append(string.Format(createSyntax, join.Name, join.Output));
+                testQuery.Append(string.Format(createSyntax, join.Name, GetCreateTableColumnString(join.OutTable), join.Output));
+                dropBuilder.Append(string.Format(dropSyntax, join.Name));
             }
-
+            MakeSort();
             testQuery.Append("\r\n -- ========" + _sortQuery.Name + "=========\r\n");
             //testQuery.Append(string.Format(dropSyntax, _sortQuery.Name));
-            testQuery.Append(string.Format(createSyntax, _sortQuery.Name, _sortQuery.Output));
+            testQuery.Append(string.Format(createSyntax, _sortQuery.Name, GetCreateTableColumnString(_sortQuery.OutTable), _sortQuery.Output));
+            dropBuilder.Append(string.Format(dropSyntax, _sortQuery.Name));
 
             testQueryTb.Text = testQuery.ToString();
+            testQueryTb.Text += "SELECT * FROM So_1;";
+            testQueryTb.Text += dropBuilder.ToString();
         }
 
         #endregion
@@ -811,6 +817,7 @@ namespace MySQL_Clear_standart
             _sortQuery.GroupByColumnList = listener.GroupByColumnsNames;
             _sortQuery.OrderByStructures = orderByStructures;
             _sortQuery.CreateQuerry();
+            CreateScheme(_sortQuery);
 
         }
 
@@ -846,6 +853,21 @@ namespace MySQL_Clear_standart
             outDB.Name = _dbName.Name + "_Join";
             outDB.Types = _dbName.Types;
             using (FileStream fs = new FileStream(@"res\JoinOutDB.xml", FileMode.Create, FileAccess.ReadWrite))
+            {
+                XmlSerializer dbSerializer = new XmlSerializer(typeof(DataBaseStructure));
+                dbSerializer.Serialize(fs, outDB);
+            }
+        }
+
+        private void CreateScheme(SortStructure sortQuerry)
+        {
+            List<TableStructure> outTables = new List<TableStructure>();
+            outTables.Add(sortQuerry.OutTable);
+            DataBaseStructure outDB = new DataBaseStructure("SORT_OUT_DB", outTables.ToArray());
+            MatchColumns(_dbName, outDB);
+            outDB.Name = _dbName.Name + "_Sort";
+            outDB.Types = _dbName.Types;
+            using (FileStream fs = new FileStream(@"res\SortOutDB.xml", FileMode.Create, FileAccess.ReadWrite))
             {
                 XmlSerializer dbSerializer = new XmlSerializer(typeof(DataBaseStructure));
                 dbSerializer.Serialize(fs, outDB);
@@ -1237,6 +1259,46 @@ namespace MySQL_Clear_standart
             }
         }
 
+        private string GetCreateTableColumnString(TableStructure table)
+        {
+            string output = null;
+            foreach (ColumnStructure column in table.Columns)
+            {
+                if (column.Type != null)
+                {
+                    output += "\r\n" + column.Name + " " + column.Type.Name + ",";
+                }
+                else
+                {
+                    output += "\r\n" + column.Name + " *INTEGER"+",";
+                }
+            }
+
+            if (GetIndexName(table)!=null)
+            {
+                output += "\r\nPRIMARY KEY (" + GetIndexName(table) + ")";
+            }
+            else
+            {
+                output = output.Remove(output.Length - 1);
+            }
+
+            return output;
+        }
+
+        private string GetIndexName(TableStructure table)
+        {
+            string output = null;
+            foreach (ColumnStructure column in table.Columns)
+            {
+                if (column.IsPrimary == 1)
+                {
+                    output = column.Name;
+                    break;
+                }
+            }
+            return output;
+        }
         #endregion
 
     }

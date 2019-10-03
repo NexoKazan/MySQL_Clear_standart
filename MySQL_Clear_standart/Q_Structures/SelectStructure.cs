@@ -116,6 +116,11 @@ namespace MySQL_Clear_standart
                         _output += "\r\n\t" + whereStructure.getWhereString;
                     }
 
+                    if (whereStructure != _whereList.LastOrDefault())
+                    {
+                        _output += " AND ";
+                    }
+
                 }
             }
 

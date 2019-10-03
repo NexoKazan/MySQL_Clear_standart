@@ -15,6 +15,7 @@ namespace MySQL_Clear_standart
         private string _output;
         private SelectStructure _select;
         private JoinStructure _join;
+        private TableStructure _outTable;
         private List<string> _groupByColumnList;
         private List<AsStructure> _asSortList;
         private List<OrderByStructure> _orderByStructures;
@@ -47,6 +48,11 @@ namespace MySQL_Clear_standart
         public SelectStructure Select
         {
             set { _select = value; }
+        }
+
+        public TableStructure OutTable
+        {
+            get { return _outTable; }
         }
 
         public string Output
@@ -107,15 +113,13 @@ namespace MySQL_Clear_standart
             {
                 if (asStructure.GetAsRightColumn.IsRenamed)
                 {
-                    _output += asStructure.AggregateFunctionName + "(" + asStructure.GetAsRightColumn.Name + ")" +
-                               " AS " + asStructure.GetAsRightColumn.OldName;
+                    string tmpHolder = asStructure.GetAsRightColumn.Name;
+                    asStructure.GetAsRightColumn.Name = asStructure.GetAsRightColumn.OldName;
+                    asStructure.GetAsRightColumn.OldName = tmpHolder;
                 }
-                else
-                {
-                    _output += asStructure.AggregateFunctionName + "(" + asStructure.AsString + ")" +
-                            " AS " + asStructure.GetAsRightColumn.Name;
-                }
-
+                _output += asStructure.AggregateFunctionName + "(" + asStructure.GetAsRightColumn.OldName + ")" + " AS " +
+                           asStructure.GetAsRightColumn.Name;
+                tmpSelectColumns.Add(asStructure.GetAsRightColumn);
                 if (asStructure != _asSortList.Last())
                 {
                     _output += ",\r\n\t";
@@ -126,6 +130,8 @@ namespace MySQL_Clear_standart
                 }
             }
 
+            _outTable = new TableStructure(_name+"_TB", tmpSelectColumns.ToArray());
+            
             _output = _output.Remove(_output.Length - 1, 1);
             _output += "FROM\r\n\t" + _fromName + "\r\n";
             if (_groupByColumnList.Count != 0)
