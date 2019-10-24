@@ -90,6 +90,7 @@ namespace MySQL_Clear_standart
         private TreeVisitor vTree;
         private ParseTreeWalker walker;
         private MyMySQLListener listener;
+       
         bool pictureSize = false;
 
         #endregion
@@ -537,16 +538,15 @@ namespace MySQL_Clear_standart
             textBox6.Clear();
             textBox6.Text = "\r\n========" + _sortQuery.Name + "========\r\n" + _sortQuery.Output + "\r\n";
         }
-
-
+        
         private void btn_CreateTest_Click(object sender, EventArgs e)
         {
-            MakeSelect();
-            
-           
+            MakeSort();
 
             string dropSyntax = "DROP TABLE {0};\r\n";
-            string createSyntax = "CREATE TABLE {0} ( {1} ) ENGINE=MEMORY\r\n {2};\r\n";
+            string createTableSyntax = "CREATE TABLE {0} ( {1} ) ENGINE=MEMORY;\r\n\r\n";
+            string createIndexSyntax = "CREATE INDEX {0} ON {1} ( {2} ); \r\n\r\n";
+            string querSyntax = "{0}\r\n";
             var dropBuilder = new StringBuilder();
             var testQuery = new StringBuilder();
 
@@ -554,21 +554,24 @@ namespace MySQL_Clear_standart
             {
                 testQuery.Append("\r\n -- ========" + select.Name + "=========\r\n");
                 //testQuery.Append(string.Format(dropSyntax, select.Name));
-                testQuery.Append(string.Format(createSyntax, select.Name, GetCreateTableColumnString(select.OutTable), select.Output));
+                testQuery.Append(string.Format(createTableSyntax, select.Name, GetCreateTableColumnString(select.OutTable)));
+                testQuery.Append(string.Format(createIndexSyntax, select.Name + "_index", select.Name, select.IndexColumnName));
+                testQuery.Append(string.Format(querSyntax, select.Output));
                 dropBuilder.Append(string.Format(dropSyntax, select.Name));
             }
-            MakeJoin();
             foreach (var join in _joinQuery)
             {
                 testQuery.Append("\r\n -- ========" + join.Name + "=========\r\n");
                // testQuery.Append(string.Format(dropSyntax, join.Name));
-                testQuery.Append(string.Format(createSyntax, join.Name, GetCreateTableColumnString(join.OutTable), join.Output));
+                testQuery.Append(string.Format(createTableSyntax, join.Name, GetCreateTableColumnString(join.OutTable)));
+                testQuery.Append(string.Format(createIndexSyntax, join.Name + "_index", join.Name, join.IndexColumnName));
+                testQuery.Append(string.Format(querSyntax, join.Output));
                 dropBuilder.Append(string.Format(dropSyntax, join.Name));
             }
-            MakeSort();
             testQuery.Append("\r\n -- ========" + _sortQuery.Name + "=========\r\n");
             //testQuery.Append(string.Format(dropSyntax, _sortQuery.Name));
-            testQuery.Append(string.Format(createSyntax, _sortQuery.Name, GetCreateTableColumnString(_sortQuery.OutTable), _sortQuery.Output));
+            testQuery.Append(string.Format(createTableSyntax, _sortQuery.Name, GetCreateTableColumnString(_sortQuery.OutTable)));
+            testQuery.Append(string.Format(querSyntax, _sortQuery.Output));
             dropBuilder.Append(string.Format(dropSyntax, _sortQuery.Name));
 
             testQueryTb.Text = testQuery.ToString();
@@ -727,7 +730,7 @@ namespace MySQL_Clear_standart
             treeNodeDrawable = new CommonNode(tree);
             vTree = new TreeVisitor(treeNodeDrawable);
             walker = new ParseTreeWalker();
-            listener = new MyMySQLListener();
+            listener = new MyMySQLListener(0);
             listener.voc = mySqlParser.Vocabulary;
             walker.Walk(listener, tree);
 
@@ -771,6 +774,10 @@ namespace MySQL_Clear_standart
                 );
             }
 
+            foreach (SelectStructure select in _selectQuery)
+            {
+                select.CreateQuerry();
+            }
             CreateScheme(_selectQuery);
         }
 
@@ -791,7 +798,6 @@ namespace MySQL_Clear_standart
 
         private void MakeSort()
         {
-            MakeSelect();
             MakeJoin();
             _sortQuery = new SortStructure("So_1");
             List<OrderByStructure> orderByStructures = listener.OrderByList;
@@ -1115,11 +1121,11 @@ namespace MySQL_Clear_standart
             inList = inList.Distinct().ToList();
             foreach (string allColumn in inList)
             {
-                for (int i = 0; i < table.Columns.Length; i++)
+                foreach (var t in table.Columns)
                 {
-                    if (allColumn == table.Columns[i].Name)
+                    if (allColumn == t.Name)
                     {
-                        outList.Add(table.Columns[i]);
+                        outList.Add(t);
                         break;
                     }
                 }
@@ -1275,30 +1281,45 @@ namespace MySQL_Clear_standart
                     output += "\r\n" + column.Name + " *INTEGER"+",";
                 }
             }
-
-            if (GetIndexName(table)!=null)
-            {
-                output += "\r\nPRIMARY KEY (" + GetIndexName(table) + ")";
-            }
-            else
-            {
-                output = output.Remove(output.Length - 1);
-            }
-
             return output;
         }
 
-        private string GetIndexName(TableStructure table)
+        private string GetIndexName(SelectStructure select)
         {
             string output = null;
-            foreach (ColumnStructure column in table.Columns)
-            {
-                if (column.IsPrimary == 1)
-                {
-                    output = column.Name;
-                    break;
-                }
-            }
+            string multiIndex = null;
+            return output;
+        } 
+
+        private string GetIndexName(JoinStructure join)
+        {
+            string output = null;
+            //string multiIndex = null;
+            //foreach (ColumnStructure column in table.Columns)
+            //{
+            //    switch (column.IsPrimary)
+            //    {
+            //        case 1 : 
+            //            output = column.Name;
+            //            break;
+            //        case 2:
+            //            multiIndex += column.Name + ", ";
+            //            break;
+            //        default: break;
+            //    }
+            //}
+
+            //if (multiIndex != null)
+            //{
+            //    output = multiIndex;
+            //}
+            return output;
+        }
+
+        private string GetIndexName(SortStructure sort)
+        {
+            string output = null;
+            string multiIndex = null;
             return output;
         }
         #endregion

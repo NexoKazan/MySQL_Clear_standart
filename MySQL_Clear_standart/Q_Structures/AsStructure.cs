@@ -76,7 +76,7 @@ namespace MySQL_Clear_standart
             _asTables = new List<TableStructure>();
             _asRightColumn = new ColumnStructure(_asRightName);
             _asRightColumn.Size = -1;
-            foreach (var col in _asColumnList)
+            foreach (var col in _asColumnList)     //определение типа столбца
             {
                 foreach (var tb in db.Tables)
                 {
@@ -100,7 +100,7 @@ namespace MySQL_Clear_standart
             if (_asTables.Count == 1)
             {
                 _isSelectPart = true;
-                _table = _asTables[0].Name;
+                _table = _asTables[0].Name; //переделать в структуру.
                 _asRightColumn.IsRenamed = true;
                 _asRightColumn.OldName = _asRightColumn.Name;
                 _asRightColumn.Name = _asTables[0].ShortName + _asRightName;

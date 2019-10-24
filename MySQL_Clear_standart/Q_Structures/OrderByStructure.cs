@@ -8,7 +8,7 @@ using MySQL_Clear_standart.DataBaseSchemeStructure;
 namespace MySQL_Clear_standart.Q_Structures
 {
     class OrderByStructure
-    {
+    {   // сделать конструктор
         private ColumnStructure _column;
         private string _columnName;
         private bool _isDESC = false;

@@ -33,8 +33,7 @@ namespace MySQL_Clear_standart.Listeners
             _functionName = context.Start.Text;
         }
 
-        public override void EnterAggregateWindowedFunction(
-            [NotNull] MySqlParser.AggregateWindowedFunctionContext context)
+        public override void EnterAggregateWindowedFunction([NotNull] MySqlParser.AggregateWindowedFunctionContext context)
         {
             if (context.starArg != null)
             {

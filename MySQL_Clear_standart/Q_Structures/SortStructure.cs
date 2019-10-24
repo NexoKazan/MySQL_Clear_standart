@@ -115,6 +115,7 @@ namespace MySQL_Clear_standart
                 {
                     string tmpHolder = asStructure.GetAsRightColumn.Name;
                     asStructure.GetAsRightColumn.Name = asStructure.GetAsRightColumn.OldName;
+                    asStructure.GetAsRightColumn.IsRenamed = false;
                     asStructure.GetAsRightColumn.OldName = tmpHolder;
                 }
                 if(asStructure.GetAsRightColumn.OldName!=null)

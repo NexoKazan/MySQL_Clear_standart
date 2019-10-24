@@ -14,6 +14,7 @@ namespace MySQL_Clear_standart
         private string _name;
         private string _output;
         private string _comparisonOperator;
+        private string _indexColumnName;
         private bool _isFirst = false;
         private bool _switched = false;
         private bool _isJoined = false;
@@ -49,7 +50,13 @@ namespace MySQL_Clear_standart
         {
             get { return _rightColumnString; }
         }
-        
+
+        public string IndexColumnName
+        {
+            get { return _indexColumnName; }
+            set { _indexColumnName = value; }
+        }
+
         public ColumnStructure LeftColumn
         {
             get { return _leftColumn; }
@@ -225,6 +232,111 @@ namespace MySQL_Clear_standart
             }
 
             _output += "WHERE\r\n\t" + _leftColumn.Name + " " + _comparisonOperator + " " + _rightColumn.Name;
+            SetIndex();
+        }
+
+        private void SetIndex()
+        {
+            if (_leftJoin != null)
+            {
+                foreach (ColumnStructure column in _leftJoin.Columns)
+                {
+                    if (column.Name == LeftColumnString)
+                    {
+                        _leftJoin.IndexColumnName = column.Name;
+                    }
+                    else
+                    {
+                        if (column.Name == RightColumnString)
+                        {
+                            _leftJoin.IndexColumnName = column.Name;
+                        }
+                    }
+                }
+                
+                if (_switched)
+                {
+                    if (_leftSelect != null)
+                    {
+                        foreach (ColumnStructure column in _leftSelect.OutColumn)
+                        {
+                            if (column.Name == LeftColumnString)
+                            {
+                                _leftSelect.IndexColumnName = column.Name;
+                            }
+                            else
+                            {
+                                if (column.Name == RightColumnString)
+                                {
+                                    _leftSelect.IndexColumnName = column.Name;
+                                }
+                            }
+                        }
+                    }
+                       
+                }
+                else
+                {
+                    if (_rightSelect != null)
+                    {
+                        foreach (ColumnStructure column in _rightSelect.OutColumn)
+                        {
+                            if (column.Name == LeftColumnString)
+                            {
+                                _rightSelect.IndexColumnName = column.Name;
+                            }
+                            else
+                            {
+                                if (column.Name == RightColumnString)
+                                {
+                                    _rightSelect.IndexColumnName = column.Name;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            else
+            {
+                if (_leftSelect != null)
+                {
+                    foreach (ColumnStructure column in _leftSelect.OutColumn)
+                    {
+                        if (column.Name == LeftColumnString)
+                        {
+                            _leftSelect.IndexColumnName = column.Name;
+                        }
+                        else
+                        {
+                            if (column.Name == RightColumnString)
+                            {
+                                _leftSelect.IndexColumnName = column.Name;
+                            }
+                        }
+                    }
+                   
+                }
+
+                if (_rightSelect != null)
+                {
+                   
+                    foreach (ColumnStructure column in _rightSelect.OutColumn)
+                    {
+                        if (column.Name == LeftColumnString)
+                        {
+                            _rightSelect.IndexColumnName = column.Name;
+                        }
+                        else
+                        {
+                            if (column.Name == RightColumnString)
+                            {
+                                _rightSelect.IndexColumnName = column.Name;
+                            }
+                        }
+                    }
+                 
+                }
+            }
         }
     }
 }

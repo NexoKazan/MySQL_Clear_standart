@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using MySQL_Clear_standart.DataBaseSchemeStructure;
 
 namespace MySQL_Clear_standart
-{
+{   // добавить структуры БД
     class WhereStructure
     {
         private string _string; //переименовать!
