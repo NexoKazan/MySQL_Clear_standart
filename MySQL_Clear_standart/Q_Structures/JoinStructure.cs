@@ -15,6 +15,7 @@ namespace MySQL_Clear_standart
         private string _output;
         private string _comparisonOperator;
         private string _indexColumnName;
+        private string _createTableColumnNames;
         private bool _isFirst = false;
         private bool _switched = false;
         private bool _isJoined = false;
@@ -55,6 +56,11 @@ namespace MySQL_Clear_standart
         {
             get { return _indexColumnName; }
             set { _indexColumnName = value; }
+        }
+
+        public string CreateTableColumnNames
+        {
+            get { return _createTableColumnNames; }
         }
 
         public ColumnStructure LeftColumn
@@ -121,7 +127,7 @@ namespace MySQL_Clear_standart
             get { return _isJoined; }
             set { _isJoined = value; }
         }
-        
+
         #endregion
         
         public void CreateQuerry()
@@ -233,6 +239,7 @@ namespace MySQL_Clear_standart
 
             _output += "WHERE\r\n\t" + _leftColumn.Name + " " + _comparisonOperator + " " + _rightColumn.Name;
             SetIndex();
+            SetCreateTableColumnList();
         }
 
         private void SetIndex()
@@ -337,6 +344,19 @@ namespace MySQL_Clear_standart
                  
                 }
             }
+        }
+
+        private void SetCreateTableColumnList()
+        {
+            for (int i = 0; i < _outTable.Columns.Length; i++)
+            {
+                _createTableColumnNames += _outTable.Columns[i].Name + " " + _outTable.Columns[i].Type.Name;
+                if (i < _outTable.Columns.Length - 1)
+                {
+                    _createTableColumnNames += ",\r\n";
+                }
+            }
+        
         }
     }
 }

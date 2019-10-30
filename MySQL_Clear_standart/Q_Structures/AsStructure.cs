@@ -97,7 +97,7 @@ namespace MySQL_Clear_standart
             }
 
             _asTables =_asTables.Distinct().ToList();
-            if (_asTables.Count == 1)
+            if (_asTables.Count == 1 ) 
             {
                 _isSelectPart = true;
                 _table = _asTables[0].Name; //переделать в структуру.

@@ -13,6 +13,7 @@ namespace MySQL_Clear_standart
         private string _name;
         private string _fromName;
         private string _output;
+        private string _createTableColumnNames;
         private SelectStructure _select;
         private JoinStructure _join;
         private TableStructure _outTable;
@@ -63,6 +64,12 @@ namespace MySQL_Clear_standart
         public string Name
         {
             get { return _name; }
+        }
+
+
+        public string CreateTableColumnNames
+        {
+            get { return _createTableColumnNames; }
         }
 
         public void CreateQuerry()
@@ -193,6 +200,28 @@ namespace MySQL_Clear_standart
 
                 
             }
+            SetCreateTableColumnList();
         }
+
+        private void SetCreateTableColumnList()
+        {
+            for (int i = 0; i < _outTable.Columns.Length; i++)
+            {
+                if (_outTable.Columns[i].Type != null)
+                {
+                    _createTableColumnNames += _outTable.Columns[i].Name + " " + _outTable.Columns[i].Type.Name;
+                }
+                else
+                {
+                    _createTableColumnNames += _outTable.Columns[i].Name + " " + "INTEGER";
+                }
+
+                if (i < _outTable.Columns.Length - 1)
+                {
+                    _createTableColumnNames += ",\r\n";
+                }
+            }
+        }
+        
     }
 }

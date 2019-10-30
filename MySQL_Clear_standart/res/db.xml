@@ -97,7 +97,7 @@
   </Tables>
   <Types>
     <S_Type Name="CHAR(25)" Size="25" ID="1" />
-    <S_Type Name="INTEGER" Size="4" ID="2" />
+    <S_Type Name="INT" Size="4" ID="2" />
     <S_Type Name="VARCHAR(152)" Size="152" ID="3" />
     <S_Type Name="VARCHAR(25)" Size="25" ID="4" />
     <S_Type Name="VARCHAR(55)" Size="55" ID="5" />

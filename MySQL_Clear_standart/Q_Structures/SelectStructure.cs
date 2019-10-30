@@ -15,6 +15,7 @@ namespace MySQL_Clear_standart
         private string _tableName;
         private static int _id = 0;
         private string _indexColumnName = null;
+        private string _createTableColumnNames;
         private List<ColumnStructure> _columnsList;
         private List<WhereStructure> _whereList;
         private List<AsStructure> _asList;
@@ -52,6 +53,12 @@ namespace MySQL_Clear_standart
         {
             get { return _indexColumnName; }
             set { _indexColumnName = value; }
+        }
+
+        public string CreateTableColumnNames
+        {
+            get { return _createTableColumnNames; }
+            set { _createTableColumnNames = value; }
         }
 
         public ColumnStructure[] OutColumn
@@ -143,6 +150,14 @@ namespace MySQL_Clear_standart
                 }
             }
 
+            for (int i = 0; i < _outColumn.Length; i++)
+            {
+                _createTableColumnNames += _outColumn[i].Name + " " + _outColumn[i].Type.Name;
+                if (i < _outColumn.Length - 1)
+                {
+                    _createTableColumnNames += ",\r\n";
+                }
+            }
         }
     }
 }

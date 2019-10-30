@@ -312,50 +312,24 @@ namespace MySQL_Clear_standart
             #endregion
 
             MakeSelect();
+            output += "\r\n===========SELECT============\r\n";
+            foreach (var column in _selectQuery[2].OutTable.Columns)
+            {
+                output += column.Name + "   " + column.OldName + "\r\n";
+            }
+
             MakeJoin();
+            output += "\r\n===========JOIN============\r\n";
+            foreach (var column in _selectQuery[2].OutTable.Columns)
+            {
+                output += column.Name + "   " + column.OldName + "\r\n";
+            }
             MakeSort();
-
-            //List<OrderByStructure> _orderByStructures = listener.OrderByList;
-            //foreach (OrderByStructure orderByStructure in _orderByStructures)
-            //{
-            //    output += orderByStructure.ColumnName + " " + orderByStructure.IsDESC + "\r\n";
-
-            //}
-            //output += "\r\n========SELECT================\r\n";
-            //foreach (var asStructure in listener.AsList)
-            //{
-            //    if (asStructure.IsSelectPart)
-            //    {
-            //        output += asStructure.AggregateFunctionName + "\r\n";
-            //        output += asStructure.GetAsRightColumn.Name + "\r\n";
-            //        output += asStructure.GetAsRightColumn.OldName + "\r\n";
-            //    }
-            //}
-
-            //output += "\r\n========SORT================\r\n";
-            //foreach (var asStructure in listener.AsList)
-            //{
-            //    if (!asStructure.IsSelectPart)
-            //    {
-            //        if (!asStructure.AsString.Contains("*"))
-            //        {
-            //            output += asStructure.AggregateFunctionName + "\r\n";
-            //            output += asStructure.AsString + "\r\n";
-            //            output += asStructure.GetAsRightColumn.Name + "\r\n";
-            //        }
-            //        else
-            //        {
-            //            output += asStructure.AsString + "\r\n";
-            //            output += asStructure.GetAsRightColumn.Name + "\r\n";
-            //        }
-            //    }
-            //}
-            
-            //output += "\r\n========JOINS================\r\n";
-            //foreach (var joinStructure in _joinQuery)
-            //{
-            //    output += joinStructure.Name + "\r\n";
-            //}
+            output += "\r\n===========SORT============\r\n";
+            foreach (var column in _selectQuery[2].OutTable.Columns)
+            {
+                output += column.Name + "   " + column.OldName + "\r\n";
+            }
             textBox1.Text = output;
         }
         
@@ -544,9 +518,9 @@ namespace MySQL_Clear_standart
             MakeSort();
 
             string dropSyntax = "DROP TABLE {0};\r\n";
-            string createTableSyntax = "CREATE TABLE {0} ( {1} ) ENGINE=MEMORY;\r\n\r\n";
+            string createTableSyntax = "CREATE TABLE {0} (\r\n{1} ) ENGINE=MEMORY;\r\n\r\n";
             string createIndexSyntax = "CREATE INDEX {0} ON {1} ( {2} ); \r\n\r\n";
-            string querSyntax = "{0}\r\n";
+            string querSyntax = "{0};\r\n";
             var dropBuilder = new StringBuilder();
             var testQuery = new StringBuilder();
 
@@ -554,23 +528,28 @@ namespace MySQL_Clear_standart
             {
                 testQuery.Append("\r\n -- ========" + select.Name + "=========\r\n");
                 //testQuery.Append(string.Format(dropSyntax, select.Name));
-                testQuery.Append(string.Format(createTableSyntax, select.Name, GetCreateTableColumnString(select.OutTable)));
-                testQuery.Append(string.Format(createIndexSyntax, select.Name + "_index", select.Name, select.IndexColumnName));
+                testQuery.Append(string.Format(createTableSyntax, select.Name, select.CreateTableColumnNames));
                 testQuery.Append(string.Format(querSyntax, select.Output));
+                testQuery.Append(string.Format(createIndexSyntax, select.Name + "_index", select.Name, select.IndexColumnName));
                 dropBuilder.Append(string.Format(dropSyntax, select.Name));
             }
             foreach (var join in _joinQuery)
             {
                 testQuery.Append("\r\n -- ========" + join.Name + "=========\r\n");
                // testQuery.Append(string.Format(dropSyntax, join.Name));
-                testQuery.Append(string.Format(createTableSyntax, join.Name, GetCreateTableColumnString(join.OutTable)));
-                testQuery.Append(string.Format(createIndexSyntax, join.Name + "_index", join.Name, join.IndexColumnName));
+                testQuery.Append(string.Format(createTableSyntax, join.Name, join.CreateTableColumnNames));
                 testQuery.Append(string.Format(querSyntax, join.Output));
+                if (join != _joinQuery.LastOrDefault())
+                {
+                    testQuery.Append(string.Format(createIndexSyntax, join.Name + "_index", join.Name,
+                        join.IndexColumnName));
+                }
+
                 dropBuilder.Append(string.Format(dropSyntax, join.Name));
             }
             testQuery.Append("\r\n -- ========" + _sortQuery.Name + "=========\r\n");
             //testQuery.Append(string.Format(dropSyntax, _sortQuery.Name));
-            testQuery.Append(string.Format(createTableSyntax, _sortQuery.Name, GetCreateTableColumnString(_sortQuery.OutTable)));
+            testQuery.Append(string.Format(createTableSyntax, _sortQuery.Name, _sortQuery.CreateTableColumnNames));
             testQuery.Append(string.Format(querSyntax, _sortQuery.Output));
             dropBuilder.Append(string.Format(dropSyntax, _sortQuery.Name));
 
