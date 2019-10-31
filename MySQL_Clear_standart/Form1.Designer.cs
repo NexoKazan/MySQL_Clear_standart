@@ -46,7 +46,6 @@
             this.btn_CreateSelect = new System.Windows.Forms.Button();
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.panel1 = new System.Windows.Forms.Panel();
-            this.radioButton1 = new System.Windows.Forms.RadioButton();
             this.label1 = new System.Windows.Forms.Label();
             this.comboBox1 = new System.Windows.Forms.ComboBox();
             this.btn_Debug = new System.Windows.Forms.Button();
@@ -56,6 +55,7 @@
             this.btn_CreateTree = new System.Windows.Forms.Button();
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.tabControl1 = new System.Windows.Forms.TabControl();
+            this.checkBox_DisableHeavyQuerry = new System.Windows.Forms.CheckBox();
             this.tabPage3.SuspendLayout();
             this.tabPage2.SuspendLayout();
             this.tabPage1.SuspendLayout();
@@ -261,7 +261,7 @@
             // 
             this.panel1.AutoScroll = true;
             this.panel1.AutoSize = true;
-            this.panel1.Controls.Add(this.radioButton1);
+            this.panel1.Controls.Add(this.checkBox_DisableHeavyQuerry);
             this.panel1.Controls.Add(this.label1);
             this.panel1.Controls.Add(this.comboBox1);
             this.panel1.Controls.Add(this.btn_Debug);
@@ -275,19 +275,6 @@
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(1122, 551);
             this.panel1.TabIndex = 0;
-            // 
-            // radioButton1
-            // 
-            this.radioButton1.AutoCheck = false;
-            this.radioButton1.AutoSize = true;
-            this.radioButton1.Checked = true;
-            this.radioButton1.Location = new System.Drawing.Point(185, 30);
-            this.radioButton1.Name = "radioButton1";
-            this.radioButton1.Size = new System.Drawing.Size(66, 17);
-            this.radioButton1.TabIndex = 9;
-            this.radioButton1.TabStop = true;
-            this.radioButton1.Text = "NoSubQ";
-            this.radioButton1.UseVisualStyleBackColor = true;
             // 
             // label1
             // 
@@ -399,6 +386,18 @@
             this.tabControl1.Size = new System.Drawing.Size(1136, 583);
             this.tabControl1.TabIndex = 5;
             // 
+            // checkBox_DisableHeavyQuerry
+            // 
+            this.checkBox_DisableHeavyQuerry.AutoSize = true;
+            this.checkBox_DisableHeavyQuerry.Checked = true;
+            this.checkBox_DisableHeavyQuerry.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.checkBox_DisableHeavyQuerry.Location = new System.Drawing.Point(188, 30);
+            this.checkBox_DisableHeavyQuerry.Name = "checkBox_DisableHeavyQuerry";
+            this.checkBox_DisableHeavyQuerry.Size = new System.Drawing.Size(100, 17);
+            this.checkBox_DisableHeavyQuerry.TabIndex = 9;
+            this.checkBox_DisableHeavyQuerry.Text = "DisableHeavyQ";
+            this.checkBox_DisableHeavyQuerry.UseVisualStyleBackColor = true;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -450,9 +449,9 @@
         private System.Windows.Forms.TextBox textBox5;
         private System.Windows.Forms.TextBox textBox6;
         private System.Windows.Forms.Button btn_CreateSort;
-        private System.Windows.Forms.RadioButton radioButton1;
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.TextBox testQueryTb;
+        private System.Windows.Forms.CheckBox checkBox_DisableHeavyQuerry;
     }
 }
 

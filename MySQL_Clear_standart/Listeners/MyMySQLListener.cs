@@ -23,6 +23,8 @@ namespace MySQL_Clear_standart
         public List<WhereStructure> WhereList = new List<WhereStructure>();
         public List<AsStructure> AsList = new List<AsStructure>();
         public List<OrderByStructure> OrderByList = new List<OrderByStructure>();
+
+        public List<MyMySQLListener> SubQueryListeners = new List<MyMySQLListener>();
         
         private bool _triggerEnterSelectFunctionElemenAsExist = false;
         private int _depth;
@@ -34,6 +36,11 @@ namespace MySQL_Clear_standart
         {
             _tmpDepth =_depth = depth;
 
+        }
+
+        public int Depth
+        {
+            get { return _depth; }
         }
 
         public override void EnterFullColumnName([NotNull] MySqlParser.FullColumnNameContext context)
@@ -125,6 +132,10 @@ namespace MySQL_Clear_standart
         {
             _depth++;
             MyMySQLListener tmpSubListener = new MyMySQLListener(_depth);
+            ParseTreeWalker walker = new ParseTreeWalker();
+            walker.Walk(tmpSubListener, context.selectStatement());
+            SubQueryListeners.Add(tmpSubListener);
+            
         }
 
         public override void ExitSubqueryExpessionAtom([NotNull] MySqlParser.SubqueryExpessionAtomContext context)

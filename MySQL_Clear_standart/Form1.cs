@@ -18,6 +18,10 @@ using MySQL_Clear_standart.DataBaseSchemeStructure;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using ClusterixN.Common.Data.Query.Relation;
+using ClusterixN.Common.Utils;
+using ClusterixN.Network.Packets;
+using MySQL_Clear_standart.Network;
 using MySQL_Clear_standart.Properties;
 using MySQL_Clear_standart.Q_Structures;
 
@@ -75,6 +79,11 @@ namespace MySQL_Clear_standart
         private SelectStructure[] _selectQuery;
         private List<JoinStructure> _joinQuery;
         private SortStructure _sortQuery;
+
+        private SelectStructure[] _subSelectQuery;
+        private List<JoinStructure> _subJoinQuery;
+        private SortStructure _subSortQuery;
+        
         private bool _toDoTextFlag;
 
         #region baseDefinition объявляются переменный для построения дерева
@@ -155,7 +164,7 @@ namespace MySQL_Clear_standart
             pictureBox1.Visible = true;
             textBox1.Width = 283;
             //запросы TPC-H (убраны Date)
-            if (!radioButton1.Checked)
+            if (!checkBox_DisableHeavyQuerry.Checked)
             {
                 switch (Convert.ToInt16(comboBox1.Text))
                 {
@@ -311,25 +320,19 @@ namespace MySQL_Clear_standart
 
             #endregion
 
-            MakeSelect();
-            output += "\r\n===========SELECT============\r\n";
-            foreach (var column in _selectQuery[2].OutTable.Columns)
+            if (listener.SubQueryListeners.Count != 0)
             {
-                output += column.Name + "   " + column.OldName + "\r\n";
+                foreach (var subQListener in listener.SubQueryListeners)
+                {
+                    MakeSubSelect(subQListener);
+                    for (int i = 0; i < _subSelectQuery.Length; i++)
+                    {
+                        output += "\r\n========" + _subSelectQuery[i].Name + "=========\r\n";
+                        output += _subSelectQuery[i].Output + "\r\n";
+                    }
+                }
             }
 
-            MakeJoin();
-            output += "\r\n===========JOIN============\r\n";
-            foreach (var column in _selectQuery[2].OutTable.Columns)
-            {
-                output += column.Name + "   " + column.OldName + "\r\n";
-            }
-            MakeSort();
-            output += "\r\n===========SORT============\r\n";
-            foreach (var column in _selectQuery[2].OutTable.Columns)
-            {
-                output += column.Name + "   " + column.OldName + "\r\n";
-            }
             textBox1.Text = output;
         }
         
@@ -417,6 +420,21 @@ namespace MySQL_Clear_standart
                 textBox3.Text += "\r\n========" + _selectQuery[i].Name + "=========\r\n";
                 textBox3.Text += _selectQuery[i].Output + "\r\n";
             }
+
+            if (listener.SubQueryListeners.Count != 0)
+            {
+                textBox3.Text += "\r\n========SUB_Q=========\r\n";
+                foreach (var subQListener in listener.SubQueryListeners)
+                {
+                    MakeSubSelect(subQListener);
+                }
+
+                foreach (SelectStructure subSelect in _subSelectQuery)
+                {
+                    textBox3.Text += "\r\n========" + subSelect.Name + "=========\r\n";
+                    textBox3.Text += subSelect.Output + "\r\n";
+                }
+            }
         }
 
         private void btn_CreateJoin_Click(object sender, EventArgs e)
@@ -426,6 +444,19 @@ namespace MySQL_Clear_standart
             foreach (var join in _joinQuery)
             {
                 textBox5.Text += "\r\n========" + join.Name + "========\r\n" + join.Output + "\r\n";
+            }
+            if (listener.SubQueryListeners.Count != 0)
+            {
+                textBox5.Text += "\r\n========SUB_Q=========\r\n";
+                foreach (var subQListener in listener.SubQueryListeners)
+                {
+                    MakeSubJoin(subQListener);
+                }
+
+                foreach (var join in _subJoinQuery)
+                {
+                    textBox5.Text += "\r\n========" + join.Name + "========\r\n" + join.Output + "\r\n";
+                }
             }
         }
 
@@ -517,9 +548,9 @@ namespace MySQL_Clear_standart
         {
             MakeSort();
 
-            string dropSyntax = "DROP TABLE {0};\r\n";
-            string createTableSyntax = "CREATE TABLE {0} (\r\n{1} ) ENGINE=MEMORY;\r\n\r\n";
-            string createIndexSyntax = "CREATE INDEX {0} ON {1} ( {2} ); \r\n\r\n";
+            string dropSyntax = "DROP TABLE {0};\r\n" + Environment.NewLine;
+            string createTableSyntax = "CREATE TABLE {0} (\r\n{1} {2} ) ENGINE=MEMORY\r\n\r\n";
+            string createIndexSyntax = ",\r\n INDEX {0} ( {2} ) \r\n\r\n";
             string querSyntax = "{0};\r\n";
             var dropBuilder = new StringBuilder();
             var testQuery = new StringBuilder();
@@ -528,34 +559,56 @@ namespace MySQL_Clear_standart
             {
                 testQuery.Append("\r\n -- ========" + select.Name + "=========\r\n");
                 //testQuery.Append(string.Format(dropSyntax, select.Name));
-                testQuery.Append(string.Format(createTableSyntax, select.Name, select.CreateTableColumnNames));
+                testQuery.Append(string.Format(createTableSyntax, select.Name, select.CreateTableColumnNames, string.Format(createIndexSyntax, select.Name + "_index", select.Name, select.IndexColumnName)));
                 testQuery.Append(string.Format(querSyntax, select.Output));
-                testQuery.Append(string.Format(createIndexSyntax, select.Name + "_index", select.Name, select.IndexColumnName));
+                //testQuery.Append(string.Format(createIndexSyntax, select.Name + "_index", select.Name, select.IndexColumnName));
                 dropBuilder.Append(string.Format(dropSyntax, select.Name));
             }
             foreach (var join in _joinQuery)
             {
                 testQuery.Append("\r\n -- ========" + join.Name + "=========\r\n");
                // testQuery.Append(string.Format(dropSyntax, join.Name));
-                testQuery.Append(string.Format(createTableSyntax, join.Name, join.CreateTableColumnNames));
+                testQuery.Append(string.Format(createTableSyntax, join.Name, join.CreateTableColumnNames, 
+                    join != _joinQuery.LastOrDefault() ?
+                    string.Format(createIndexSyntax, join.Name + "_index", join.Name,
+                        join.IndexColumnName) : ""));
                 testQuery.Append(string.Format(querSyntax, join.Output));
-                if (join != _joinQuery.LastOrDefault())
-                {
-                    testQuery.Append(string.Format(createIndexSyntax, join.Name + "_index", join.Name,
-                        join.IndexColumnName));
-                }
 
                 dropBuilder.Append(string.Format(dropSyntax, join.Name));
             }
             testQuery.Append("\r\n -- ========" + _sortQuery.Name + "=========\r\n");
             //testQuery.Append(string.Format(dropSyntax, _sortQuery.Name));
-            testQuery.Append(string.Format(createTableSyntax, _sortQuery.Name, _sortQuery.CreateTableColumnNames));
+            testQuery.Append(string.Format(createTableSyntax, _sortQuery.Name, _sortQuery.CreateTableColumnNames, ""));
             testQuery.Append(string.Format(querSyntax, _sortQuery.Output));
             dropBuilder.Append(string.Format(dropSyntax, _sortQuery.Name));
 
             testQueryTb.Text = testQuery.ToString();
             testQueryTb.Text += "SELECT * FROM So_1;";
             testQueryTb.Text += dropBuilder.ToString();
+
+            //QueryBuilder qb = new QueryBuilder((new Random()).Next(0, 1000000));
+            //var sel1 = qb.AddSelectQuery(qb.CreateSelectQuery(_selectQuery[0].Output, 0));
+            //var sel2 = qb.AddSelectQuery(qb.CreateSelectQuery(_selectQuery[1].Output, 0));
+
+            //var j1 = qb.AddJoinQuery
+            //(
+            //    qb.CreateJoinQuery
+            //    (
+            //        _joinQuery[0].Output, qb.CreateRelationSchema(
+            //            _joinQuery[0].OutTable.Columns.Select(j => new Field() {Name = j.Name, Params = j.Type.Name})
+            //                .ToList(),
+            //            new List<Index>()
+            //                {new Index() {FieldNames = new List<string>() {_joinQuery[0].IndexColumnName}}}), 0,
+            //        qb.CreateRelation(sel1, "PS", qb.CreateRelationSchema(_selectQuery[0].OutTable.Columns.Select(j => new Field() {Name = j.Name, Params = j.Type.Name})
+            //                .ToList(),
+            //            new List<Index>()
+            //                {new Index() {FieldNames = new List<string>() {_selectQuery[0].IndexColumnName}}})),
+            //        qb.CreateRelation(sel2, "s2", qb.CreateRelationSchema())
+            //    )
+            //);
+
+            //var clinet = new ClusterixClient("127.0.0.1", 1234);
+            //clinet.Send(new XmlQueryPacket() { XmlQuery = qb.GetQuery().ToString() });
         }
 
         #endregion
@@ -738,7 +791,7 @@ namespace MySQL_Clear_standart
             {
                 _selectQuery[i] = new SelectStructure
                 (
-                    "S_" + i.ToString(), //name(s)
+                    "S_" + listener.Depth + "_" + i.ToString(), //name(s)
                     listener.TableNames[i], //TableName(s)
                     GetClearColumns //Columns (s)
                     (
@@ -765,8 +818,8 @@ namespace MySQL_Clear_standart
             MakeSelect();
             _joinQuery = listener.JoinStructures;
             FillJoins(_joinQuery, _dbName, _selectQuery.ToList());
-            GetJoinSequence(_joinQuery);
-            _joinQuery = SortJoin(_joinQuery);
+            GetJoinSequence(_joinQuery, listener.Depth);
+            _joinQuery = SortJoin(_joinQuery, listener.Depth);
             foreach (var join in _joinQuery)
             {
                 join.CreateQuerry();
@@ -806,6 +859,78 @@ namespace MySQL_Clear_standart
             _sortQuery.CreateQuerry();
             CreateScheme(_sortQuery);
 
+        }
+
+        private void MakeSubSelect(MyMySQLListener subQuerylistener)
+        {
+            _subSelectQuery = new SelectStructure[subQuerylistener.TableNames.Count];
+            FindeWhereStructureTable(subQuerylistener.WhereList, _dbName);
+            foreach (AsStructure asStructure in subQuerylistener.AsList)
+            {
+                asStructure.FindeTable(_dbName);
+            }
+
+            for (int i = 0; i < subQuerylistener.TableNames.Count; i++)
+            {
+                _subSelectQuery[i] = new SelectStructure
+                (
+                    "S_" + subQuerylistener.Depth + "_" + i.ToString(), //name(s)
+                    subQuerylistener.TableNames[i], //TableName(s)
+                    GetClearColumns //Columns (s)
+                    (
+                        subQuerylistener.ColumnNames, //goodColumns(s)
+                        subQuerylistener.ExprColumnNames, //wrongColums(s)
+                        GetCorrectTable(subQuerylistener.TableNames[i],
+                            _dbName) // TableName(TableStructure) нужно для нахождения существующих столбцов и сопоставления
+                    ),
+                    GetCorrectWhereStructure(subQuerylistener.WhereList,
+                        subQuerylistener.TableNames[i]), //WhereStructure(WhereStructure)
+                    GetCorrectAsStructure(subQuerylistener.AsList, subQuerylistener.TableNames[i]) //asStructure(asStructure)
+                );
+            }
+
+            foreach (SelectStructure select in _subSelectQuery)
+            {
+                select.CreateQuerry();
+            }
+            CreateScheme(_subSelectQuery);
+        }
+
+        private void MakeSubJoin(MyMySQLListener subQuerylistener)
+        {
+            
+            MakeSubSelect(subQuerylistener);
+            _subJoinQuery = subQuerylistener.JoinStructures;
+           
+            List<SelectStructure> tmpSelects = new List<SelectStructure>();
+            tmpSelects.AddRange(_subSelectQuery);
+            bool tmpSelect = true;
+            foreach (SelectStructure select in _selectQuery)
+            {
+                foreach (var subSelect in _subSelectQuery)
+                {
+                    if (select.TableName == subSelect.TableName)
+                    {
+                        tmpSelect = false;
+                        break;
+                    }
+                }
+
+                if (tmpSelect)
+                {
+                    tmpSelects.Add(select);
+                }
+            }
+
+            FillJoins(_subJoinQuery, _dbName, tmpSelects);
+            GetJoinSequence(_subJoinQuery, subQuerylistener.Depth);
+            _subJoinQuery = SortJoin(_subJoinQuery, subQuerylistener.Depth);
+            foreach (var join in _subJoinQuery)
+            {
+                join.CreateQuerry();
+            }
+
+            CreateScheme(_subJoinQuery);
         }
 
         private void CreateScheme(SelectStructure[] selectQuery)
@@ -873,7 +998,7 @@ namespace MySQL_Clear_standart
             }
         }
 
-        private void GetJoinSequence(List<JoinStructure> joinStructures)
+        private void GetJoinSequence(List<JoinStructure> joinStructures, int joinDepth)
         {
             if (joinStructures.Count != 0)
             {
@@ -883,8 +1008,11 @@ namespace MySQL_Clear_standart
 
                 foreach (JoinStructure joinStructure in joinStructures)
                 {
-                    Pares pr = new Pares(joinStructure.LeftSelect.Name, joinStructure.RightSelect.Name);
-                    j_list.Add(pr);
+                    if (joinStructure.LeftSelect.Name[2] == joinStructure.RightSelect.Name[2])
+                    {
+                        Pares pr = new Pares(joinStructure.LeftSelect.Name, joinStructure.RightSelect.Name);
+                        j_list.Add(pr);
+                    }
                 }
 
                 bool razriv = true;
@@ -1014,19 +1142,19 @@ namespace MySQL_Clear_standart
 
                     for (int j = 0; j < j_sequence.Count; j++)
                     {
-                        j_sequence[j].Name = "J_" + j;
+                        j_sequence[j].Name = "J_" + joinDepth + "_" + j;
                     }
                 }
             }
         }
 
-        private List<JoinStructure> SortJoin(List<JoinStructure> joinStructures)
+        private List<JoinStructure> SortJoin(List<JoinStructure> joinStructures, int joinDepth)
         {
             List<JoinStructure> tmp = new List<JoinStructure>();
             int notJoinedCount = 0;
             for (int i = 0; i < joinStructures.Count; i++)
             {
-                string s = "J_" + i;
+                string s = "J_" + joinDepth + "_"  + i;
                 foreach (JoinStructure joinStructure in joinStructures)
                 {
                     if (joinStructure.Name == s)
@@ -1040,7 +1168,7 @@ namespace MySQL_Clear_standart
             {
                 if (joinStructure.Name == null)
                 {
-                    joinStructure.Name = "J_" + tmp.Count.ToString();
+                    joinStructure.Name = "J_" + joinDepth + "_"  + tmp.Count.ToString();
                     joinStructure.LeftJoin = tmp.Last();
                     joinStructure.LeftSelect = null;
                     joinStructure.RightSelect = null;

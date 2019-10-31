@@ -199,7 +199,7 @@ namespace MySQL_Clear_standart
                 }
                 else
                 {
-                    _output += _leftJoin.Name + "\r\n";
+                    _output +=  _leftJoin.Name + "\r\n";
                 }
                 if (_switched)
                 {
