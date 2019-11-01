@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Data.Common;
 using System.Diagnostics.PerformanceData;
 using System.Drawing;
 using System.Linq;
@@ -21,6 +22,7 @@ using System.Runtime.InteropServices;
 using ClusterixN.Common.Data.Query.Relation;
 using ClusterixN.Common.Utils;
 using ClusterixN.Network.Packets;
+using MySQL_Clear_standart.Listeners;
 using MySQL_Clear_standart.Network;
 using MySQL_Clear_standart.Properties;
 using MySQL_Clear_standart.Q_Structures;
@@ -30,52 +32,8 @@ namespace MySQL_Clear_standart
 {
     public partial class Form1 : Form
     {
-        #region Создание схемы БД
-
-
-        private DataBaseStructure _dbName;
-
-        private void FillScheme()
-        {
-            #region Устаревший метод заполнения схемы БД.
-
-            //_orderColumns = new ColumnStructure[4];
-            //_orderColumns[0] = new ColumnStructure("O_CUSTKEY");
-            //_orderColumns[1] = new ColumnStructure("O_ORDERDATE");
-            //_orderColumns[2] = new ColumnStructure("O_ORDERKEY");
-            //_orderColumns[3] = new ColumnStructure("O_SHIPPRIORITY");
-
-            //_lineitemColumns = new ColumnStructure[4];
-            //_lineitemColumns[0] = new ColumnStructure("L_DISCOUNT");
-            //_lineitemColumns[1] = new ColumnStructure("L_EXTENDEDPRICE");
-            //_lineitemColumns[2] = new ColumnStructure("L_ORDERKEY");
-            //_lineitemColumns[3] = new ColumnStructure("L_SHIPDATE");
-
-            //_customerColumns = new ColumnStructure[2];
-            //_customerColumns[0] = new ColumnStructure("C_CUSTKEY");
-            //_customerColumns[1] = new ColumnStructure("C_MKTSEGMENT");
-
-            //_table = new TableStructure[3];
-            //_table[0] = new TableStructure("CUSTOMER", _customerColumns);
-            //_table[1] = new TableStructure("LINEITEM", _lineitemColumns);
-            //_table[2] = new TableStructure("ORDERS", _orderColumns);
-
-            //_dbName = new DataBaseStructure("TPCH", _table); 
-
-            #endregion
-
-            using (FileStream dbCreateFileStream = new FileStream("res//db.xml", FileMode.Open, FileAccess.ReadWrite)
-            ) // Заполнение БД из XML
-            {
-                XmlSerializer dbCreateSerializer = new XmlSerializer(typeof(DataBaseStructure));
-                _dbName = (DataBaseStructure) dbCreateSerializer.Deserialize(dbCreateFileStream);
-            }
-
-            SetID(_dbName);
-        }
-
-        #endregion
-
+        #region v1
+       
         private SelectStructure[] _selectQuery;
         private List<JoinStructure> _joinQuery;
         private SortStructure _sortQuery;
@@ -85,31 +43,7 @@ namespace MySQL_Clear_standart
         private SortStructure _subSortQuery;
         
         private bool _toDoTextFlag;
-
-        #region baseDefinition объявляются переменный для построения дерева
-
-        private string output = " ";
-        private string inputString;
-        private ICharStream inputStream;
-        private ITokenSource mySqlLexer;
-        private CommonTokenStream commonTokenStream;
-        private MySqlParser mySqlParser;
-        private IParseTree tree;
-        private CommonNode treeNodeDrawable;
-        private TreeVisitor vTree;
-        private ParseTreeWalker walker;
-        private MyMySQLListener listener;
-       
-        bool pictureSize = false;
-
-        #endregion
-
-        public Form1()
-        {
-            InitializeComponent();
-            GetTree();
-        }
-
+        
         #region чек сериализации
 
         protected void serializer_UnknownNode(object sender, XmlNodeEventArgs e)
@@ -125,308 +59,27 @@ namespace MySQL_Clear_standart
 
         #endregion
 
-        #region TAB_1
-
-        private void btn_CreateTree_Click(object sender, EventArgs e)
-        {
-            //Кнопка для картинки(построить дерево)
-            GetTree();
-            DefaultOutput();
-            //output = 
-            textBox1.Text = output;
-        }
-
-        private void btn_SaveTree_Click(object sender, EventArgs e)
-        {
-            //кнопка для сохранения картинки
-            saveFileDialog1.Filter = "Images|*.png;*.bmp;*.jpg";
-            ImageFormat format = ImageFormat.Png;
-            if (saveFileDialog1.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-            {
-                string ext = System.IO.Path.GetExtension(saveFileDialog1.FileName);
-                switch (ext)
-                {
-                    case ".jpg":
-                        format = ImageFormat.Jpeg;
-                        break;
-                    case ".bmp":
-                        format = ImageFormat.Bmp;
-                        break;
-                }
-
-                pictureBox1.Image.Save(saveFileDialog1.FileName, format);
-            }
-        }
-
-        private void btn_SelectQuerry_tab1_Click(object sender, EventArgs e)
-        {
-            //выбрать запрос
-            pictureBox1.Visible = true;
-            textBox1.Width = 283;
-            //запросы TPC-H (убраны Date)
-            if (!checkBox_DisableHeavyQuerry.Checked)
-            {
-                switch (Convert.ToInt16(comboBox1.Text))
-                {
-                    case 1:
-                        textBox1.Text =
-                            "SELECT\r\n\tL_RETURNFLAG,\r\n\tL_LINESTATUS,\r\n\tSUM(L_QUANTITY) AS SUM_QTY,\r\n\tSUM(L_EXTENDEDPRICE) AS SUM_BASE_PRICE,\r\n\tSUM(L_EXTENDEDPRICE * (1 - L_DISCOUNT)) AS SUM_DISC_PRICE,\r\n\tSUM(L_EXTENDEDPRICE * (1 - L_DISCOUNT) * (1 + L_TAX)) AS SUM_CHARGE,\r\n\tAVG(L_QUANTITY) AS AVG_QTY,\r\n\tAVG(L_EXTENDEDPRICE) AS AVG_PRICE,\r\n\tAVG(L_DISCOUNT) AS AVG_DISC,\r\n\tCOUNT(*) AS COUNT_ORDER\r\nFROM\r\n\tLINEITEM\r\nWHERE\r\n\tL_SHIPDATE <='1998-12-01' - INTERVAL '90' DAY\r\nGROUP BY\r\n\tL_RETURNFLAG,\r\n\tL_LINESTATUS\r\nORDER BY\r\n\tL_RETURNFLAG,\r\n\tL_LINESTATUS;\r\n";
-                        break;
-                    case 2:
-                        textBox1.Text =
-                            "SELECT\r\n\tS_ACCTBAL,\r\n\tS_NAME,\r\n\tN_NAME,\r\n\tP_PARTKEY,\r\n\tP_MFGR,\r\n\tS_ADDRESS,\r\n\tS_PHONE,\r\n\tS_COMMENT\r\nFROM\r\n\tPART,\r\n\tSUPPLIER,\r\n\tPARTSUPP,\r\n\tNATION,\r\n\tREGION\r\nWHERE\r\n\tP_PARTKEY = PS_PARTKEY\r\n\tAND S_SUPPKEY = PS_SUPPKEY\r\n\tAND P_SIZE = 48\r\n\tAND P_TYPE LIKE '%NICKEL'\r\n\tAND S_NATIONKEY = N_NATIONKEY\r\n\tAND N_REGIONKEY = R_REGIONKEY\r\n\tAND R_NAME = 'AMERICA'\r\n\tAND PS_SUPPLYCOST = (\r\n\t\tSELECT\r\n\t\t\tMIN(PS_SUPPLYCOST)\r\n\t\tFROM\r\n\t\t\tPARTSUPP,\r\n\t\t\tSUPPLIER,\r\n\t\t\tNATION,\r\n\t\t\tREGION\r\n\t\tWHERE\r\n\t\t\tP_PARTKEY = PS_PARTKEY\r\n\t\t\tAND S_SUPPKEY = PS_SUPPKEY\r\n\t\t\tAND S_NATIONKEY = N_NATIONKEY\r\n\t\t\tAND N_REGIONKEY = R_REGIONKEY\r\n\t\t\tAND R_NAME = 'AMERICA'\r\n\t)\r\nORDER BY\r\n\tS_ACCTBAL DESC,\r\n\tN_NAME,\r\n\tS_NAME,\r\n\tP_PARTKEY;\r\n";
-                        break;
-                    case 3:
-                        textBox1.Text =
-                            "SELECT\r\n\tL_ORDERKEY,\r\n\tSUM(L_EXTENDEDPRICE * (1 - L_DISCOUNT)) AS REVENUE,\r\n\tO_ORDERDATE,\r\n\tO_SHIPPRIORITY\r\nFROM\r\n\tCUSTOMER,\r\n\tORDERS,\r\n\tLINEITEM\r\nWHERE\r\n\tC_MKTSEGMENT = 'HOUSEHOLD'\r\n\tAND C_CUSTKEY = O_CUSTKEY\r\n\tAND L_ORDERKEY = O_ORDERKEY\r\n\tAND O_ORDERDATE < '1995-03-31'\r\n\tAND L_SHIPDATE > '1995-03-31'\r\nGROUP BY\r\n\tL_ORDERKEY,\r\n\tO_ORDERDATE,\r\n\tO_SHIPPRIORITY\r\nORDER BY\r\n\tREVENUE DESC,\r\n\tO_ORDERDATE;\r\n";
-                        break;
-                    case 4:
-                        textBox1.Text =
-                            "SELECT\r\n\tO_ORDERPRIORITY,\r\n\tCOUNT(*) AS ORDER_COUNT\r\nFROM\r\n\tORDERS\r\nWHERE\r\n\tO_ORDERDATE >= '1996-02-01'\r\n\tAND O_ORDERDATE < '1996-02-01' + INTERVAL '3' MONTH\r\n\tAND EXISTS (\r\n\t\tSELECT\r\n\t\t\t*\r\n\t\tFROM\r\n\t\t\tLINEITEM\r\n\t\tWHERE\r\n\t\t\tL_ORDERKEY = O_ORDERKEY\r\n\t\t\tAND L_COMMITDATE < L_RECEIPTDATE\r\n\t)\r\nGROUP BY\r\n\tO_ORDERPRIORITY\r\nORDER BY\r\n\tO_ORDERPRIORITY;\r\n";
-                        break;
-                    case 5:
-                        textBox1.Text =
-                            "SELECT\r\n\tN_NAME,\r\n\tSUM(L_EXTENDEDPRICE * (1 - L_DISCOUNT)) AS REVENUE\r\nFROM\r\n\tCUSTOMER,\r\n\tORDERS,\r\n\tLINEITEM,\r\n\tSUPPLIER,\r\n\tNATION,\r\n\tREGION\r\nWHERE\r\n\tC_CUSTKEY = O_CUSTKEY\r\n\tAND L_ORDERKEY = O_ORDERKEY\r\n\tAND L_SUPPKEY = S_SUPPKEY\r\n\tAND C_NATIONKEY = S_NATIONKEY\r\n\tAND S_NATIONKEY = N_NATIONKEY\r\n\tAND N_REGIONKEY = R_REGIONKEY\r\n\tAND R_NAME = 'MIDDLE EAST'\r\n\tAND O_ORDERDATE >= '1995-01-01'\r\n\tAND O_ORDERDATE < '1995-01-01' + INTERVAL '1' YEAR\r\nGROUP BY\r\n\tN_NAME\r\nORDER BY\r\n\tREVENUE DESC;\r\n";
-                        break;
-                    case 6:
-                        textBox1.Text =
-                            "SELECT\r\n\tSUM(L_EXTENDEDPRICE * L_DISCOUNT) AS REVENUE\r\nFROM\r\n\tLINEITEM\r\nWHERE\r\n\tL_SHIPDATE >= '1997-01-01'\r\n\tAND L_SHIPDATE < '1997-01-01' + INTERVAL '1' YEAR\r\n\tAND L_DISCOUNT BETWEEN 0.07 - 0.01 AND 0.07 + 0.01\r\n\tAND L_QUANTITY < 24;\r\n";
-                        break;
-                    case 7:
-                        textBox1.Text =
-                            "SELECT\r\n\tSUPP_NATION,\r\n\tCUST_NATION,\r\n\tL_YEAR,\r\n\tSUM(VOLUME) AS REVENUE\r\nFROM\r\n\t(\r\n\t\tSELECT\r\n\t\t\tN1.N_NAME AS SUPP_NATION,\r\n\t\t\tN2.N_NAME AS CUST_NATION,\r\n\t\t\tEXTRACT(YEAR FROM L_SHIPDATE) AS L_YEAR,\r\n\t\t\tL_EXTENDEDPRICE * (1 - L_DISCOUNT) AS VOLUME\r\n\t\tFROM\r\n\t\t\tSUPPLIER,\r\n\t\t\tLINEITEM,\r\n\t\t\tORDERS,\r\n\t\t\tCUSTOMER,\r\n\t\t\tNATION N1,\r\n\t\t\tNATION N2\r\n\t\tWHERE\r\n\t\t\tS_SUPPKEY = L_SUPPKEY\r\n\t\t\tAND O_ORDERKEY = L_ORDERKEY\r\n\t\t\tAND C_CUSTKEY = O_CUSTKEY\r\n\t\t\tAND S_NATIONKEY = N1.N_NATIONKEY\r\n\t\t\tAND C_NATIONKEY = N2.N_NATIONKEY\r\n\t\t\tAND (\r\n\t\t\t\t(N1.N_NAME = 'IRAQ' AND N2.N_NAME = 'ALGERIA')\r\n\t\t\t\tOR (N1.N_NAME = 'ALGERIA' AND N2.N_NAME = 'IRAQ')\r\n\t\t\t)\r\n\t\t\tAND L_SHIPDATE BETWEEN '1995-01-01' AND '1996-12-31'\r\n\t) AS SHIPPING\r\nGROUP BY\r\n\tSUPP_NATION,\r\n\tCUST_NATION,\r\n\tL_YEAR\r\nORDER BY\r\n\tSUPP_NATION,\r\n\tCUST_NATION,\r\n\tL_YEAR;\r\n";
-                        break;
-                    case 8:
-                        textBox1.Text =
-                            "SELECT\r\n\tO_YEAR,\r\n\tSUM(CASE\r\n\t\tWHEN NATION = 'IRAN' THEN VOLUME\r\n\t\tELSE 0\r\n\tEND) / SUM(VOLUME) AS MKT_SHARE\r\nFROM\r\n\t(\r\n\t\tSELECT\r\n\t\t\tEXTRACT(YEAR FROM O_ORDERDATE) AS O_YEAR,\r\n\t\t\tL_EXTENDEDPRICE * (1 - L_DISCOUNT) AS VOLUME,\r\n\t\t\tN2.N_NAME AS NATION\r\n\t\tFROM\r\n\t\t\tPART,\r\n\t\t\tSUPPLIER,\r\n\t\t\tLINEITEM,\r\n\t\t\tORDERS,\r\n\t\t\tCUSTOMER,\r\n\t\t\tNATION N1,\r\n\t\t\tNATION N2,\r\n\t\t\tREGION\r\n\t\tWHERE\r\n\t\t\tP_PARTKEY = L_PARTKEY\r\n\t\t\tAND S_SUPPKEY = L_SUPPKEY\r\n\t\t\tAND L_ORDERKEY = O_ORDERKEY\r\n\t\t\tAND O_CUSTKEY = C_CUSTKEY\r\n\t\t\tAND C_NATIONKEY = N1.N_NATIONKEY\r\n\t\t\tAND N1.N_REGIONKEY = R_REGIONKEY\r\n\t\t\tAND R_NAME = 'MIDDLE EAST'\r\n\t\t\tAND S_NATIONKEY = N2.N_NATIONKEY\r\n\t\t\tAND O_ORDERDATE BETWEEN '1995-01-01' AND '1996-12-31'\r\n\t\t\tAND P_TYPE = 'STANDARD BRUSHED BRASS'\r\n\t) AS ALL_NATIONS\r\nGROUP BY\r\n\tO_YEAR\r\nORDER BY\r\n\tO_YEAR;\r\n";
-                        break;
-                    case 9:
-                        textBox1.Text =
-                            "SELECT\r\n\tNATION,\r\n\tO_YEAR,\r\n\tSUM(AMOUNT) AS SUM_PROFIT\r\nFROM\r\n\t(\r\n\t\tSELECT\r\n\t\t\tN_NAME AS NATION,\r\n\t\t\tEXTRACT(YEAR FROM O_ORDERDATE) AS O_YEAR,\r\n\t\t\tL_EXTENDEDPRICE * (1 - L_DISCOUNT) - PS_SUPPLYCOST * L_QUANTITY AS AMOUNT\r\n\t\tFROM\r\n\t\t\tPART,\r\n\t\t\tSUPPLIER,\r\n\t\t\tLINEITEM,\r\n\t\t\tPARTSUPP,\r\n\t\t\tORDERS,\r\n\t\t\tNATION\r\n\t\tWHERE\r\n\t\t\tS_SUPPKEY = L_SUPPKEY\r\n\t\t\tAND PS_SUPPKEY = L_SUPPKEY\r\n\t\t\tAND PS_PARTKEY = L_PARTKEY\r\n\t\t\tAND P_PARTKEY = L_PARTKEY\r\n\t\t\tAND O_ORDERKEY = L_ORDERKEY\r\n\t\t\tAND S_NATIONKEY = N_NATIONKEY\r\n\t\t\tAND P_NAME LIKE '%SNOW%'\r\n\t) AS PROFIT\r\nGROUP BY\r\n\tNATION,\r\n\tO_YEAR\r\nORDER BY\r\n\tNATION,\r\n\tO_YEAR DESC;\r\n";
-                        break;
-                    case 10:
-                        textBox1.Text =
-                            "SELECT\r\n\tC_CUSTKEY,\r\n\tC_NAME,\r\n\tSUM(L_EXTENDEDPRICE * (1 - L_DISCOUNT)) AS REVENUE,\r\n\tC_ACCTBAL,\r\n\tN_NAME,\r\n\tC_ADDRESS,\r\n\tC_PHONE,\r\n\tC_COMMENT\r\nFROM\r\n\tCUSTOMER,\r\n\tORDERS,\r\n\tLINEITEM,\r\n\tNATION\r\nWHERE\r\n\tC_CUSTKEY = O_CUSTKEY\r\n\tAND L_ORDERKEY = O_ORDERKEY\r\n\tAND O_ORDERDATE >= '1994-04-01'\r\n\tAND O_ORDERDATE < '1994-04-01' + INTERVAL '3' MONTH\r\n\tAND L_RETURNFLAG = 'R'\r\n\tAND C_NATIONKEY = N_NATIONKEY\r\nGROUP BY\r\n\tC_CUSTKEY,\r\n\tC_NAME,\r\n\tC_ACCTBAL,\r\n\tC_PHONE,\r\n\tN_NAME,\r\n\tC_ADDRESS,\r\n\tC_COMMENT\r\nORDER BY\r\n\tREVENUE DESC;\r\n";
-                        break;
-                    case 11:
-                        textBox1.Text =
-                            "SELECT\r\n\tPS_PARTKEY,\r\n\tSUM(PS_SUPPLYCOST * PS_AVAILQTY) AS VALUE\r\nFROM\r\n\tPARTSUPP,\r\n\tSUPPLIER,\r\n\tNATION\r\nWHERE\r\n\tPS_SUPPKEY = S_SUPPKEY\r\n\tAND S_NATIONKEY = N_NATIONKEY\r\n\tAND N_NAME = 'ALGERIA'\r\nGROUP BY\r\n\tPS_PARTKEY HAVING\r\n\t\tSUM(PS_SUPPLYCOST * PS_AVAILQTY) > (\r\n\t\t\tSELECT\r\n\t\t\t\tSUM(PS_SUPPLYCOST * PS_AVAILQTY) * 0.0001000000\r\n\t\t\tFROM\r\n\t\t\t\tPARTSUPP,\r\n\t\t\t\tSUPPLIER,\r\n\t\t\t\tNATION\r\n\t\t\tWHERE\r\n\t\t\t\tPS_SUPPKEY = S_SUPPKEY\r\n\t\t\t\tAND S_NATIONKEY = N_NATIONKEY\r\n\t\t\t\tAND N_NAME = 'ALGERIA'\r\n\t\t)\r\nORDER BY\r\n\tVALUE DESC;\r\n";
-                        break;
-                    case 12:
-                        textBox1.Text =
-                            "SELECT\r\n\tL_SHIPMODE,\r\n\tSUM(CASE\r\n\t\tWHEN O_ORDERPRIORITY = '1-URGENT'\r\n\t\t\tOR O_ORDERPRIORITY = '2-HIGH'\r\n\t\t\tTHEN 1\r\n\t\tELSE 0\r\n\tEND) AS HIGH_LINE_COUNT,\r\n\tSUM(CASE\r\n\t\tWHEN O_ORDERPRIORITY <> '1-URGENT'\r\n\t\t\tAND O_ORDERPRIORITY <> '2-HIGH'\r\n\t\t\tTHEN 1\r\n\t\tELSE 0\r\n\tEND) AS LOW_LINE_COUNT\r\nFROM\r\n\tORDERS,\r\n\tLINEITEM\r\nWHERE\r\n\tO_ORDERKEY = L_ORDERKEY\r\n\tAND L_SHIPMODE IN ('AIR', 'SHIP')\r\n\tAND L_COMMITDATE < L_RECEIPTDATE\r\n\tAND L_SHIPDATE < L_COMMITDATE\r\n\tAND L_RECEIPTDATE >= '1994-01-01'\r\n\tAND L_RECEIPTDATE < '1994-01-01' + INTERVAL '1' YEAR\r\nGROUP BY\r\n\tL_SHIPMODE\r\nORDER BY\r\n\tL_SHIPMODE;\r\n";
-                        break;
-                    case 13:
-                        textBox1.Text =
-                            "SELECT\r\n\tC_COUNT,\r\n\tCOUNT(*) AS CUSTDIST\r\nFROM\r\n\t(\r\n\t\tSELECT\r\n\t\t\tC_CUSTKEY,\r\n\t\t\tCOUNT(O_ORDERKEY) AS C_COUNT\r\n\t\tFROM\r\n\t\t\tCUSTOMER LEFT OUTER JOIN ORDERS ON\r\n\t\t\t\tC_CUSTKEY = O_CUSTKEY\r\n\t\t\t\tAND O_COMMENT NOT LIKE '%SPECIAL%REQUESTS%'\r\n\t\tGROUP BY\r\n\t\t\tC_CUSTKEY\r\n\t) AS C_ORDERS\r\nGROUP BY\r\n\tC_COUNT\r\nORDER BY\r\n\tCUSTDIST DESC,\r\n\tC_COUNT DESC;\r\n";
-                        break;
-                    case 14:
-                        textBox1.Text =
-                            "SELECT\r\n\t100.00 * SUM(CASE\r\n\t\tWHEN P_TYPE LIKE 'PROMO%'\r\n\t\t\tTHEN L_EXTENDEDPRICE * (1 - L_DISCOUNT)\r\n\t\tELSE 0\r\n\tEND) / SUM(L_EXTENDEDPRICE * (1 - L_DISCOUNT)) AS PROMO_REVENUE\r\nFROM\r\n\tLINEITEM,\r\n\tPART\r\nWHERE\r\n\tL_PARTKEY = P_PARTKEY\r\n\tAND L_SHIPDATE >= '1995-01-01'\r\n\tAND L_SHIPDATE < '1995-01-01' + INTERVAL '1' MONTH;\r\n";
-                        break;
-                    default:
-                        textBox1.Text =
-                            "SELECT\r\n\tL_ORDERKEY,\r\n\tSUM(L_EXTENDEDPRICE * (1 - L_DISCOUNT)) AS REVENUE,\r\n\tSUM(C_MKTSEGMENT * (1 - L_DISCOUNT)) AS REVENUE2,\r\n\tO_ORDERDATE,\r\n\tO_SHIPPRIORITY\r\nFROM\r\n\tCUSTOMER,\r\n\tORDERS,\r\n\tLINEITEM\r\nWHERE\r\n\tC_MKTSEGMENT = \'HOUSEHOLD\'\r\n\tAND C_CUSTKEY = O_CUSTKEY\r\n\tAND L_ORDERKEY = O_ORDERKEY\r\n\tAND O_ORDERDATE < \'1995-03-31\'\r\n\tAND L_SHIPDATE  > \'1995-03-31\'\r\nGROUP BY\r\n\tL_ORDERKEY,\r\n\tO_ORDERDATE,\r\n\tO_SHIPPRIORITY\r\nORDER BY\r\n\tREVENUE DESC,\r\n\tO_ORDERDATE;\r\n";
-                        break;
-                }
-
-                if (Convert.ToInt16(comboBox1.Text) < 14)
-                {
-                    comboBox1.Text = (Convert.ToInt16(comboBox1.Text) + 1).ToString();
-                }
-                else
-                {
-                    comboBox1.Text = "0";
-                }
-            }
-            else
-            {
-                switch (Convert.ToInt16(comboBox1.Text))
-                {
-                    case 1:
-                        textBox1.Text =
-                            "SELECT\r\n\tL_RETURNFLAG,\r\n\tL_LINESTATUS,\r\n\tSUM(L_QUANTITY) AS SUM_QTY,\r\n\tSUM(L_EXTENDEDPRICE) AS SUM_BASE_PRICE,\r\n\tSUM(L_EXTENDEDPRICE * (1 - L_DISCOUNT)) AS SUM_DISC_PRICE,\r\n\tSUM(L_EXTENDEDPRICE * (1 - L_DISCOUNT) * (1 + L_TAX)) AS SUM_CHARGE,\r\n\tAVG(L_QUANTITY) AS AVG_QTY,\r\n\tAVG(L_EXTENDEDPRICE) AS AVG_PRICE,\r\n\tAVG(L_DISCOUNT) AS AVG_DISC,\r\n\tCOUNT(*) AS COUNT_ORDER\r\nFROM\r\n\tLINEITEM\r\nWHERE\r\n\tL_SHIPDATE <='1998-12-01' - INTERVAL '90' DAY\r\nGROUP BY\r\n\tL_RETURNFLAG,\r\n\tL_LINESTATUS\r\nORDER BY\r\n\tL_RETURNFLAG,\r\n\tL_LINESTATUS;\r\n";
-                        comboBox1.Text = "3";
-                        break;
-                    case 3:
-                        textBox1.Text =
-                            "SELECT\r\n\tL_ORDERKEY,\r\n\tSUM(L_EXTENDEDPRICE * (1 - L_DISCOUNT)) AS REVENUE,\r\n\tO_ORDERDATE,\r\n\tO_SHIPPRIORITY\r\nFROM\r\n\tCUSTOMER,\r\n\tORDERS,\r\n\tLINEITEM\r\nWHERE\r\n\tC_MKTSEGMENT = 'HOUSEHOLD'\r\n\tAND C_CUSTKEY = O_CUSTKEY\r\n\tAND L_ORDERKEY = O_ORDERKEY\r\n\tAND O_ORDERDATE < '1995-03-31'\r\n\tAND L_SHIPDATE > '1995-03-31'\r\nGROUP BY\r\n\tL_ORDERKEY,\r\n\tO_ORDERDATE,\r\n\tO_SHIPPRIORITY\r\nORDER BY\r\n\tREVENUE DESC,\r\n\tO_ORDERDATE;\r\n";
-                        comboBox1.Text = "5";
-                        break;
-                    case 5:
-                        textBox1.Text =
-                            "SELECT\r\n\tN_NAME,\r\n\tSUM(L_EXTENDEDPRICE * (1 - L_DISCOUNT)) AS REVENUE\r\nFROM\r\n\tCUSTOMER,\r\n\tORDERS,\r\n\tLINEITEM,\r\n\tSUPPLIER,\r\n\tNATION,\r\n\tREGION\r\nWHERE\r\n\tC_CUSTKEY = O_CUSTKEY\r\n\tAND L_ORDERKEY = O_ORDERKEY\r\n\tAND L_SUPPKEY = S_SUPPKEY\r\n\tAND C_NATIONKEY = S_NATIONKEY\r\n\tAND S_NATIONKEY = N_NATIONKEY\r\n\tAND N_REGIONKEY = R_REGIONKEY\r\n\tAND R_NAME = 'MIDDLE EAST'\r\n\tAND O_ORDERDATE >= '1995-01-01'\r\n\tAND O_ORDERDATE < '1995-01-01' + INTERVAL '1' YEAR\r\nGROUP BY\r\n\tN_NAME\r\nORDER BY\r\n\tREVENUE DESC;\r\n";
-                        comboBox1.Text = "6";
-                        break;
-                    case 6:
-                        textBox1.Text =
-                            "SELECT\r\n\tSUM(L_EXTENDEDPRICE * L_DISCOUNT) AS REVENUE\r\nFROM\r\n\tLINEITEM\r\nWHERE\r\n\tL_SHIPDATE >= '1997-01-01'\r\n\tAND L_SHIPDATE < '1997-01-01' + INTERVAL '1' YEAR\r\n\tAND L_DISCOUNT BETWEEN 0.07 - 0.01 AND 0.07 + 0.01\r\n\tAND L_QUANTITY < 24;\r\n";
-                        comboBox1.Text = "10";
-                        break;
-                    case 10:
-                        textBox1.Text =
-                            "SELECT\r\n\tC_CUSTKEY,\r\n\tC_NAME,\r\n\tSUM(L_EXTENDEDPRICE * (1 - L_DISCOUNT)) AS REVENUE,\r\n\tC_ACCTBAL,\r\n\tN_NAME,\r\n\tC_ADDRESS,\r\n\tC_PHONE,\r\n\tC_COMMENT\r\nFROM\r\n\tCUSTOMER,\r\n\tORDERS,\r\n\tLINEITEM,\r\n\tNATION\r\nWHERE\r\n\tC_CUSTKEY = O_CUSTKEY\r\n\tAND L_ORDERKEY = O_ORDERKEY\r\n\tAND O_ORDERDATE >= '1994-04-01'\r\n\tAND O_ORDERDATE < '1994-04-01' + INTERVAL '3' MONTH\r\n\tAND L_RETURNFLAG = 'R'\r\n\tAND C_NATIONKEY = N_NATIONKEY\r\nGROUP BY\r\n\tC_CUSTKEY,\r\n\tC_NAME,\r\n\tC_ACCTBAL,\r\n\tC_PHONE,\r\n\tN_NAME,\r\n\tC_ADDRESS,\r\n\tC_COMMENT\r\nORDER BY\r\n\tREVENUE DESC;\r\n";
-                        comboBox1.Text = "12";
-                        break;
-                    case 12:
-                        textBox1.Text =
-                            "SELECT\r\n\tL_SHIPMODE,\r\n\tSUM(CASE\r\n\t\tWHEN O_ORDERPRIORITY = '1-URGENT'\r\n\t\t\tOR O_ORDERPRIORITY = '2-HIGH'\r\n\t\t\tTHEN 1\r\n\t\tELSE 0\r\n\tEND) AS HIGH_LINE_COUNT,\r\n\tSUM(CASE\r\n\t\tWHEN O_ORDERPRIORITY <> '1-URGENT'\r\n\t\t\tAND O_ORDERPRIORITY <> '2-HIGH'\r\n\t\t\tTHEN 1\r\n\t\tELSE 0\r\n\tEND) AS LOW_LINE_COUNT\r\nFROM\r\n\tORDERS,\r\n\tLINEITEM\r\nWHERE\r\n\tO_ORDERKEY = L_ORDERKEY\r\n\tAND L_SHIPMODE IN ('AIR', 'SHIP')\r\n\tAND L_COMMITDATE < L_RECEIPTDATE\r\n\tAND L_SHIPDATE < L_COMMITDATE\r\n\tAND L_RECEIPTDATE >= '1994-01-01'\r\n\tAND L_RECEIPTDATE < '1994-01-01' + INTERVAL '1' YEAR\r\nGROUP BY\r\n\tL_SHIPMODE\r\nORDER BY\r\n\tL_SHIPMODE;\r\n";
-                        comboBox1.Text = "14";
-                        break;
-                    case 14:
-                        textBox1.Text =
-                            "SELECT\r\n\t100.00 * SUM(CASE\r\n\t\tWHEN P_TYPE LIKE 'PROMO%'\r\n\t\t\tTHEN L_EXTENDEDPRICE * (1 - L_DISCOUNT)\r\n\t\tELSE 0\r\n\tEND) / SUM(L_EXTENDEDPRICE * (1 - L_DISCOUNT)) AS PROMO_REVENUE\r\nFROM\r\n\tLINEITEM,\r\n\tPART\r\nWHERE\r\n\tL_PARTKEY = P_PARTKEY\r\n\tAND L_SHIPDATE >= '1995-01-01'\r\n\tAND L_SHIPDATE < '1995-01-01' + INTERVAL '1' MONTH;\r\n";
-                        break;
-                    default:
-                        textBox1.Text =
-                            "SELECT\r\n\tL_ORDERKEY,\r\n\tSUM(L_EXTENDEDPRICE * (1 - L_DISCOUNT)) AS REVENUE,\r\n\tSUM(C_MKTSEGMENT * (1 - L_DISCOUNT)) AS REVENUE2,\r\n\tO_ORDERDATE,\r\n\tO_SHIPPRIORITY\r\nFROM\r\n\tCUSTOMER,\r\n\tORDERS,\r\n\tLINEITEM\r\nWHERE\r\n\tC_MKTSEGMENT = \'HOUSEHOLD\'\r\n\tAND C_CUSTKEY = O_CUSTKEY\r\n\tAND L_ORDERKEY = O_ORDERKEY\r\n\tAND O_ORDERDATE < \'1995-03-31\'\r\n\tAND L_SHIPDATE  > \'1995-03-31\'\r\nGROUP BY\r\n\tL_ORDERKEY,\r\n\tO_ORDERDATE,\r\n\tO_SHIPPRIORITY\r\nORDER BY\r\n\tREVENUE DESC,\r\n\tO_ORDERDATE;\r\n";
-                        comboBox1.Text = "1";
-                        break;
-                }
-                if (Convert.ToInt16(comboBox1.Text) == 14)
-                {
-                    comboBox1.Text = "0";
-                }
-            }
-
-        }
-
-        private void btn_Debug_Click(object sender, EventArgs e)
-        {
-            //GetQuerryTreesScreens(@"D:\!Studing\Скриншоты деревьев\Originals\",12,14);
-            //отладка
-            pictureBox1.Visible = false;
-            textBox1.Width = Width - 8;
-            GetTree();
-            output = "\r\n========Return================\r\n";
-
-            #region Test DB create
-
-            //S_Type[] testTypes = new S_Type[1];
-            //testTypes[0] = new S_Type("testType",1024, "1");
-
-            //ColumnStructure[] testColumns = new ColumnStructure[1];
-            //testColumns[0] = new ColumnStructure("TestColumn", "1", false);
-
-            //TableStructure[] testTables = new TableStructure[1];
-            //testTables[0] = new TableStructure("testTable", testColumns);
-
-            //DataBaseStructure testDB = new DataBaseStructure("testDB",testTables,testTypes);
-            //using (FileStream fs = new FileStream("testDB.xml", FileMode.Create, FileAccess.ReadWrite))
-            //{
-            //    XmlSerializer dbSerializer = new XmlSerializer(typeof(DataBaseStructure));
-            //    dbSerializer.Serialize(fs, testDB);
-            //}
-
-            #endregion
-
-            if (listener.SubQueryListeners.Count != 0)
-            {
-                foreach (var subQListener in listener.SubQueryListeners)
-                {
-                    MakeSubSelect(subQListener);
-                    for (int i = 0; i < _subSelectQuery.Length; i++)
-                    {
-                        output += "\r\n========" + _subSelectQuery[i].Name + "=========\r\n";
-                        output += _subSelectQuery[i].Output + "\r\n";
-                    }
-                }
-            }
-
-            textBox1.Text = output;
-        }
-        
-        private void label1_Click(object sender, EventArgs e)
-        {
-            string txt;
-            switch (Convert.ToInt16(comboBox1.Text))
-            {
-                case 2:
-                    txt =
-                        "SELECT\r\n\tL_RETURNFLAG,\r\n\tL_LINESTATUS,\r\n\tSUM(L_QUANTITY) AS SUM_QTY,\r\n\tSUM(L_EXTENDEDPRICE) AS SUM_BASE_PRICE,\r\n\tSUM(L_EXTENDEDPRICE * (1 - L_DISCOUNT)) AS SUM_DISC_PRICE,\r\n\tSUM(L_EXTENDEDPRICE * (1 - L_DISCOUNT) * (1 + L_TAX)) AS SUM_CHARGE,\r\n\tAVG(L_QUANTITY) AS AVG_QTY,\r\n\tAVG(L_EXTENDEDPRICE) AS AVG_PRICE,\r\n\tAVG(L_DISCOUNT) AS AVG_DISC,\r\n\tCOUNT(*) AS COUNT_ORDER\r\nFROM\r\n\tLINEITEM\r\nWHERE\r\n\tL_SHIPDATE <='1998-12-01' - INTERVAL '90' DAY\r\nGROUP BY\r\n\tL_RETURNFLAG,\r\n\tL_LINESTATUS\r\nORDER BY\r\n\tL_RETURNFLAG,\r\n\tL_LINESTATUS;\r\n";
-                    break;
-                case 3:
-                    txt =
-                        "SELECT\r\n\tS_ACCTBAL,\r\n\tS_NAME,\r\n\tN_NAME,\r\n\tP_PARTKEY,\r\n\tP_MFGR,\r\n\tS_ADDRESS,\r\n\tS_PHONE,\r\n\tS_COMMENT\r\nFROM\r\n\tPART,\r\n\tSUPPLIER,\r\n\tPARTSUPP,\r\n\tNATION,\r\n\tREGION\r\nWHERE\r\n\tP_PARTKEY = PS_PARTKEY\r\n\tAND S_SUPPKEY = PS_SUPPKEY\r\n\tAND P_SIZE = 48\r\n\tAND P_TYPE LIKE '%NICKEL'\r\n\tAND S_NATIONKEY = N_NATIONKEY\r\n\tAND N_REGIONKEY = R_REGIONKEY\r\n\tAND R_NAME = 'AMERICA'\r\n\tAND PS_SUPPLYCOST = (\r\n\t\tSELECT\r\n\t\t\tMIN(PS_SUPPLYCOST)\r\n\t\tFROM\r\n\t\t\tPARTSUPP,\r\n\t\t\tSUPPLIER,\r\n\t\t\tNATION,\r\n\t\t\tREGION\r\n\t\tWHERE\r\n\t\t\tP_PARTKEY = PS_PARTKEY\r\n\t\t\tAND S_SUPPKEY = PS_SUPPKEY\r\n\t\t\tAND S_NATIONKEY = N_NATIONKEY\r\n\t\t\tAND N_REGIONKEY = R_REGIONKEY\r\n\t\t\tAND R_NAME = 'AMERICA'\r\n\t)\r\nORDER BY\r\n\tS_ACCTBAL DESC,\r\n\tN_NAME,\r\n\tS_NAME,\r\n\tP_PARTKEY;\r\n";
-                    break;
-                case 4:
-                    txt =
-                        "SELECT\r\n\tL_ORDERKEY,\r\n\tSUM(L_EXTENDEDPRICE * (1 - L_DISCOUNT)) AS REVENUE,\r\n\tO_ORDERDATE,\r\n\tO_SHIPPRIORITY\r\nFROM\r\n\tCUSTOMER,\r\n\tORDERS,\r\n\tLINEITEM\r\nWHERE\r\n\tC_MKTSEGMENT = 'HOUSEHOLD'\r\n\tAND C_CUSTKEY = O_CUSTKEY\r\n\tAND L_ORDERKEY = O_ORDERKEY\r\n\tAND O_ORDERDATE < '1995-03-31'\r\n\tAND L_SHIPDATE > '1995-03-31'\r\nGROUP BY\r\n\tL_ORDERKEY,\r\n\tO_ORDERDATE,\r\n\tO_SHIPPRIORITY\r\nORDER BY\r\n\tREVENUE DESC,\r\n\tO_ORDERDATE;\r\n";
-                    break;
-                case 5:
-                    txt =
-                        "SELECT\r\n\tO_ORDERPRIORITY,\r\n\tCOUNT(*) AS ORDER_COUNT\r\nFROM\r\n\tORDERS\r\nWHERE\r\n\tO_ORDERDATE >= '1996-02-01'\r\n\tAND O_ORDERDATE < '1996-02-01' + INTERVAL '3' MONTH\r\n\tAND EXISTS (\r\n\t\tSELECT\r\n\t\t\t*\r\n\t\tFROM\r\n\t\t\tLINEITEM\r\n\t\tWHERE\r\n\t\t\tL_ORDERKEY = O_ORDERKEY\r\n\t\t\tAND L_COMMITDATE < L_RECEIPTDATE\r\n\t)\r\nGROUP BY\r\n\tO_ORDERPRIORITY\r\nORDER BY\r\n\tO_ORDERPRIORITY;\r\n";
-                    break;
-                case 6:
-                    txt =
-                        "SELECT\r\n\tN_NAME,\r\n\tSUM(L_EXTENDEDPRICE * (1 - L_DISCOUNT)) AS REVENUE\r\nFROM\r\n\tCUSTOMER,\r\n\tORDERS,\r\n\tLINEITEM,\r\n\tSUPPLIER,\r\n\tNATION,\r\n\tREGION\r\nWHERE\r\n\tC_CUSTKEY = O_CUSTKEY\r\n\tAND L_ORDERKEY = O_ORDERKEY\r\n\tAND L_SUPPKEY = S_SUPPKEY\r\n\tAND C_NATIONKEY = S_NATIONKEY\r\n\tAND S_NATIONKEY = N_NATIONKEY\r\n\tAND N_REGIONKEY = R_REGIONKEY\r\n\tAND R_NAME = 'MIDDLE EAST'\r\n\tAND O_ORDERDATE >= '1995-01-01'\r\n\tAND O_ORDERDATE < '1995-01-01' + INTERVAL '1' YEAR\r\nGROUP BY\r\n\tN_NAME\r\nORDER BY\r\n\tREVENUE DESC;\r\n";
-                    break;
-                case 7:
-                    txt =
-                        "SELECT\r\n\tSUM(L_EXTENDEDPRICE * L_DISCOUNT) AS REVENUE\r\nFROM\r\n\tLINEITEM\r\nWHERE\r\n\tL_SHIPDATE >= '1997-01-01'\r\n\tAND L_SHIPDATE < '1997-01-01' + INTERVAL '1' YEAR\r\n\tAND L_DISCOUNT BETWEEN 0.07 - 0.01 AND 0.07 + 0.01\r\n\tAND L_QUANTITY < 24;\r\n";
-                    break;
-                case 8:
-                    txt =
-                        "SELECT\r\n\tSUPP_NATION,\r\n\tCUST_NATION,\r\n\tL_YEAR,\r\n\tSUM(VOLUME) AS REVENUE\r\nFROM\r\n\t(\r\n\t\tSELECT\r\n\t\t\tN1.N_NAME AS SUPP_NATION,\r\n\t\t\tN2.N_NAME AS CUST_NATION,\r\n\t\t\tEXTRACT(YEAR FROM L_SHIPDATE) AS L_YEAR,\r\n\t\t\tL_EXTENDEDPRICE * (1 - L_DISCOUNT) AS VOLUME\r\n\t\tFROM\r\n\t\t\tSUPPLIER,\r\n\t\t\tLINEITEM,\r\n\t\t\tORDERS,\r\n\t\t\tCUSTOMER,\r\n\t\t\tNATION N1,\r\n\t\t\tNATION N2\r\n\t\tWHERE\r\n\t\t\tS_SUPPKEY = L_SUPPKEY\r\n\t\t\tAND O_ORDERKEY = L_ORDERKEY\r\n\t\t\tAND C_CUSTKEY = O_CUSTKEY\r\n\t\t\tAND S_NATIONKEY = N1.N_NATIONKEY\r\n\t\t\tAND C_NATIONKEY = N2.N_NATIONKEY\r\n\t\t\tAND (\r\n\t\t\t\t(N1.N_NAME = 'IRAQ' AND N2.N_NAME = 'ALGERIA')\r\n\t\t\t\tOR (N1.N_NAME = 'ALGERIA' AND N2.N_NAME = 'IRAQ')\r\n\t\t\t)\r\n\t\t\tAND L_SHIPDATE BETWEEN '1995-01-01' AND '1996-12-31'\r\n\t) AS SHIPPING\r\nGROUP BY\r\n\tSUPP_NATION,\r\n\tCUST_NATION,\r\n\tL_YEAR\r\nORDER BY\r\n\tSUPP_NATION,\r\n\tCUST_NATION,\r\n\tL_YEAR;\r\n";
-                    break;
-                case 9:
-                    txt =
-                        "SELECT\r\n\tO_YEAR,\r\n\tSUM(CASE\r\n\t\tWHEN NATION = 'IRAN' THEN VOLUME\r\n\t\tELSE 0\r\n\tEND) / SUM(VOLUME) AS MKT_SHARE\r\nFROM\r\n\t(\r\n\t\tSELECT\r\n\t\t\tEXTRACT(YEAR FROM O_ORDERDATE) AS O_YEAR,\r\n\t\t\tL_EXTENDEDPRICE * (1 - L_DISCOUNT) AS VOLUME,\r\n\t\t\tN2.N_NAME AS NATION\r\n\t\tFROM\r\n\t\t\tPART,\r\n\t\t\tSUPPLIER,\r\n\t\t\tLINEITEM,\r\n\t\t\tORDERS,\r\n\t\t\tCUSTOMER,\r\n\t\t\tNATION N1,\r\n\t\t\tNATION N2,\r\n\t\t\tREGION\r\n\t\tWHERE\r\n\t\t\tP_PARTKEY = L_PARTKEY\r\n\t\t\tAND S_SUPPKEY = L_SUPPKEY\r\n\t\t\tAND L_ORDERKEY = O_ORDERKEY\r\n\t\t\tAND O_CUSTKEY = C_CUSTKEY\r\n\t\t\tAND C_NATIONKEY = N1.N_NATIONKEY\r\n\t\t\tAND N1.N_REGIONKEY = R_REGIONKEY\r\n\t\t\tAND R_NAME = 'MIDDLE EAST'\r\n\t\t\tAND S_NATIONKEY = N2.N_NATIONKEY\r\n\t\t\tAND O_ORDERDATE BETWEEN '1995-01-01' AND '1996-12-31'\r\n\t\t\tAND P_TYPE = 'STANDARD BRUSHED BRASS'\r\n\t) AS ALL_NATIONS\r\nGROUP BY\r\n\tO_YEAR\r\nORDER BY\r\n\tO_YEAR;\r\n";
-                    break;
-                case 10:
-                    txt =
-                        "SELECT\r\n\tNATION,\r\n\tO_YEAR,\r\n\tSUM(AMOUNT) AS SUM_PROFIT\r\nFROM\r\n\t(\r\n\t\tSELECT\r\n\t\t\tN_NAME AS NATION,\r\n\t\t\tEXTRACT(YEAR FROM O_ORDERDATE) AS O_YEAR,\r\n\t\t\tL_EXTENDEDPRICE * (1 - L_DISCOUNT) - PS_SUPPLYCOST * L_QUANTITY AS AMOUNT\r\n\t\tFROM\r\n\t\t\tPART,\r\n\t\t\tSUPPLIER,\r\n\t\t\tLINEITEM,\r\n\t\t\tPARTSUPP,\r\n\t\t\tORDERS,\r\n\t\t\tNATION\r\n\t\tWHERE\r\n\t\t\tS_SUPPKEY = L_SUPPKEY\r\n\t\t\tAND PS_SUPPKEY = L_SUPPKEY\r\n\t\t\tAND PS_PARTKEY = L_PARTKEY\r\n\t\t\tAND P_PARTKEY = L_PARTKEY\r\n\t\t\tAND O_ORDERKEY = L_ORDERKEY\r\n\t\t\tAND S_NATIONKEY = N_NATIONKEY\r\n\t\t\tAND P_NAME LIKE '%SNOW%'\r\n\t) AS PROFIT\r\nGROUP BY\r\n\tNATION,\r\n\tO_YEAR\r\nORDER BY\r\n\tNATION,\r\n\tO_YEAR DESC;\r\n";
-                    break;
-                case 11:
-                    txt =
-                        "SELECT\r\n\tC_CUSTKEY,\r\n\tC_NAME,\r\n\tSUM(L_EXTENDEDPRICE * (1 - L_DISCOUNT)) AS REVENUE,\r\n\tC_ACCTBAL,\r\n\tN_NAME,\r\n\tC_ADDRESS,\r\n\tC_PHONE,\r\n\tC_COMMENT\r\nFROM\r\n\tCUSTOMER,\r\n\tORDERS,\r\n\tLINEITEM,\r\n\tNATION\r\nWHERE\r\n\tC_CUSTKEY = O_CUSTKEY\r\n\tAND L_ORDERKEY = O_ORDERKEY\r\n\tAND O_ORDERDATE >= '1994-04-01'\r\n\tAND O_ORDERDATE < '1994-04-01' + INTERVAL '3' MONTH\r\n\tAND L_RETURNFLAG = 'R'\r\n\tAND C_NATIONKEY = N_NATIONKEY\r\nGROUP BY\r\n\tC_CUSTKEY,\r\n\tC_NAME,\r\n\tC_ACCTBAL,\r\n\tC_PHONE,\r\n\tN_NAME,\r\n\tC_ADDRESS,\r\n\tC_COMMENT\r\nORDER BY\r\n\tREVENUE DESC;\r\n";
-                    break;
-                case 12:
-                    txt =
-                        "SELECT\r\n\tPS_PARTKEY,\r\n\tSUM(PS_SUPPLYCOST * PS_AVAILQTY) AS VALUE\r\nFROM\r\n\tPARTSUPP,\r\n\tSUPPLIER,\r\n\tNATION\r\nWHERE\r\n\tPS_SUPPKEY = S_SUPPKEY\r\n\tAND S_NATIONKEY = N_NATIONKEY\r\n\tAND N_NAME = 'ALGERIA'\r\nGROUP BY\r\n\tPS_PARTKEY HAVING\r\n\t\tSUM(PS_SUPPLYCOST * PS_AVAILQTY) > (\r\n\t\t\tSELECT\r\n\t\t\t\tSUM(PS_SUPPLYCOST * PS_AVAILQTY) * 0.0001000000\r\n\t\t\tFROM\r\n\t\t\t\tPARTSUPP,\r\n\t\t\t\tSUPPLIER,\r\n\t\t\t\tNATION\r\n\t\t\tWHERE\r\n\t\t\t\tPS_SUPPKEY = S_SUPPKEY\r\n\t\t\t\tAND S_NATIONKEY = N_NATIONKEY\r\n\t\t\t\tAND N_NAME = 'ALGERIA'\r\n\t\t)\r\nORDER BY\r\n\tVALUE DESC;\r\n";
-                    break;
-                case 13:
-                    txt =
-                        "SELECT\r\n\tL_SHIPMODE,\r\n\tSUM(CASE\r\n\t\tWHEN O_ORDERPRIORITY = '1-URGENT'\r\n\t\t\tOR O_ORDERPRIORITY = '2-HIGH'\r\n\t\t\tTHEN 1\r\n\t\tELSE 0\r\n\tEND) AS HIGH_LINE_COUNT,\r\n\tSUM(CASE\r\n\t\tWHEN O_ORDERPRIORITY <> '1-URGENT'\r\n\t\t\tAND O_ORDERPRIORITY <> '2-HIGH'\r\n\t\t\tTHEN 1\r\n\t\tELSE 0\r\n\tEND) AS LOW_LINE_COUNT\r\nFROM\r\n\tORDERS,\r\n\tLINEITEM\r\nWHERE\r\n\tO_ORDERKEY = L_ORDERKEY\r\n\tAND L_SHIPMODE IN ('AIR', 'SHIP')\r\n\tAND L_COMMITDATE < L_RECEIPTDATE\r\n\tAND L_SHIPDATE < L_COMMITDATE\r\n\tAND L_RECEIPTDATE >= '1994-01-01'\r\n\tAND L_RECEIPTDATE < '1994-01-01' + INTERVAL '1' YEAR\r\nGROUP BY\r\n\tL_SHIPMODE\r\nORDER BY\r\n\tL_SHIPMODE;\r\n";
-                    break;
-                case 14:
-                    txt =
-                        "SELECT\r\n\tC_COUNT,\r\n\tCOUNT(*) AS CUSTDIST\r\nFROM\r\n\t(\r\n\t\tSELECT\r\n\t\t\tC_CUSTKEY,\r\n\t\t\tCOUNT(O_ORDERKEY) AS C_COUNT\r\n\t\tFROM\r\n\t\t\tCUSTOMER LEFT OUTER JOIN ORDERS ON\r\n\t\t\t\tC_CUSTKEY = O_CUSTKEY\r\n\t\t\t\tAND O_COMMENT NOT LIKE '%SPECIAL%REQUESTS%'\r\n\t\tGROUP BY\r\n\t\t\tC_CUSTKEY\r\n\t) AS C_ORDERS\r\nGROUP BY\r\n\tC_COUNT\r\nORDER BY\r\n\tCUSTDIST DESC,\r\n\tC_COUNT DESC;\r\n";
-                    break;
-                case 0:
-                    txt =
-                        "SELECT\r\n\t100.00 * SUM(CASE\r\n\t\tWHEN P_TYPE LIKE 'PROMO%'\r\n\t\t\tTHEN L_EXTENDEDPRICE * (1 - L_DISCOUNT)\r\n\t\tELSE 0\r\n\tEND) / SUM(L_EXTENDEDPRICE * (1 - L_DISCOUNT)) AS PROMO_REVENUE\r\nFROM\r\n\tLINEITEM,\r\n\tPART\r\nWHERE\r\n\tL_PARTKEY = P_PARTKEY\r\n\tAND L_SHIPDATE >= '1995-01-01'\r\n\tAND L_SHIPDATE < '1995-01-01' + INTERVAL '1' MONTH;\r\n";
-                    break;
-                default:
-                    txt =
-                        "SELECT\r\n\tL_ORDERKEY,\r\n\tSUM(L_EXTENDEDPRICE * (1 - L_DISCOUNT)) AS REVENUE,\r\n\tSUM(C_MKTSEGMENT * (1 - L_DISCOUNT)) AS REVENUE2,\r\n\tO_ORDERDATE,\r\n\tO_SHIPPRIORITY\r\nFROM\r\n\tCUSTOMER,\r\n\tORDERS,\r\n\tLINEITEM\r\nWHERE\r\n\tC_MKTSEGMENT = \'HOUSEHOLD\'\r\n\tAND C_CUSTKEY = O_CUSTKEY\r\n\tAND L_ORDERKEY = O_ORDERKEY\r\n\tAND O_ORDERDATE < \'1995-03-31\'\r\n\tAND L_SHIPDATE  > \'1995-03-31\'\r\nGROUP BY\r\n\tL_ORDERKEY,\r\n\tO_ORDERDATE,\r\n\tO_SHIPPRIORITY\r\nORDER BY\r\n\tREVENUE DESC,\r\n\tO_ORDERDATE;\r\n";
-                    break;
-            }
-
-            MessageBox.Show(txt);
-        }
-        #endregion
-
         #region TAB_2
 
         private void btn_CreateSelect_Click(object sender, EventArgs e)
         {
             //составление запросов SELECT
-            MakeSelect();
+            
 
             textBox3.Clear();
+            _selectQuery = MakeSelect(CreateSubDatabase(_dbName, _listener.TableNames.ToArray(), _listener.ColumnNames.ToArray()), _listener);
             for (int i = 0; i < _selectQuery.Length; i++)
             {
                 textBox3.Text += "\r\n========" + _selectQuery[i].Name + "=========\r\n";
                 textBox3.Text += _selectQuery[i].Output + "\r\n";
             }
 
-            if (listener.SubQueryListeners.Count != 0)
+            if (_listener.SubQueryListeners.Count != 0)
             {
                 textBox3.Text += "\r\n========SUB_Q=========\r\n";
-                foreach (var subQListener in listener.SubQueryListeners)
+                foreach (var subQlistener in _listener.SubQueryListeners)
                 {
-                    MakeSubSelect(subQListener);
+                    MakeSubSelect(subQlistener);
                 }
 
                 foreach (SelectStructure subSelect in _subSelectQuery)
@@ -445,12 +98,12 @@ namespace MySQL_Clear_standart
             {
                 textBox5.Text += "\r\n========" + join.Name + "========\r\n" + join.Output + "\r\n";
             }
-            if (listener.SubQueryListeners.Count != 0)
+            if (_listener.SubQueryListeners.Count != 0)
             {
                 textBox5.Text += "\r\n========SUB_Q=========\r\n";
-                foreach (var subQListener in listener.SubQueryListeners)
+                foreach (var subQlistener in _listener.SubQueryListeners)
                 {
-                    MakeSubJoin(subQListener);
+                    MakeSubJoin(subQlistener);
                 }
 
                 foreach (var join in _subJoinQuery)
@@ -613,74 +266,16 @@ namespace MySQL_Clear_standart
 
         #endregion
 
-        #region FormMethods
-
-        private void Form1_SizeChanged(object sender, EventArgs e)
-        {
-            ReSize();
-        }
-
-        private void Form1_Load(object sender, EventArgs e)
-        {
-            FillScheme();
-            ReSize();
-            GetTree();
-            _toDoTextFlag = true;
-            StreamReader sr = new StreamReader(@"res\ToDo.txt", System.Text.Encoding.Default);
-            textBox4.Text = sr.ReadToEnd();
-            sr.Close();
-            _toDoTextFlag = false;
-            using (FileStream fs = new FileStream(@"res\db_result.xml", FileMode.Create, FileAccess.ReadWrite))
-            {
-                XmlSerializer dbSerializer = new XmlSerializer(typeof(DataBaseStructure));
-                dbSerializer.Serialize(fs, _dbName);
-            }
-
-
-        }
-
-        private void textBox1_TextChanged(object sender, EventArgs e)
-        {
-            textBox2.Text = textBox1.Text;
-        }
-
-        private void textBox2_TextChanged(object sender, EventArgs e)
-        {
-            textBox1.Text = textBox2.Text;
-        }
-
-        private void textBox4_TextChanged(object sender, EventArgs e)
-        {
-            if (!_toDoTextFlag)
-            {
-                using (StreamWriter sw = new StreamWriter(@"res\ToDo.txt", false, System.Text.Encoding.Default))
-                {
-                    sw.WriteLine(textBox4.Text);
-                    sw.Close();
-                }
-            }
-        }
-
-        private void allow_SelectAl(object sender, KeyEventArgs e)
-        {
-            if (e.Control && e.KeyCode == Keys.A)
-            {
-                if (sender != null)
-                    ((TextBox)sender).SelectAll();
-            }
-        }
-
-        
-        #endregion
+       
 
         #region СлужебныеМетоды
 
-        private TableStructure GetCorrectTable(string listenerTable, DataBaseStructure db)
+        private TableStructure GetCorrectTable(string _listenerTable, DataBaseStructure db)
         {
             TableStructure outTable = new TableStructure();
             foreach (TableStructure table in db.Tables)
             {
-                if (table.Name == listenerTable)
+                if (table.Name == _listenerTable)
                 {
                     outTable = table;
                     break;
@@ -708,66 +303,6 @@ namespace MySQL_Clear_standart
             }
         }
 
-        private void DefaultOutput()
-        {
-
-            output = "\r\n========TableNames============\r\n";
-            foreach (string tableName in listener.TableNames)
-            {
-                output += tableName + "\r\n";
-            }
-
-            output += "\r\n========ColumnNames===========\r\n";
-            List<string> col = listener.ColumnNames;
-            col = col.Distinct().ToList();
-            col.Sort();
-            foreach (string columnName in col)
-            {
-                output += columnName + "\r\n";
-            }
-
-            output += "\r\n========ExprColumnNames========\r\n";
-            List<string> exprCol = listener.ExprColumnNames;
-            exprCol = exprCol.Distinct().ToList();
-            exprCol.Sort();
-            foreach (string columnName in exprCol)
-            {
-                output += columnName + "\r\n";
-            }
-
-            output += "\r\n========Return================\r\n";
-            output += listener._return;
-
-            if (pictureBox1.Image != null)
-            {
-                pictureBox1.Image.Dispose();
-                pictureBox1.Image = null;
-            }
-
-            Image image = vTree.Draw();
-            pictureBox1.Image = image;
-        }
-
-        private void GetTree()
-        {
-            FillScheme(); //странный баг.
-            textBox2.Text = textBox1.Text;
-            inputString = textBox1.Text;
-            inputStream = new AntlrInputStream(inputString);
-            mySqlLexer = new MySqlLexer(inputStream);
-            commonTokenStream = new CommonTokenStream(mySqlLexer);
-            mySqlParser = new MySqlParser(commonTokenStream);
-            mySqlParser.BuildParseTree = true;
-            tree = mySqlParser.root();
-            treeNodeDrawable = new CommonNode(tree);
-            vTree = new TreeVisitor(treeNodeDrawable);
-            walker = new ParseTreeWalker();
-            listener = new MyMySQLListener(0);
-            listener.voc = mySqlParser.Vocabulary;
-            walker.Walk(listener, tree);
-
-        }
-
         private void ReSize()
         {
             textBox2.Width = textBox3.Width = textBox5.Width = textBox6.Width = testQueryTb.Width = (tabPage2.Width - 100) / 5;
@@ -776,50 +311,15 @@ namespace MySQL_Clear_standart
             textBox6.Location = new Point(textBox5.Location.X + 20 + textBox3.Width, textBox3.Location.Y);
             testQueryTb.Location = new Point(textBox6.Location.X + 20 + textBox3.Width, textBox3.Location.Y);
         }
-
-        private void MakeSelect()
-        {
-            GetTree();
-            _selectQuery = new SelectStructure[listener.TableNames.Count];
-            FindeWhereStructureTable(listener.WhereList, _dbName);
-            foreach (AsStructure asStructure in listener.AsList)
-            {
-                asStructure.FindeTable(_dbName);
-            }
-
-            for (int i = 0; i < listener.TableNames.Count; i++)
-            {
-                _selectQuery[i] = new SelectStructure
-                (
-                    "S_" + listener.Depth + "_" + i.ToString(), //name(s)
-                    listener.TableNames[i], //TableName(s)
-                    GetClearColumns //Columns (s)
-                    (
-                        listener.ColumnNames, //goodColumns(s)
-                        listener.ExprColumnNames, //wrongColums(s)
-                        GetCorrectTable(listener.TableNames[i],
-                            _dbName) // TableName(TableStructure) нужно для нахождения существующих столбцов и сопоставления
-                    ),
-                    GetCorrectWhereStructure(listener.WhereList,
-                        listener.TableNames[i]), //WhereStructure(WhereStructure)
-                    GetCorrectAsStructure(listener.AsList, listener.TableNames[i]) //asStructure(asStructure)
-                );
-            }
-
-            foreach (SelectStructure select in _selectQuery)
-            {
-                select.CreateQuerry();
-            }
-            CreateScheme(_selectQuery);
-        }
+       
 
         private void MakeJoin()
         {
-            MakeSelect();
-            _joinQuery = listener.JoinStructures;
+            MakeSelect(CreateSubDatabase(_dbName, _listener.TableNames.ToArray(), _listener.ColumnNames.ToArray()), _listener);
+            _joinQuery = _listener.JoinStructures;
             FillJoins(_joinQuery, _dbName, _selectQuery.ToList());
-            GetJoinSequence(_joinQuery, listener.Depth);
-            _joinQuery = SortJoin(_joinQuery, listener.Depth);
+            GetJoinSequence(_joinQuery, _listener.Depth);
+            _joinQuery = SortJoin(_joinQuery, _listener.Depth);
             foreach (var join in _joinQuery)
             {
                 join.CreateQuerry();
@@ -832,7 +332,7 @@ namespace MySQL_Clear_standart
         {
             MakeJoin();
             _sortQuery = new SortStructure("So_1");
-            List<OrderByStructure> orderByStructures = listener.OrderByList;
+            List<OrderByStructure> orderByStructures = _listener.OrderByList;
             List<ColumnStructure> inputColumns;
 
             if (_joinQuery.Count != 0)
@@ -853,40 +353,33 @@ namespace MySQL_Clear_standart
 
             _sortQuery.Select = _selectQuery.LastOrDefault();
             _sortQuery.Join = _joinQuery.LastOrDefault();
-            _sortQuery.AsSortList = listener.AsList;
-            _sortQuery.GroupByColumnList = listener.GroupByColumnsNames;
+            _sortQuery.AsSortList = _listener.AsList;
+            _sortQuery.GroupByColumnList = _listener.GroupByColumnsNames;
             _sortQuery.OrderByStructures = orderByStructures;
             _sortQuery.CreateQuerry();
             CreateScheme(_sortQuery);
 
         }
 
-        private void MakeSubSelect(MyMySQLListener subQuerylistener)
+        private void MakeSubSelect(MainListener subQuery_listener)
         {
-            _subSelectQuery = new SelectStructure[subQuerylistener.TableNames.Count];
-            FindeWhereStructureTable(subQuerylistener.WhereList, _dbName);
-            foreach (AsStructure asStructure in subQuerylistener.AsList)
+            _subSelectQuery = new SelectStructure[subQuery_listener.TableNames.Count];
+            FindeWhereStructureTable(subQuery_listener.WhereList, _dbName);
+            foreach (AsStructure asStructure in subQuery_listener.AsList)
             {
                 asStructure.FindeTable(_dbName);
             }
 
-            for (int i = 0; i < subQuerylistener.TableNames.Count; i++)
+            for (int i = 0; i < subQuery_listener.TableNames.Count; i++)
             {
-                _subSelectQuery[i] = new SelectStructure
-                (
-                    "S_" + subQuerylistener.Depth + "_" + i.ToString(), //name(s)
-                    subQuerylistener.TableNames[i], //TableName(s)
-                    GetClearColumns //Columns (s)
-                    (
-                        subQuerylistener.ColumnNames, //goodColumns(s)
-                        subQuerylistener.ExprColumnNames, //wrongColums(s)
-                        GetCorrectTable(subQuerylistener.TableNames[i],
-                            _dbName) // TableName(TableStructure) нужно для нахождения существующих столбцов и сопоставления
-                    ),
-                    GetCorrectWhereStructure(subQuerylistener.WhereList,
-                        subQuerylistener.TableNames[i]), //WhereStructure(WhereStructure)
-                    GetCorrectAsStructure(subQuerylistener.AsList, subQuerylistener.TableNames[i]) //asStructure(asStructure)
-                );
+                //_subSelectQuery[i] = new SelectStructure
+                //(
+                //    "S_" + subQuery_listener.Depth + "_" + i.ToString(), //name(s)
+                   
+                //    GetCorrectWhereStructure(subQuery_listener.WhereList,
+                //        subQuery_listener.TableNames[i]), //WhereStructure(WhereStructure)
+                //    GetCorrectAsStructure(subQuery_listener.AsList, subQuery_listener.TableNames[i]) //asStructure(asStructure)
+                //);
             }
 
             foreach (SelectStructure select in _subSelectQuery)
@@ -896,11 +389,11 @@ namespace MySQL_Clear_standart
             CreateScheme(_subSelectQuery);
         }
 
-        private void MakeSubJoin(MyMySQLListener subQuerylistener)
+        private void MakeSubJoin(MainListener subQuery_listener)
         {
             
-            MakeSubSelect(subQuerylistener);
-            _subJoinQuery = subQuerylistener.JoinStructures;
+            MakeSubSelect(subQuery_listener);
+            _subJoinQuery = subQuery_listener.JoinStructures;
            
             List<SelectStructure> tmpSelects = new List<SelectStructure>();
             tmpSelects.AddRange(_subSelectQuery);
@@ -923,8 +416,8 @@ namespace MySQL_Clear_standart
             }
 
             FillJoins(_subJoinQuery, _dbName, tmpSelects);
-            GetJoinSequence(_subJoinQuery, subQuerylistener.Depth);
-            _subJoinQuery = SortJoin(_subJoinQuery, subQuerylistener.Depth);
+            GetJoinSequence(_subJoinQuery, subQuery_listener.Depth);
+            _subJoinQuery = SortJoin(_subJoinQuery, subQuery_listener.Depth);
             foreach (var join in _subJoinQuery)
             {
                 join.CreateQuerry();
@@ -991,10 +484,10 @@ namespace MySQL_Clear_standart
             for (int i = start; i < end + 1; i++)
             {
                 string pt = path + i.ToString() + ".bmp";
-                comboBox1.Text = i.ToString();
-                btn_SelectQuerry_tab1.PerformClick();
-                btn_CreateTree.PerformClick();
-                pictureBox1.Image.Save(pt, ImageFormat.Bmp);
+                comboBox_tab1_QueryNumber.Text = i.ToString();
+                btn_tab1_SelectQuerry.PerformClick();
+                btn_tab1_CreateTree.PerformClick();
+                pictureBox_tab1_Tree.Image.Save(pt, ImageFormat.Bmp);
             }
         }
 
@@ -1240,7 +733,7 @@ namespace MySQL_Clear_standart
 
             foreach (ColumnStructure column in outList)
             {
-                foreach (string selectColumn in listener.SelectColumns)
+                foreach (string selectColumn in _listener.SelectColumns)
                 {
                     if (column.Name == selectColumn)
                     {
@@ -1430,6 +923,433 @@ namespace MySQL_Clear_standart
             return output;
         }
         #endregion
+        
+        #endregion
 
+        #region v2
+
+        #region глобальные переменные
+        
+        private DataBaseStructure _dbName;
+        // объявляются переменный для построения дерева
+        private string _output = " ";
+        private string _inputString;
+        private ICharStream _inputStream;
+        private ITokenSource _mySqlLexer;
+        private CommonTokenStream _commonTokenStream;
+        private MySqlParser _mySqlParser;
+        private IParseTree _tree;
+        private CommonNode _treeNodeDrawable;
+        private TreeVisitor _vTree;
+        private ParseTreeWalker _walker;
+        private MainListener _listener;
+       
+        bool pictureSize = false;
+        
+
+        #endregion
+
+        #region СлужебныеМетоды
+        
+        private void GetTree()
+        {
+            FillScheme(); //странный баг.
+            textBox2.Text = textBox_tab1_Query.Text;
+            _inputString = textBox_tab1_Query.Text;
+            _inputStream = new AntlrInputStream(_inputString);
+            _mySqlLexer = new MySqlLexer(_inputStream);
+            _commonTokenStream = new CommonTokenStream(_mySqlLexer);
+            _mySqlParser = new MySqlParser(_commonTokenStream);
+            _mySqlParser.BuildParseTree = true;
+            _tree = _mySqlParser.root();
+            _treeNodeDrawable = new CommonNode(_tree);
+            _vTree = new TreeVisitor(_treeNodeDrawable);
+            _walker = new ParseTreeWalker();
+            _listener = new MainListener(0);
+            _listener.Vocabulary = _mySqlParser.Vocabulary;
+            _walker.Walk(_listener, _tree);
+
+        }
+        
+        private void FillScheme()
+        {
+            using (FileStream dbCreateFileStream = new FileStream("res//db.xml", FileMode.Open, FileAccess.ReadWrite)
+            ) // Заполнение БД из XML
+            {
+                XmlSerializer dbCreateSerializer = new XmlSerializer(typeof(DataBaseStructure));
+                _dbName = (DataBaseStructure) dbCreateSerializer.Deserialize(dbCreateFileStream);
+            }
+
+            SetID(_dbName);
+        }
+
+        private string GetQuery(int queryNumber)
+        {
+            string query;
+            if (!checkBox_tab1_DisableHeavyQuerry.Checked)
+            {
+                switch (queryNumber)
+                {
+
+                    case 1:
+                        query =
+                            "SELECT\r\n\tL_RETURNFLAG,\r\n\tL_LINESTATUS,\r\n\tSUM(L_QUANTITY) AS SUM_QTY,\r\n\tSUM(L_EXTENDEDPRICE) AS SUM_BASE_PRICE,\r\n\tSUM(L_EXTENDEDPRICE * (1 - L_DISCOUNT)) AS SUM_DISC_PRICE,\r\n\tSUM(L_EXTENDEDPRICE * (1 - L_DISCOUNT) * (1 + L_TAX)) AS SUM_CHARGE,\r\n\tAVG(L_QUANTITY) AS AVG_QTY,\r\n\tAVG(L_EXTENDEDPRICE) AS AVG_PRICE,\r\n\tAVG(L_DISCOUNT) AS AVG_DISC,\r\n\tCOUNT(*) AS COUNT_ORDER\r\nFROM\r\n\tLINEITEM\r\nWHERE\r\n\tL_SHIPDATE <='1998-12-01' - INTERVAL '90' DAY\r\nGROUP BY\r\n\tL_RETURNFLAG,\r\n\tL_LINESTATUS\r\nORDER BY\r\n\tL_RETURNFLAG,\r\n\tL_LINESTATUS;\r\n";
+                        break;
+                    case 2:
+                        query =
+                            "SELECT\r\n\tS_ACCTBAL,\r\n\tS_NAME,\r\n\tN_NAME,\r\n\tP_PARTKEY,\r\n\tP_MFGR,\r\n\tS_ADDRESS,\r\n\tS_PHONE,\r\n\tS_COMMENT\r\nFROM\r\n\tPART,\r\n\tSUPPLIER,\r\n\tPARTSUPP,\r\n\tNATION,\r\n\tREGION\r\nWHERE\r\n\tP_PARTKEY = PS_PARTKEY\r\n\tAND S_SUPPKEY = PS_SUPPKEY\r\n\tAND P_SIZE = 48\r\n\tAND P_TYPE LIKE '%NICKEL'\r\n\tAND S_NATIONKEY = N_NATIONKEY\r\n\tAND N_REGIONKEY = R_REGIONKEY\r\n\tAND R_NAME = 'AMERICA'\r\n\tAND PS_SUPPLYCOST = (\r\n\t\tSELECT\r\n\t\t\tMIN(PS_SUPPLYCOST)\r\n\t\tFROM\r\n\t\t\tPARTSUPP,\r\n\t\t\tSUPPLIER,\r\n\t\t\tNATION,\r\n\t\t\tREGION\r\n\t\tWHERE\r\n\t\t\tP_PARTKEY = PS_PARTKEY\r\n\t\t\tAND S_SUPPKEY = PS_SUPPKEY\r\n\t\t\tAND S_NATIONKEY = N_NATIONKEY\r\n\t\t\tAND N_REGIONKEY = R_REGIONKEY\r\n\t\t\tAND R_NAME = 'AMERICA'\r\n\t)\r\nORDER BY\r\n\tS_ACCTBAL DESC,\r\n\tN_NAME,\r\n\tS_NAME,\r\n\tP_PARTKEY;\r\n";
+                        break;
+                    case 3:
+                        query =
+                            "SELECT\r\n\tL_ORDERKEY,\r\n\tSUM(L_EXTENDEDPRICE * (1 - L_DISCOUNT)) AS REVENUE,\r\n\tO_ORDERDATE,\r\n\tO_SHIPPRIORITY\r\nFROM\r\n\tCUSTOMER,\r\n\tORDERS,\r\n\tLINEITEM\r\nWHERE\r\n\tC_MKTSEGMENT = 'HOUSEHOLD'\r\n\tAND C_CUSTKEY = O_CUSTKEY\r\n\tAND L_ORDERKEY = O_ORDERKEY\r\n\tAND O_ORDERDATE < '1995-03-31'\r\n\tAND L_SHIPDATE > '1995-03-31'\r\nGROUP BY\r\n\tL_ORDERKEY,\r\n\tO_ORDERDATE,\r\n\tO_SHIPPRIORITY\r\nORDER BY\r\n\tREVENUE DESC,\r\n\tO_ORDERDATE;\r\n";
+                        break;
+                    case 4:
+                        query =
+                            "SELECT\r\n\tO_ORDERPRIORITY,\r\n\tCOUNT(*) AS ORDER_COUNT\r\nFROM\r\n\tORDERS\r\nWHERE\r\n\tO_ORDERDATE >= '1996-02-01'\r\n\tAND O_ORDERDATE < '1996-02-01' + INTERVAL '3' MONTH\r\n\tAND EXISTS (\r\n\t\tSELECT\r\n\t\t\t*\r\n\t\tFROM\r\n\t\t\tLINEITEM\r\n\t\tWHERE\r\n\t\t\tL_ORDERKEY = O_ORDERKEY\r\n\t\t\tAND L_COMMITDATE < L_RECEIPTDATE\r\n\t)\r\nGROUP BY\r\n\tO_ORDERPRIORITY\r\nORDER BY\r\n\tO_ORDERPRIORITY;\r\n";
+                        break;
+                    case 5:
+                        query =
+                            "SELECT\r\n\tN_NAME,\r\n\tSUM(L_EXTENDEDPRICE * (1 - L_DISCOUNT)) AS REVENUE\r\nFROM\r\n\tCUSTOMER,\r\n\tORDERS,\r\n\tLINEITEM,\r\n\tSUPPLIER,\r\n\tNATION,\r\n\tREGION\r\nWHERE\r\n\tC_CUSTKEY = O_CUSTKEY\r\n\tAND L_ORDERKEY = O_ORDERKEY\r\n\tAND L_SUPPKEY = S_SUPPKEY\r\n\tAND C_NATIONKEY = S_NATIONKEY\r\n\tAND S_NATIONKEY = N_NATIONKEY\r\n\tAND N_REGIONKEY = R_REGIONKEY\r\n\tAND R_NAME = 'MIDDLE EAST'\r\n\tAND O_ORDERDATE >= '1995-01-01'\r\n\tAND O_ORDERDATE < '1995-01-01' + INTERVAL '1' YEAR\r\nGROUP BY\r\n\tN_NAME\r\nORDER BY\r\n\tREVENUE DESC;\r\n";
+                        break;
+                    case 6:
+                        query =
+                            "SELECT\r\n\tSUM(L_EXTENDEDPRICE * L_DISCOUNT) AS REVENUE\r\nFROM\r\n\tLINEITEM\r\nWHERE\r\n\tL_SHIPDATE >= '1997-01-01'\r\n\tAND L_SHIPDATE < '1997-01-01' + INTERVAL '1' YEAR\r\n\tAND L_DISCOUNT BETWEEN 0.07 - 0.01 AND 0.07 + 0.01\r\n\tAND L_QUANTITY < 24;\r\n";
+                        break;
+                    case 7:
+                        query =
+                            "SELECT\r\n\tSUPP_NATION,\r\n\tCUST_NATION,\r\n\tL_YEAR,\r\n\tSUM(VOLUME) AS REVENUE\r\nFROM\r\n\t(\r\n\t\tSELECT\r\n\t\t\tN1.N_NAME AS SUPP_NATION,\r\n\t\t\tN2.N_NAME AS CUST_NATION,\r\n\t\t\tEXTRACT(YEAR FROM L_SHIPDATE) AS L_YEAR,\r\n\t\t\tL_EXTENDEDPRICE * (1 - L_DISCOUNT) AS VOLUME\r\n\t\tFROM\r\n\t\t\tSUPPLIER,\r\n\t\t\tLINEITEM,\r\n\t\t\tORDERS,\r\n\t\t\tCUSTOMER,\r\n\t\t\tNATION N1,\r\n\t\t\tNATION N2\r\n\t\tWHERE\r\n\t\t\tS_SUPPKEY = L_SUPPKEY\r\n\t\t\tAND O_ORDERKEY = L_ORDERKEY\r\n\t\t\tAND C_CUSTKEY = O_CUSTKEY\r\n\t\t\tAND S_NATIONKEY = N1.N_NATIONKEY\r\n\t\t\tAND C_NATIONKEY = N2.N_NATIONKEY\r\n\t\t\tAND (\r\n\t\t\t\t(N1.N_NAME = 'IRAQ' AND N2.N_NAME = 'ALGERIA')\r\n\t\t\t\tOR (N1.N_NAME = 'ALGERIA' AND N2.N_NAME = 'IRAQ')\r\n\t\t\t)\r\n\t\t\tAND L_SHIPDATE BETWEEN '1995-01-01' AND '1996-12-31'\r\n\t) AS SHIPPING\r\nGROUP BY\r\n\tSUPP_NATION,\r\n\tCUST_NATION,\r\n\tL_YEAR\r\nORDER BY\r\n\tSUPP_NATION,\r\n\tCUST_NATION,\r\n\tL_YEAR;\r\n";
+                        break;
+                    case 8:
+                        query =
+                            "SELECT\r\n\tO_YEAR,\r\n\tSUM(CASE\r\n\t\tWHEN NATION = 'IRAN' THEN VOLUME\r\n\t\tELSE 0\r\n\tEND) / SUM(VOLUME) AS MKT_SHARE\r\nFROM\r\n\t(\r\n\t\tSELECT\r\n\t\t\tEXTRACT(YEAR FROM O_ORDERDATE) AS O_YEAR,\r\n\t\t\tL_EXTENDEDPRICE * (1 - L_DISCOUNT) AS VOLUME,\r\n\t\t\tN2.N_NAME AS NATION\r\n\t\tFROM\r\n\t\t\tPART,\r\n\t\t\tSUPPLIER,\r\n\t\t\tLINEITEM,\r\n\t\t\tORDERS,\r\n\t\t\tCUSTOMER,\r\n\t\t\tNATION N1,\r\n\t\t\tNATION N2,\r\n\t\t\tREGION\r\n\t\tWHERE\r\n\t\t\tP_PARTKEY = L_PARTKEY\r\n\t\t\tAND S_SUPPKEY = L_SUPPKEY\r\n\t\t\tAND L_ORDERKEY = O_ORDERKEY\r\n\t\t\tAND O_CUSTKEY = C_CUSTKEY\r\n\t\t\tAND C_NATIONKEY = N1.N_NATIONKEY\r\n\t\t\tAND N1.N_REGIONKEY = R_REGIONKEY\r\n\t\t\tAND R_NAME = 'MIDDLE EAST'\r\n\t\t\tAND S_NATIONKEY = N2.N_NATIONKEY\r\n\t\t\tAND O_ORDERDATE BETWEEN '1995-01-01' AND '1996-12-31'\r\n\t\t\tAND P_TYPE = 'STANDARD BRUSHED BRASS'\r\n\t) AS ALL_NATIONS\r\nGROUP BY\r\n\tO_YEAR\r\nORDER BY\r\n\tO_YEAR;\r\n";
+                        break;
+                    case 9:
+                        query =
+                            "SELECT\r\n\tNATION,\r\n\tO_YEAR,\r\n\tSUM(AMOUNT) AS SUM_PROFIT\r\nFROM\r\n\t(\r\n\t\tSELECT\r\n\t\t\tN_NAME AS NATION,\r\n\t\t\tEXTRACT(YEAR FROM O_ORDERDATE) AS O_YEAR,\r\n\t\t\tL_EXTENDEDPRICE * (1 - L_DISCOUNT) - PS_SUPPLYCOST * L_QUANTITY AS AMOUNT\r\n\t\tFROM\r\n\t\t\tPART,\r\n\t\t\tSUPPLIER,\r\n\t\t\tLINEITEM,\r\n\t\t\tPARTSUPP,\r\n\t\t\tORDERS,\r\n\t\t\tNATION\r\n\t\tWHERE\r\n\t\t\tS_SUPPKEY = L_SUPPKEY\r\n\t\t\tAND PS_SUPPKEY = L_SUPPKEY\r\n\t\t\tAND PS_PARTKEY = L_PARTKEY\r\n\t\t\tAND P_PARTKEY = L_PARTKEY\r\n\t\t\tAND O_ORDERKEY = L_ORDERKEY\r\n\t\t\tAND S_NATIONKEY = N_NATIONKEY\r\n\t\t\tAND P_NAME LIKE '%SNOW%'\r\n\t) AS PROFIT\r\nGROUP BY\r\n\tNATION,\r\n\tO_YEAR\r\nORDER BY\r\n\tNATION,\r\n\tO_YEAR DESC;\r\n";
+                        break;
+                    case 10:
+                        query =
+                            "SELECT\r\n\tC_CUSTKEY,\r\n\tC_NAME,\r\n\tSUM(L_EXTENDEDPRICE * (1 - L_DISCOUNT)) AS REVENUE,\r\n\tC_ACCTBAL,\r\n\tN_NAME,\r\n\tC_ADDRESS,\r\n\tC_PHONE,\r\n\tC_COMMENT\r\nFROM\r\n\tCUSTOMER,\r\n\tORDERS,\r\n\tLINEITEM,\r\n\tNATION\r\nWHERE\r\n\tC_CUSTKEY = O_CUSTKEY\r\n\tAND L_ORDERKEY = O_ORDERKEY\r\n\tAND O_ORDERDATE >= '1994-04-01'\r\n\tAND O_ORDERDATE < '1994-04-01' + INTERVAL '3' MONTH\r\n\tAND L_RETURNFLAG = 'R'\r\n\tAND C_NATIONKEY = N_NATIONKEY\r\nGROUP BY\r\n\tC_CUSTKEY,\r\n\tC_NAME,\r\n\tC_ACCTBAL,\r\n\tC_PHONE,\r\n\tN_NAME,\r\n\tC_ADDRESS,\r\n\tC_COMMENT\r\nORDER BY\r\n\tREVENUE DESC;\r\n";
+                        break;
+                    case 11:
+                        query =
+                            "SELECT\r\n\tPS_PARTKEY,\r\n\tSUM(PS_SUPPLYCOST * PS_AVAILQTY) AS VALUE\r\nFROM\r\n\tPARTSUPP,\r\n\tSUPPLIER,\r\n\tNATION\r\nWHERE\r\n\tPS_SUPPKEY = S_SUPPKEY\r\n\tAND S_NATIONKEY = N_NATIONKEY\r\n\tAND N_NAME = 'ALGERIA'\r\nGROUP BY\r\n\tPS_PARTKEY HAVING\r\n\t\tSUM(PS_SUPPLYCOST * PS_AVAILQTY) > (\r\n\t\t\tSELECT\r\n\t\t\t\tSUM(PS_SUPPLYCOST * PS_AVAILQTY) * 0.0001000000\r\n\t\t\tFROM\r\n\t\t\t\tPARTSUPP,\r\n\t\t\t\tSUPPLIER,\r\n\t\t\t\tNATION\r\n\t\t\tWHERE\r\n\t\t\t\tPS_SUPPKEY = S_SUPPKEY\r\n\t\t\t\tAND S_NATIONKEY = N_NATIONKEY\r\n\t\t\t\tAND N_NAME = 'ALGERIA'\r\n\t\t)\r\nORDER BY\r\n\tVALUE DESC;\r\n";
+                        break;
+                    case 12:
+                        query =
+                            "SELECT\r\n\tL_SHIPMODE,\r\n\tSUM(CASE\r\n\t\tWHEN O_ORDERPRIORITY = '1-URGENT'\r\n\t\t\tOR O_ORDERPRIORITY = '2-HIGH'\r\n\t\t\tTHEN 1\r\n\t\tELSE 0\r\n\tEND) AS HIGH_LINE_COUNT,\r\n\tSUM(CASE\r\n\t\tWHEN O_ORDERPRIORITY <> '1-URGENT'\r\n\t\t\tAND O_ORDERPRIORITY <> '2-HIGH'\r\n\t\t\tTHEN 1\r\n\t\tELSE 0\r\n\tEND) AS LOW_LINE_COUNT\r\nFROM\r\n\tORDERS,\r\n\tLINEITEM\r\nWHERE\r\n\tO_ORDERKEY = L_ORDERKEY\r\n\tAND L_SHIPMODE IN ('AIR', 'SHIP')\r\n\tAND L_COMMITDATE < L_RECEIPTDATE\r\n\tAND L_SHIPDATE < L_COMMITDATE\r\n\tAND L_RECEIPTDATE >= '1994-01-01'\r\n\tAND L_RECEIPTDATE < '1994-01-01' + INTERVAL '1' YEAR\r\nGROUP BY\r\n\tL_SHIPMODE\r\nORDER BY\r\n\tL_SHIPMODE;\r\n";
+                        break;
+                    case 13:
+                        query =
+                            "SELECT\r\n\tC_COUNT,\r\n\tCOUNT(*) AS CUSTDIST\r\nFROM\r\n\t(\r\n\t\tSELECT\r\n\t\t\tC_CUSTKEY,\r\n\t\t\tCOUNT(O_ORDERKEY) AS C_COUNT\r\n\t\tFROM\r\n\t\t\tCUSTOMER LEFT OUTER JOIN ORDERS ON\r\n\t\t\t\tC_CUSTKEY = O_CUSTKEY\r\n\t\t\t\tAND O_COMMENT NOT LIKE '%SPECIAL%REQUESTS%'\r\n\t\tGROUP BY\r\n\t\t\tC_CUSTKEY\r\n\t) AS C_ORDERS\r\nGROUP BY\r\n\tC_COUNT\r\nORDER BY\r\n\tCUSTDIST DESC,\r\n\tC_COUNT DESC;\r\n";
+                        break;
+                    case 14:
+                        query =
+                            "SELECT\r\n\t100.00 * SUM(CASE\r\n\t\tWHEN P_TYPE LIKE 'PROMO%'\r\n\t\t\tTHEN L_EXTENDEDPRICE * (1 - L_DISCOUNT)\r\n\t\tELSE 0\r\n\tEND) / SUM(L_EXTENDEDPRICE * (1 - L_DISCOUNT)) AS PROMO_REVENUE\r\nFROM\r\n\tLINEITEM,\r\n\tPART\r\nWHERE\r\n\tL_PARTKEY = P_PARTKEY\r\n\tAND L_SHIPDATE >= '1995-01-01'\r\n\tAND L_SHIPDATE < '1995-01-01' + INTERVAL '1' MONTH;\r\n";
+                        break;
+                    default:
+                        query =
+                            "SELECT\r\n\tL_ORDERKEY,\r\n\tSUM(L_EXTENDEDPRICE * (1 - L_DISCOUNT)) AS REVENUE,\r\n\tSUM(C_MKTSEGMENT * (1 - L_DISCOUNT)) AS REVENUE2,\r\n\tO_ORDERDATE,\r\n\tO_SHIPPRIORITY\r\nFROM\r\n\tCUSTOMER,\r\n\tORDERS,\r\n\tLINEITEM\r\nWHERE\r\n\tC_MKTSEGMENT = \'HOUSEHOLD\'\r\n\tAND C_CUSTKEY = O_CUSTKEY\r\n\tAND L_ORDERKEY = O_ORDERKEY\r\n\tAND O_ORDERDATE < \'1995-03-31\'\r\n\tAND L_SHIPDATE  > \'1995-03-31\'\r\nGROUP BY\r\n\tL_ORDERKEY,\r\n\tO_ORDERDATE,\r\n\tO_SHIPPRIORITY\r\nORDER BY\r\n\tREVENUE DESC,\r\n\tO_ORDERDATE;\r\n";
+                        break;
+                }
+            }
+            else
+            {
+                switch (queryNumber)
+                {
+                    case 1:
+                        query =
+                            "SELECT\r\n\tL_RETURNFLAG,\r\n\tL_LINESTATUS,\r\n\tSUM(L_QUANTITY) AS SUM_QTY,\r\n\tSUM(L_EXTENDEDPRICE) AS SUM_BASE_PRICE,\r\n\tSUM(L_EXTENDEDPRICE * (1 - L_DISCOUNT)) AS SUM_DISC_PRICE,\r\n\tSUM(L_EXTENDEDPRICE * (1 - L_DISCOUNT) * (1 + L_TAX)) AS SUM_CHARGE,\r\n\tAVG(L_QUANTITY) AS AVG_QTY,\r\n\tAVG(L_EXTENDEDPRICE) AS AVG_PRICE,\r\n\tAVG(L_DISCOUNT) AS AVG_DISC,\r\n\tCOUNT(*) AS COUNT_ORDER\r\nFROM\r\n\tLINEITEM\r\nWHERE\r\n\tL_SHIPDATE <='1998-12-01' - INTERVAL '90' DAY\r\nGROUP BY\r\n\tL_RETURNFLAG,\r\n\tL_LINESTATUS\r\nORDER BY\r\n\tL_RETURNFLAG,\r\n\tL_LINESTATUS;\r\n";
+                        comboBox_tab1_QueryNumber.Text = "3";
+                        break;
+                    case 3:
+                        query =
+                            "SELECT\r\n\tL_ORDERKEY,\r\n\tSUM(L_EXTENDEDPRICE * (1 - L_DISCOUNT)) AS REVENUE,\r\n\tO_ORDERDATE,\r\n\tO_SHIPPRIORITY\r\nFROM\r\n\tCUSTOMER,\r\n\tORDERS,\r\n\tLINEITEM\r\nWHERE\r\n\tC_MKTSEGMENT = 'HOUSEHOLD'\r\n\tAND C_CUSTKEY = O_CUSTKEY\r\n\tAND L_ORDERKEY = O_ORDERKEY\r\n\tAND O_ORDERDATE < '1995-03-31'\r\n\tAND L_SHIPDATE > '1995-03-31'\r\nGROUP BY\r\n\tL_ORDERKEY,\r\n\tO_ORDERDATE,\r\n\tO_SHIPPRIORITY\r\nORDER BY\r\n\tREVENUE DESC,\r\n\tO_ORDERDATE;\r\n";
+                        comboBox_tab1_QueryNumber.Text = "5";
+                        break;
+                    case 5:
+                        query =
+                            "SELECT\r\n\tN_NAME,\r\n\tSUM(L_EXTENDEDPRICE * (1 - L_DISCOUNT)) AS REVENUE\r\nFROM\r\n\tCUSTOMER,\r\n\tORDERS,\r\n\tLINEITEM,\r\n\tSUPPLIER,\r\n\tNATION,\r\n\tREGION\r\nWHERE\r\n\tC_CUSTKEY = O_CUSTKEY\r\n\tAND L_ORDERKEY = O_ORDERKEY\r\n\tAND L_SUPPKEY = S_SUPPKEY\r\n\tAND C_NATIONKEY = S_NATIONKEY\r\n\tAND S_NATIONKEY = N_NATIONKEY\r\n\tAND N_REGIONKEY = R_REGIONKEY\r\n\tAND R_NAME = 'MIDDLE EAST'\r\n\tAND O_ORDERDATE >= '1995-01-01'\r\n\tAND O_ORDERDATE < '1995-01-01' + INTERVAL '1' YEAR\r\nGROUP BY\r\n\tN_NAME\r\nORDER BY\r\n\tREVENUE DESC;\r\n";
+                        comboBox_tab1_QueryNumber.Text = "6";
+                        break;
+                    case 6:
+                        query =
+                            "SELECT\r\n\tSUM(L_EXTENDEDPRICE * L_DISCOUNT) AS REVENUE\r\nFROM\r\n\tLINEITEM\r\nWHERE\r\n\tL_SHIPDATE >= '1997-01-01'\r\n\tAND L_SHIPDATE < '1997-01-01' + INTERVAL '1' YEAR\r\n\tAND L_DISCOUNT BETWEEN 0.07 - 0.01 AND 0.07 + 0.01\r\n\tAND L_QUANTITY < 24;\r\n";
+                        comboBox_tab1_QueryNumber.Text = "10";
+                        break;
+                    case 10:
+                        query =
+                            "SELECT\r\n\tC_CUSTKEY,\r\n\tC_NAME,\r\n\tSUM(L_EXTENDEDPRICE * (1 - L_DISCOUNT)) AS REVENUE,\r\n\tC_ACCTBAL,\r\n\tN_NAME,\r\n\tC_ADDRESS,\r\n\tC_PHONE,\r\n\tC_COMMENT\r\nFROM\r\n\tCUSTOMER,\r\n\tORDERS,\r\n\tLINEITEM,\r\n\tNATION\r\nWHERE\r\n\tC_CUSTKEY = O_CUSTKEY\r\n\tAND L_ORDERKEY = O_ORDERKEY\r\n\tAND O_ORDERDATE >= '1994-04-01'\r\n\tAND O_ORDERDATE < '1994-04-01' + INTERVAL '3' MONTH\r\n\tAND L_RETURNFLAG = 'R'\r\n\tAND C_NATIONKEY = N_NATIONKEY\r\nGROUP BY\r\n\tC_CUSTKEY,\r\n\tC_NAME,\r\n\tC_ACCTBAL,\r\n\tC_PHONE,\r\n\tN_NAME,\r\n\tC_ADDRESS,\r\n\tC_COMMENT\r\nORDER BY\r\n\tREVENUE DESC;\r\n";
+                        comboBox_tab1_QueryNumber.Text = "12";
+                        break;
+                    case 12:
+                        query =
+                            "SELECT\r\n\tL_SHIPMODE,\r\n\tSUM(CASE\r\n\t\tWHEN O_ORDERPRIORITY = '1-URGENT'\r\n\t\t\tOR O_ORDERPRIORITY = '2-HIGH'\r\n\t\t\tTHEN 1\r\n\t\tELSE 0\r\n\tEND) AS HIGH_LINE_COUNT,\r\n\tSUM(CASE\r\n\t\tWHEN O_ORDERPRIORITY <> '1-URGENT'\r\n\t\t\tAND O_ORDERPRIORITY <> '2-HIGH'\r\n\t\t\tTHEN 1\r\n\t\tELSE 0\r\n\tEND) AS LOW_LINE_COUNT\r\nFROM\r\n\tORDERS,\r\n\tLINEITEM\r\nWHERE\r\n\tO_ORDERKEY = L_ORDERKEY\r\n\tAND L_SHIPMODE IN ('AIR', 'SHIP')\r\n\tAND L_COMMITDATE < L_RECEIPTDATE\r\n\tAND L_SHIPDATE < L_COMMITDATE\r\n\tAND L_RECEIPTDATE >= '1994-01-01'\r\n\tAND L_RECEIPTDATE < '1994-01-01' + INTERVAL '1' YEAR\r\nGROUP BY\r\n\tL_SHIPMODE\r\nORDER BY\r\n\tL_SHIPMODE;\r\n";
+                        comboBox_tab1_QueryNumber.Text = "14";
+                        break;
+                    case 14:
+                        query =
+                            "SELECT\r\n\t100.00 * SUM(CASE\r\n\t\tWHEN P_TYPE LIKE 'PROMO%'\r\n\t\t\tTHEN L_EXTENDEDPRICE * (1 - L_DISCOUNT)\r\n\t\tELSE 0\r\n\tEND) / SUM(L_EXTENDEDPRICE * (1 - L_DISCOUNT)) AS PROMO_REVENUE\r\nFROM\r\n\tLINEITEM,\r\n\tPART\r\nWHERE\r\n\tL_PARTKEY = P_PARTKEY\r\n\tAND L_SHIPDATE >= '1995-01-01'\r\n\tAND L_SHIPDATE < '1995-01-01' + INTERVAL '1' MONTH;\r\n";
+                        break;
+                    default:
+                        query =
+                            "SELECT\r\n\tL_ORDERKEY,\r\n\tSUM(L_EXTENDEDPRICE * (1 - L_DISCOUNT)) AS REVENUE,\r\n\tSUM(C_MKTSEGMENT * (1 - L_DISCOUNT)) AS REVENUE2,\r\n\tO_ORDERDATE,\r\n\tO_SHIPPRIORITY\r\nFROM\r\n\tCUSTOMER,\r\n\tORDERS,\r\n\tLINEITEM\r\nWHERE\r\n\tC_MKTSEGMENT = \'HOUSEHOLD\'\r\n\tAND C_CUSTKEY = O_CUSTKEY\r\n\tAND L_ORDERKEY = O_ORDERKEY\r\n\tAND O_ORDERDATE < \'1995-03-31\'\r\n\tAND L_SHIPDATE  > \'1995-03-31\'\r\nGROUP BY\r\n\tL_ORDERKEY,\r\n\tO_ORDERDATE,\r\n\tO_SHIPPRIORITY\r\nORDER BY\r\n\tREVENUE DESC,\r\n\tO_ORDERDATE;\r\n";
+                        comboBox_tab1_QueryNumber.Text = "1";
+                        break;
+                }
+            }
+
+            return query;
+        }
+
+        private string ShowDataBase(DataBaseStructure dataBase)
+        {
+            string output = "";
+            foreach (TableStructure table in dataBase.Tables)
+            {
+                output += table.Name + Environment.NewLine;
+                foreach (ColumnStructure column in table.Columns)
+                {
+                    output += "\t" + column.Name +"\t\t" + column.Type.Name + "\t" + column.IsForSelect + Environment.NewLine;
+                }
+            }
+            return output;
+        }
+
+        private DataBaseStructure CreateSubDatabase(DataBaseStructure fullDataBase, string[] TableNames,
+            string[] ColumnNames)
+        {
+            DataBaseStructure subDataBase;
+            List<TableStructure> tmpTables = new List<TableStructure>();
+            List<ColumnStructure> tmpColumns;
+
+            foreach (TableStructure fullTable in fullDataBase.Tables)
+            {
+                foreach (string subTableName in TableNames)
+                {
+                    if (subTableName == fullTable.Name)
+                    {
+                        tmpTables.Add(fullTable);
+                        break;
+                    }
+                }
+            }
+
+            foreach (TableStructure tmpTable in tmpTables)
+            {
+                tmpColumns = new List<ColumnStructure>();
+                foreach (ColumnStructure tmpTableColumn in tmpTable.Columns)
+                {
+                    foreach (string subColumnName in ColumnNames)
+                    {
+                        if (subColumnName == tmpTableColumn.Name)
+                        {
+                            tmpColumns.Add(tmpTableColumn);
+                            break;
+                            
+                        }
+                    }
+                }
+
+                tmpTable.Columns = tmpColumns.ToArray();
+            }
+
+            subDataBase = new DataBaseStructure("sub_" + fullDataBase.Name ,tmpTables.ToArray(), fullDataBase.Types);
+            return subDataBase;
+        }
+
+        private SelectStructure[] MakeSelect(DataBaseStructure dataBase, MainListener listener)
+        {
+            GetTree();
+            SelectStructure[] selectQueries = new SelectStructure[dataBase.Tables.Length];
+            FindeWhereStructureTable(listener.WhereList, dataBase);
+            foreach (AsStructure asStructure in listener.AsList)
+            {
+                asStructure.FindeTable(dataBase);
+            }
+
+            for (var i = 0; i < dataBase.Tables.Length; i++)
+            {
+                selectQueries[i] = new SelectStructure("S_" + listener.Depth + "_" + i, dataBase.Tables[i],
+                    GetCorrectWhereStructure(listener.WhereList, dataBase.Tables[i].Name),
+                    GetCorrectAsStructure(listener.AsList, listener.TableNames[i])
+                    );
+            }
+            foreach (SelectStructure select in selectQueries)
+            {
+                select.CreateQuerry();
+            }
+            CreateScheme(selectQueries);
+            return selectQueries;
+        }
+        
+        #endregion
+
+        #region FormMethods
+        
+        public Form1()
+        {
+            InitializeComponent();
+            GetTree();
+        }
+
+        private void Form1_SizeChanged(object sender, EventArgs e)
+        {
+            ReSize();
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            FillScheme();
+            ReSize();
+            GetTree();
+            _toDoTextFlag = true;
+            StreamReader sr = new StreamReader(@"res\ToDo.txt", System.Text.Encoding.Default);
+            textBox4.Text = sr.ReadToEnd();
+            sr.Close();
+            _toDoTextFlag = false;
+            using (FileStream fs = new FileStream(@"res\db_result.xml", FileMode.Create, FileAccess.ReadWrite))
+            {
+                XmlSerializer dbSerializer = new XmlSerializer(typeof(DataBaseStructure));
+                dbSerializer.Serialize(fs, _dbName);
+            }
+
+
+        }
+
+        private void textBox1_TextChanged(object sender, EventArgs e)
+        {
+            textBox2.Text = textBox_tab1_Query.Text;
+        }
+
+        private void textBox2_TextChanged(object sender, EventArgs e)
+        {
+            textBox_tab1_Query.Text = textBox2.Text;
+        }
+
+        private void textBox4_TextChanged(object sender, EventArgs e)
+        {
+            if (!_toDoTextFlag)
+            {
+                using (StreamWriter sw = new StreamWriter(@"res\ToDo.txt", false, System.Text.Encoding.Default))
+                {
+                    sw.WriteLine(textBox4.Text);
+                    sw.Close();
+                }
+            }
+        }
+
+        private void allow_SelectAl(object sender, KeyEventArgs e)
+        {
+            if (e.Control && e.KeyCode == Keys.A)
+            {
+                if (sender != null)
+                    ((TextBox)sender).SelectAll();
+            }
+        }
+
+        
+        #endregion
+        
+        #region TAB_1
+
+        private void btn_CreateTree_Click(object sender, EventArgs e)
+        {
+            //Кнопка для картинки(построить дерево)
+            GetTree();
+            richTextBox_tab1_Query.Visible = false;
+            Image image = _vTree.Draw();
+            pictureBox_tab1_Tree.Image = image;
+
+        }
+
+        private void btn_SaveTree_Click(object sender, EventArgs e)
+        {
+            //кнопка для сохранения картинки
+            saveFileDialog1.Filter = "Images|*.png;*.bmp;*.jpg";
+            ImageFormat format = ImageFormat.Png;
+            if (saveFileDialog1.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                string ext = System.IO.Path.GetExtension(saveFileDialog1.FileName);
+                switch (ext)
+                {
+                    case ".jpg":
+                        format = ImageFormat.Jpeg;
+                        break;
+                    case ".bmp":
+                        format = ImageFormat.Bmp;
+                        break;
+                }
+
+                pictureBox_tab1_Tree.Image.Save(saveFileDialog1.FileName, format);
+            }
+        }
+
+        private void btn_SelectQuerry_tab1_Click(object sender, EventArgs e)
+        {
+            //выбрать запрос
+            pictureBox_tab1_Tree.Visible = true;
+            richTextBox_tab1_Query.Visible = false;
+            textBox_tab1_Query.Width = 283;
+            richTextBox_tab1_Query.Text = "ЗАПРОС " + comboBox_tab1_QueryNumber.Text + Environment.NewLine;
+            //запросы TPC-H (убраны Date)
+            if (!checkBox_tab1_DisableHeavyQuerry.Checked)
+            {
+                textBox_tab1_Query.Text = GetQuery(Convert.ToInt16(comboBox_tab1_QueryNumber.Text));
+                if (Convert.ToInt16(comboBox_tab1_QueryNumber.Text) < 14)
+                {
+                    comboBox_tab1_QueryNumber.Text = (Convert.ToInt16(comboBox_tab1_QueryNumber.Text) + 1).ToString();
+                }
+                else
+                {
+                    comboBox_tab1_QueryNumber.Text = "0";
+                }
+            }
+            else
+            {
+                textBox_tab1_Query.Text = GetQuery(Convert.ToInt16(comboBox_tab1_QueryNumber.Text));
+                
+                if (Convert.ToInt16(comboBox_tab1_QueryNumber.Text) == 14)
+                {
+                    comboBox_tab1_QueryNumber.Text = "0";
+                }
+            }
+
+        }
+
+        private void btn_Debug_Click(object sender, EventArgs e)
+        {
+            //GetQuerryTreesScreens(@"D:\!Studing\Скриншоты деревьев\Originals\",12,14);
+            //отладка
+            pictureBox_tab1_Tree.Visible = false;
+            richTextBox_tab1_Query.Visible = true;
+            richTextBox_tab1_Query.Text += textBox_tab1_Query.Text;
+            textBox_tab1_Query.Width = Width - richTextBox_tab1_Query.Width - 50;
+            richTextBox_tab1_Query.Height = textBox_tab1_Query.Height;
+            richTextBox_tab1_Query.Location = new Point(textBox_tab1_Query.Location.X + textBox_tab1_Query.Width + 10,
+                textBox_tab1_Query.Location.Y);
+            GetTree();
+            _output = "\r\n========Return================\r\n";
+
+            List<string> columns = _listener.ColumnNames.Distinct().ToList();
+            List<string> tables = _listener.TableNames.Distinct().ToList();
+            _output = "\r\n========TABLES================\r\n";
+            foreach (var table in tables)
+            {
+                _output += table + Environment.NewLine;
+            }
+            _output += "\r\n========COLUMNS================\r\n";
+            foreach (var column in columns)
+            {
+                _output += column + Environment.NewLine;
+            }
+            DataBaseStructure subDbTest = CreateSubDatabase(_dbName, tables.ToArray(), columns.ToArray());
+            _output = ShowDataBase(subDbTest);
+            textBox_tab1_Query.Text = _output;
+        }
+        
+        #endregion
+
+        #endregion
     }
 }

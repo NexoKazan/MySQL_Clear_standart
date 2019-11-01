@@ -45,23 +45,23 @@
             this.textBox2 = new System.Windows.Forms.TextBox();
             this.btn_CreateSelect = new System.Windows.Forms.Button();
             this.tabPage1 = new System.Windows.Forms.TabPage();
-            this.panel1 = new System.Windows.Forms.Panel();
-            this.label1 = new System.Windows.Forms.Label();
-            this.comboBox1 = new System.Windows.Forms.ComboBox();
-            this.btn_Debug = new System.Windows.Forms.Button();
-            this.btn_SelectQuerry_tab1 = new System.Windows.Forms.Button();
-            this.btn_SaveTree = new System.Windows.Forms.Button();
-            this.pictureBox1 = new System.Windows.Forms.PictureBox();
-            this.btn_CreateTree = new System.Windows.Forms.Button();
-            this.textBox1 = new System.Windows.Forms.TextBox();
-            this.tabControl1 = new System.Windows.Forms.TabControl();
-            this.checkBox_DisableHeavyQuerry = new System.Windows.Forms.CheckBox();
+            this.panel_tab1_main = new System.Windows.Forms.Panel();
+            this.checkBox_tab1_DisableHeavyQuerry = new System.Windows.Forms.CheckBox();
+            this.comboBox_tab1_QueryNumber = new System.Windows.Forms.ComboBox();
+            this.btn_tab1_Debug = new System.Windows.Forms.Button();
+            this.btn_tab1_SelectQuerry = new System.Windows.Forms.Button();
+            this.btn_tab1_SaveTree = new System.Windows.Forms.Button();
+            this.pictureBox_tab1_Tree = new System.Windows.Forms.PictureBox();
+            this.btn_tab1_CreateTree = new System.Windows.Forms.Button();
+            this.textBox_tab1_Query = new System.Windows.Forms.TextBox();
+            this.tabControl_main = new System.Windows.Forms.TabControl();
+            this.richTextBox_tab1_Query = new System.Windows.Forms.RichTextBox();
             this.tabPage3.SuspendLayout();
             this.tabPage2.SuspendLayout();
             this.tabPage1.SuspendLayout();
-            this.panel1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
-            this.tabControl1.SuspendLayout();
+            this.panel_tab1_main.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox_tab1_Tree)).BeginInit();
+            this.tabControl_main.SuspendLayout();
             this.SuspendLayout();
             // 
             // tabPage3
@@ -197,7 +197,7 @@
             this.comboBox2.Name = "comboBox2";
             this.comboBox2.Size = new System.Drawing.Size(33, 21);
             this.comboBox2.TabIndex = 8;
-            this.comboBox2.Text = "0";
+            this.comboBox2.Text = "2";
             // 
             // btn_SelectQuerry_tab2
             // 
@@ -248,7 +248,7 @@
             // 
             // tabPage1
             // 
-            this.tabPage1.Controls.Add(this.panel1);
+            this.tabPage1.Controls.Add(this.panel_tab1_main);
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
@@ -257,39 +257,41 @@
             this.tabPage1.Text = "tabPage1";
             this.tabPage1.UseVisualStyleBackColor = true;
             // 
-            // panel1
+            // panel_tab1_main
             // 
-            this.panel1.AutoScroll = true;
-            this.panel1.AutoSize = true;
-            this.panel1.Controls.Add(this.checkBox_DisableHeavyQuerry);
-            this.panel1.Controls.Add(this.label1);
-            this.panel1.Controls.Add(this.comboBox1);
-            this.panel1.Controls.Add(this.btn_Debug);
-            this.panel1.Controls.Add(this.btn_SelectQuerry_tab1);
-            this.panel1.Controls.Add(this.btn_SaveTree);
-            this.panel1.Controls.Add(this.pictureBox1);
-            this.panel1.Controls.Add(this.btn_CreateTree);
-            this.panel1.Controls.Add(this.textBox1);
-            this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panel1.Location = new System.Drawing.Point(3, 3);
-            this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(1122, 551);
-            this.panel1.TabIndex = 0;
+            this.panel_tab1_main.AutoScroll = true;
+            this.panel_tab1_main.AutoSize = true;
+            this.panel_tab1_main.Controls.Add(this.richTextBox_tab1_Query);
+            this.panel_tab1_main.Controls.Add(this.checkBox_tab1_DisableHeavyQuerry);
+            this.panel_tab1_main.Controls.Add(this.comboBox_tab1_QueryNumber);
+            this.panel_tab1_main.Controls.Add(this.btn_tab1_Debug);
+            this.panel_tab1_main.Controls.Add(this.btn_tab1_SelectQuerry);
+            this.panel_tab1_main.Controls.Add(this.btn_tab1_SaveTree);
+            this.panel_tab1_main.Controls.Add(this.pictureBox_tab1_Tree);
+            this.panel_tab1_main.Controls.Add(this.btn_tab1_CreateTree);
+            this.panel_tab1_main.Controls.Add(this.textBox_tab1_Query);
+            this.panel_tab1_main.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panel_tab1_main.Location = new System.Drawing.Point(3, 3);
+            this.panel_tab1_main.Name = "panel_tab1_main";
+            this.panel_tab1_main.Size = new System.Drawing.Size(1122, 551);
+            this.panel_tab1_main.TabIndex = 0;
             // 
-            // label1
+            // checkBox_tab1_DisableHeavyQuerry
             // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(185, 72);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(47, 13);
-            this.label1.TabIndex = 8;
-            this.label1.Text = "Запрос:";
-            this.label1.Click += new System.EventHandler(this.label1_Click);
+            this.checkBox_tab1_DisableHeavyQuerry.AutoSize = true;
+            this.checkBox_tab1_DisableHeavyQuerry.Checked = true;
+            this.checkBox_tab1_DisableHeavyQuerry.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.checkBox_tab1_DisableHeavyQuerry.Location = new System.Drawing.Point(188, 30);
+            this.checkBox_tab1_DisableHeavyQuerry.Name = "checkBox_tab1_DisableHeavyQuerry";
+            this.checkBox_tab1_DisableHeavyQuerry.Size = new System.Drawing.Size(100, 17);
+            this.checkBox_tab1_DisableHeavyQuerry.TabIndex = 9;
+            this.checkBox_tab1_DisableHeavyQuerry.Text = "DisableHeavyQ";
+            this.checkBox_tab1_DisableHeavyQuerry.UseVisualStyleBackColor = true;
             // 
-            // comboBox1
+            // comboBox_tab1_QueryNumber
             // 
-            this.comboBox1.FormattingEnabled = true;
-            this.comboBox1.Items.AddRange(new object[] {
+            this.comboBox_tab1_QueryNumber.FormattingEnabled = true;
+            this.comboBox_tab1_QueryNumber.Items.AddRange(new object[] {
             "1",
             "2",
             "3",
@@ -304,99 +306,97 @@
             "12",
             "13",
             "14"});
-            this.comboBox1.Location = new System.Drawing.Point(185, 3);
-            this.comboBox1.Name = "comboBox1";
-            this.comboBox1.Size = new System.Drawing.Size(67, 21);
-            this.comboBox1.TabIndex = 7;
-            this.comboBox1.Text = "0";
+            this.comboBox_tab1_QueryNumber.Location = new System.Drawing.Point(185, 3);
+            this.comboBox_tab1_QueryNumber.Name = "comboBox_tab1_QueryNumber";
+            this.comboBox_tab1_QueryNumber.Size = new System.Drawing.Size(67, 21);
+            this.comboBox_tab1_QueryNumber.TabIndex = 7;
+            this.comboBox_tab1_QueryNumber.Text = "2";
             // 
-            // btn_Debug
+            // btn_tab1_Debug
             // 
-            this.btn_Debug.Location = new System.Drawing.Point(86, 49);
-            this.btn_Debug.Name = "btn_Debug";
-            this.btn_Debug.Size = new System.Drawing.Size(93, 36);
-            this.btn_Debug.TabIndex = 5;
-            this.btn_Debug.Text = "Отладка";
-            this.btn_Debug.UseVisualStyleBackColor = true;
-            this.btn_Debug.Click += new System.EventHandler(this.btn_Debug_Click);
+            this.btn_tab1_Debug.Location = new System.Drawing.Point(86, 49);
+            this.btn_tab1_Debug.Name = "btn_tab1_Debug";
+            this.btn_tab1_Debug.Size = new System.Drawing.Size(93, 36);
+            this.btn_tab1_Debug.TabIndex = 5;
+            this.btn_tab1_Debug.Text = "Отладка";
+            this.btn_tab1_Debug.UseVisualStyleBackColor = true;
+            this.btn_tab1_Debug.Click += new System.EventHandler(this.btn_Debug_Click);
             // 
-            // btn_SelectQuerry_tab1
+            // btn_tab1_SelectQuerry
             // 
-            this.btn_SelectQuerry_tab1.Location = new System.Drawing.Point(5, 3);
-            this.btn_SelectQuerry_tab1.Name = "btn_SelectQuerry_tab1";
-            this.btn_SelectQuerry_tab1.Size = new System.Drawing.Size(93, 40);
-            this.btn_SelectQuerry_tab1.TabIndex = 4;
-            this.btn_SelectQuerry_tab1.Text = "Выбрать запрос";
-            this.btn_SelectQuerry_tab1.UseVisualStyleBackColor = true;
-            this.btn_SelectQuerry_tab1.Click += new System.EventHandler(this.btn_SelectQuerry_tab1_Click);
+            this.btn_tab1_SelectQuerry.Location = new System.Drawing.Point(5, 3);
+            this.btn_tab1_SelectQuerry.Name = "btn_tab1_SelectQuerry";
+            this.btn_tab1_SelectQuerry.Size = new System.Drawing.Size(93, 40);
+            this.btn_tab1_SelectQuerry.TabIndex = 4;
+            this.btn_tab1_SelectQuerry.Text = "Выбрать запрос";
+            this.btn_tab1_SelectQuerry.UseVisualStyleBackColor = true;
+            this.btn_tab1_SelectQuerry.Click += new System.EventHandler(this.btn_SelectQuerry_tab1_Click);
             // 
-            // btn_SaveTree
+            // btn_tab1_SaveTree
             // 
-            this.btn_SaveTree.Location = new System.Drawing.Point(5, 49);
-            this.btn_SaveTree.Name = "btn_SaveTree";
-            this.btn_SaveTree.Size = new System.Drawing.Size(75, 36);
-            this.btn_SaveTree.TabIndex = 3;
-            this.btn_SaveTree.Text = "Сохранить дерево";
-            this.btn_SaveTree.UseVisualStyleBackColor = true;
-            this.btn_SaveTree.Click += new System.EventHandler(this.btn_SaveTree_Click);
+            this.btn_tab1_SaveTree.Location = new System.Drawing.Point(5, 49);
+            this.btn_tab1_SaveTree.Name = "btn_tab1_SaveTree";
+            this.btn_tab1_SaveTree.Size = new System.Drawing.Size(75, 36);
+            this.btn_tab1_SaveTree.TabIndex = 3;
+            this.btn_tab1_SaveTree.Text = "Сохранить дерево";
+            this.btn_tab1_SaveTree.UseVisualStyleBackColor = true;
+            this.btn_tab1_SaveTree.Click += new System.EventHandler(this.btn_SaveTree_Click);
             // 
-            // pictureBox1
+            // pictureBox_tab1_Tree
             // 
-            this.pictureBox1.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox1.Image")));
-            this.pictureBox1.Location = new System.Drawing.Point(293, 3);
-            this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(175, 159);
-            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
-            this.pictureBox1.TabIndex = 2;
-            this.pictureBox1.TabStop = false;
+            this.pictureBox_tab1_Tree.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox_tab1_Tree.Image")));
+            this.pictureBox_tab1_Tree.Location = new System.Drawing.Point(294, -3);
+            this.pictureBox_tab1_Tree.Name = "pictureBox_tab1_Tree";
+            this.pictureBox_tab1_Tree.Size = new System.Drawing.Size(175, 159);
+            this.pictureBox_tab1_Tree.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
+            this.pictureBox_tab1_Tree.TabIndex = 2;
+            this.pictureBox_tab1_Tree.TabStop = false;
             // 
-            // btn_CreateTree
+            // btn_tab1_CreateTree
             // 
-            this.btn_CreateTree.Location = new System.Drawing.Point(104, 3);
-            this.btn_CreateTree.Name = "btn_CreateTree";
-            this.btn_CreateTree.Size = new System.Drawing.Size(75, 40);
-            this.btn_CreateTree.TabIndex = 1;
-            this.btn_CreateTree.Text = "Построить дерево";
-            this.btn_CreateTree.UseVisualStyleBackColor = true;
-            this.btn_CreateTree.Click += new System.EventHandler(this.btn_CreateTree_Click);
+            this.btn_tab1_CreateTree.Location = new System.Drawing.Point(104, 3);
+            this.btn_tab1_CreateTree.Name = "btn_tab1_CreateTree";
+            this.btn_tab1_CreateTree.Size = new System.Drawing.Size(75, 40);
+            this.btn_tab1_CreateTree.TabIndex = 1;
+            this.btn_tab1_CreateTree.Text = "Построить дерево";
+            this.btn_tab1_CreateTree.UseVisualStyleBackColor = true;
+            this.btn_tab1_CreateTree.Click += new System.EventHandler(this.btn_CreateTree_Click);
             // 
-            // textBox1
+            // textBox_tab1_Query
             // 
-            this.textBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this.textBox_tab1_Query.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
-            this.textBox1.Location = new System.Drawing.Point(5, 91);
-            this.textBox1.Multiline = true;
-            this.textBox1.Name = "textBox1";
-            this.textBox1.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.textBox1.Size = new System.Drawing.Size(283, 413);
-            this.textBox1.TabIndex = 0;
-            this.textBox1.Text = resources.GetString("textBox1.Text");
-            this.textBox1.TextChanged += new System.EventHandler(this.textBox1_TextChanged);
-            this.textBox1.KeyDown += new System.Windows.Forms.KeyEventHandler(this.allow_SelectAl);
+            this.textBox_tab1_Query.Location = new System.Drawing.Point(5, 91);
+            this.textBox_tab1_Query.Multiline = true;
+            this.textBox_tab1_Query.Name = "textBox_tab1_Query";
+            this.textBox_tab1_Query.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.textBox_tab1_Query.Size = new System.Drawing.Size(283, 413);
+            this.textBox_tab1_Query.TabIndex = 0;
+            this.textBox_tab1_Query.Text = resources.GetString("textBox_tab1_Query.Text");
+            this.textBox_tab1_Query.TextChanged += new System.EventHandler(this.textBox1_TextChanged);
+            this.textBox_tab1_Query.KeyDown += new System.Windows.Forms.KeyEventHandler(this.allow_SelectAl);
             // 
-            // tabControl1
+            // tabControl_main
             // 
-            this.tabControl1.Controls.Add(this.tabPage1);
-            this.tabControl1.Controls.Add(this.tabPage2);
-            this.tabControl1.Controls.Add(this.tabPage3);
-            this.tabControl1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tabControl1.Location = new System.Drawing.Point(0, 0);
-            this.tabControl1.Name = "tabControl1";
-            this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(1136, 583);
-            this.tabControl1.TabIndex = 5;
+            this.tabControl_main.Controls.Add(this.tabPage1);
+            this.tabControl_main.Controls.Add(this.tabPage2);
+            this.tabControl_main.Controls.Add(this.tabPage3);
+            this.tabControl_main.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tabControl_main.Location = new System.Drawing.Point(0, 0);
+            this.tabControl_main.Name = "tabControl_main";
+            this.tabControl_main.SelectedIndex = 0;
+            this.tabControl_main.Size = new System.Drawing.Size(1136, 583);
+            this.tabControl_main.TabIndex = 5;
             // 
-            // checkBox_DisableHeavyQuerry
+            // richTextBox_tab1_Query
             // 
-            this.checkBox_DisableHeavyQuerry.AutoSize = true;
-            this.checkBox_DisableHeavyQuerry.Checked = true;
-            this.checkBox_DisableHeavyQuerry.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.checkBox_DisableHeavyQuerry.Location = new System.Drawing.Point(188, 30);
-            this.checkBox_DisableHeavyQuerry.Name = "checkBox_DisableHeavyQuerry";
-            this.checkBox_DisableHeavyQuerry.Size = new System.Drawing.Size(100, 17);
-            this.checkBox_DisableHeavyQuerry.TabIndex = 9;
-            this.checkBox_DisableHeavyQuerry.Text = "DisableHeavyQ";
-            this.checkBox_DisableHeavyQuerry.UseVisualStyleBackColor = true;
+            this.richTextBox_tab1_Query.Location = new System.Drawing.Point(293, 91);
+            this.richTextBox_tab1_Query.Name = "richTextBox_tab1_Query";
+            this.richTextBox_tab1_Query.ReadOnly = true;
+            this.richTextBox_tab1_Query.Size = new System.Drawing.Size(551, 412);
+            this.richTextBox_tab1_Query.TabIndex = 10;
+            this.richTextBox_tab1_Query.Text = "";
+            this.richTextBox_tab1_Query.Visible = false;
             // 
             // Form1
             // 
@@ -404,7 +404,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoScroll = true;
             this.ClientSize = new System.Drawing.Size(1136, 583);
-            this.Controls.Add(this.tabControl1);
+            this.Controls.Add(this.tabControl_main);
             this.Name = "Form1";
             this.Text = "Form1";
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
@@ -416,10 +416,10 @@
             this.tabPage2.PerformLayout();
             this.tabPage1.ResumeLayout(false);
             this.tabPage1.PerformLayout();
-            this.panel1.ResumeLayout(false);
-            this.panel1.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
-            this.tabControl1.ResumeLayout(false);
+            this.panel_tab1_main.ResumeLayout(false);
+            this.panel_tab1_main.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox_tab1_Tree)).EndInit();
+            this.tabControl_main.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -435,23 +435,23 @@
         private System.Windows.Forms.TextBox textBox2;
         private System.Windows.Forms.Button btn_CreateSelect;
         private System.Windows.Forms.TabPage tabPage1;
-        private System.Windows.Forms.Panel panel1;
-        private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.ComboBox comboBox1;
-        private System.Windows.Forms.Button btn_Debug;
-        private System.Windows.Forms.Button btn_SelectQuerry_tab1;
-        private System.Windows.Forms.Button btn_SaveTree;
-        private System.Windows.Forms.PictureBox pictureBox1;
-        private System.Windows.Forms.Button btn_CreateTree;
-        private System.Windows.Forms.TextBox textBox1;
-        private System.Windows.Forms.TabControl tabControl1;
+        private System.Windows.Forms.Panel panel_tab1_main;
+        private System.Windows.Forms.ComboBox comboBox_tab1_QueryNumber;
+        private System.Windows.Forms.Button btn_tab1_Debug;
+        private System.Windows.Forms.Button btn_tab1_SelectQuerry;
+        private System.Windows.Forms.Button btn_tab1_SaveTree;
+        private System.Windows.Forms.PictureBox pictureBox_tab1_Tree;
+        private System.Windows.Forms.Button btn_tab1_CreateTree;
+        private System.Windows.Forms.TextBox textBox_tab1_Query;
+        private System.Windows.Forms.TabControl tabControl_main;
         private System.Windows.Forms.Button btn_CreateJoin;
         private System.Windows.Forms.TextBox textBox5;
         private System.Windows.Forms.TextBox textBox6;
         private System.Windows.Forms.Button btn_CreateSort;
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.TextBox testQueryTb;
-        private System.Windows.Forms.CheckBox checkBox_DisableHeavyQuerry;
+        private System.Windows.Forms.CheckBox checkBox_tab1_DisableHeavyQuerry;
+        private System.Windows.Forms.RichTextBox richTextBox_tab1_Query;
     }
 }
 

@@ -16,17 +16,17 @@ namespace MySQL_Clear_standart
         private static int _id = 0;
         private string _indexColumnName = null;
         private string _createTableColumnNames;
-        private List<ColumnStructure> _columnsList;
+        private ColumnStructure[] _columns;
         private List<WhereStructure> _whereList;
         private List<AsStructure> _asList;
         private TableStructure _outTable;
         private ColumnStructure[] _outColumn;
         
-        public SelectStructure(string name, string tableName, List<ColumnStructure> columnsList, List<WhereStructure> whereList, List<AsStructure> asList)
+        public SelectStructure(string name, TableStructure table, List<WhereStructure> whereList, List<AsStructure> asList)
         {
             _name = name;
-            _tableName = tableName;
-            _columnsList = columnsList;
+            _tableName = table.Name;
+            _columns = table.Columns;
             _whereList = whereList;
             _asList = asList;
         }
@@ -78,7 +78,7 @@ namespace MySQL_Clear_standart
         {
             //выдернуто из свойства OutTable
             List<ColumnStructure> tempList = new List<ColumnStructure>();
-            foreach (ColumnStructure column in _columnsList)
+            foreach (ColumnStructure column in _columns)
             {
                 tempList.Add(column);
             }
@@ -108,10 +108,10 @@ namespace MySQL_Clear_standart
             _outTable = new TableStructure(_name + "_TB", _outColumn.ToArray());
 
             _output = "SELECT ";
-            for (int i = 0; i < _columnsList.Count; i++)
+            for (int i = 0; i < _columns.Length; i++)
             {
-                _output += "\r\n\t" + _columnsList[i].Name + " ";
-                if (i!= _columnsList.Count-1)
+                _output += "\r\n\t" + _columns[i].Name + " ";
+                if (i!= _columns.Length-1)
                 {
                     _output += ",";
                 }
