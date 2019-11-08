@@ -118,24 +118,24 @@ namespace MySQL_Clear_standart
 
             foreach (AsStructure asStructure in _asSortList)
             {
-                if (asStructure.GetAsRightColumn.IsRenamed)
+                if (asStructure.AsRightColumn.IsRenamed)
                 {
-                    string tmpHolder = asStructure.GetAsRightColumn.Name;
-                    asStructure.GetAsRightColumn.Name = asStructure.GetAsRightColumn.OldName;
-                    asStructure.GetAsRightColumn.IsRenamed = false;
-                    asStructure.GetAsRightColumn.OldName = tmpHolder;
+                    string tmpHolder = asStructure.AsRightColumn.Name;
+                    asStructure.AsRightColumn.Name = asStructure.AsRightColumn.OldName;
+                    asStructure.AsRightColumn.IsRenamed = false;
+                    asStructure.AsRightColumn.OldName = tmpHolder;
                 }
-                if(asStructure.GetAsRightColumn.OldName!=null)
+                if(asStructure.AsRightColumn.OldName!=null)
                 {
-                    _output += asStructure.AggregateFunctionName + "(" + asStructure.GetAsRightColumn.OldName + ")" + " AS " +
-                           asStructure.GetAsRightColumn.Name;
+                    _output += asStructure.AggregateFunctionName + "(" + asStructure.AsRightColumn.OldName + ")" + " AS " +
+                           asStructure.AsRightColumn.Name;
                 }
                 else
                 {
                     _output += asStructure.AggregateFunctionName + "(" + asStructure.AsString + ")" + " AS " +
-                               asStructure.GetAsRightColumn.Name;
+                               asStructure.AsRightColumn.Name;
                 }
-                tmpSelectColumns.Add(asStructure.GetAsRightColumn);
+                tmpSelectColumns.Add(asStructure.AsRightColumn);
                 if (asStructure != _asSortList.Last())
                 {
                     _output += ",\r\n\t";

@@ -16,7 +16,7 @@ namespace MySQL_Clear_standart
         private static int _id = 0;
         private string _indexColumnName = null;
         private string _createTableColumnNames;
-        private ColumnStructure[] _columns;
+        private TableStructure _inputTable;
         private List<WhereStructure> _whereList;
         private List<AsStructure> _asList;
         private TableStructure _outTable;
@@ -26,17 +26,14 @@ namespace MySQL_Clear_standart
         {
             _name = name;
             _tableName = table.Name;
-            _columns = table.Columns;
+            _inputTable = table;
             _whereList = whereList;
             _asList = asList;
         }
 
         public string Output
         {
-            get
-            {
-                return _output;
-            }
+            get { return _output; }
         }
 
         public string Name
@@ -68,38 +65,47 @@ namespace MySQL_Clear_standart
 
         public TableStructure OutTable
         {
-            get
-            {
-                return _outTable;
-            }
+            get { return _outTable; }
         }
+
+        public TableStructure InputTable
+        {
+            get { return _inputTable; }
+        }
+        
 
         public void CreateQuerry()
         {
             //выдернуто из свойства OutTable
             List<ColumnStructure> tempList = new List<ColumnStructure>();
-            foreach (ColumnStructure column in _columns)
+            foreach (ColumnStructure column in _inputTable.Columns)
             {
-                tempList.Add(column);
+                if(column.IsForSelect)
+                {
+                    tempList.Add(column);
+                }
+                //else if()
+                //{
+                    
+                //}
             }
 
             foreach (AsStructure asStructure in _asList)
             {//Сосздать конструктор для новых столбцов
-                if (!asStructure.GetAsRightColumn.IsRenamed && asStructure.GetAsRightColumn.OldName!=null)
+                if (!asStructure.AsRightColumn.IsRenamed && asStructure.AsRightColumn.OldName!=null)
                 {
-                    string tmpNameHolder = asStructure.GetAsRightColumn.OldName;
-                    asStructure.GetAsRightColumn.OldName = asStructure.GetAsRightColumn.Name;
-                    asStructure.GetAsRightColumn.Name = tmpNameHolder;
-                    asStructure.GetAsRightColumn.IsRenamed = true;
-                    tempList.Add(asStructure.GetAsRightColumn);
+                    string tmpNameHolder = asStructure.AsRightColumn.OldName;
+                    asStructure.AsRightColumn.OldName = asStructure.AsRightColumn.Name;
+                    asStructure.AsRightColumn.Name = tmpNameHolder;
+                    asStructure.AsRightColumn.IsRenamed = true;
+                    tempList.Add(asStructure.AsRightColumn);
                 }
                 else
                 {
-                    tempList.Add(asStructure.GetAsRightColumn);
+                    tempList.Add(asStructure.AsRightColumn);
                 }
             }
-
-            //tempList = tempList.Distinct().ToList();
+            
             _outColumn = new ColumnStructure[tempList.Count];
             for (int i = 0; i < _outColumn.Length; i++)
             {
@@ -108,10 +114,10 @@ namespace MySQL_Clear_standart
             _outTable = new TableStructure(_name + "_TB", _outColumn.ToArray());
 
             _output = "SELECT ";
-            for (int i = 0; i < _columns.Length; i++)
+            for (int i = 0; i < _inputTable.Columns.Length; i++)
             {
-                _output += "\r\n\t" + _columns[i].Name + " ";
-                if (i!= _columns.Length-1)
+                _output += "\r\n\t" + _inputTable.Columns[i].Name + " ";
+                if (i!= _inputTable.Columns.Length-1)
                 {
                     _output += ",";
                 }
@@ -122,11 +128,11 @@ namespace MySQL_Clear_standart
                 if (_output != "SELECT ")
                 {
                     _output += ",";
-                    _output += "\r\n\t" + asStructure.AsString + " AS " + asStructure.GetAsRightColumn.Name;
+                    _output += "\r\n\t" + asStructure.AsString + " AS " + asStructure.AsRightColumn.Name;
                 }
                 else
                 {
-                    _output += "\r\n\t" + asStructure.AsString + " AS " + asStructure.GetAsRightColumn.Name;
+                    _output += "\r\n\t" + asStructure.AsString + " AS " + asStructure.AsRightColumn.Name;
                 }
             }
 

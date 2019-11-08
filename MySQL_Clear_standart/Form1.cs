@@ -285,23 +285,7 @@ namespace MySQL_Clear_standart
             return outTable;
         }
 
-        private void FindeWhereStructureTable(List<WhereStructure> whereList, DataBaseStructure dataBase)
-        {
-            foreach (WhereStructure ws in whereList)
-            {
-                foreach (TableStructure dataBaseTable in dataBase.Tables)
-                {
-                    foreach (ColumnStructure column in dataBaseTable.Columns)
-                    {
-                        if (column.Name == ws.getLeftColumn)
-                        {
-                            ws.Table = dataBaseTable.Name;
-                        }
-                    }
-
-                }
-            }
-        }
+        
 
         private void ReSize()
         {
@@ -311,7 +295,6 @@ namespace MySQL_Clear_standart
             textBox6.Location = new Point(textBox5.Location.X + 20 + textBox3.Width, textBox3.Location.Y);
             testQueryTb.Location = new Point(textBox6.Location.X + 20 + textBox3.Width, textBox3.Location.Y);
         }
-       
 
         private void MakeJoin()
         {
@@ -365,10 +348,7 @@ namespace MySQL_Clear_standart
         {
             _subSelectQuery = new SelectStructure[subQuery_listener.TableNames.Count];
             FindeWhereStructureTable(subQuery_listener.WhereList, _dbName);
-            foreach (AsStructure asStructure in subQuery_listener.AsList)
-            {
-                asStructure.FindeTable(_dbName);
-            }
+            FillAsStructures(_dbName, subQuery_listener.AsList); //переделать _dbName;
 
             for (int i = 0; i < subQuery_listener.TableNames.Count; i++)
             {
@@ -745,19 +725,7 @@ namespace MySQL_Clear_standart
             return outList;
         }
 
-        private List<AsStructure> GetCorrectAsStructure(List<AsStructure> asStructures, string tableName)
-        {
-            List<AsStructure> outList = new List<AsStructure>();
-            foreach (var asStructure in asStructures)
-            {
-                if (asStructure.Table == tableName && asStructure.IsSelectPart)
-                {
-                    outList.Add(asStructure);
-                }
-            }
-
-            return outList;
-        }
+        
 
         private List<WhereStructure> GetCorrectWhereStructure(List<WhereStructure> whereList, string tableName)
         {
@@ -928,7 +896,7 @@ namespace MySQL_Clear_standart
 
         #region v2
 
-        #region глобальные переменные
+        #region Глобальные переменные
         
         private DataBaseStructure _dbName;
         // объявляются переменный для построения дерева
@@ -983,6 +951,71 @@ namespace MySQL_Clear_standart
             SetID(_dbName);
         }
 
+        private void SetIsForSelectFlags(DataBaseStructure dataBase, List<string> isForSelectColumnNames)
+        {
+            foreach (TableStructure table in dataBase.Tables)
+            {
+                foreach (ColumnStructure column in table.Columns)
+                {
+                    foreach (string columnName in isForSelectColumnNames)
+                    {
+                        if (columnName == column.Name)
+                        {
+                            column.IsForSelect = true;
+                        }
+                    }
+                }
+            }
+        }
+
+        private void FillAsStructures(DataBaseStructure dataBase, List<AsStructure> asStructures)
+        {
+            List<TableStructure> asTables = new List<TableStructure>();
+            foreach (AsStructure asStructure in asStructures)
+            {
+                asTables = new List<TableStructure>();
+                ColumnStructure rightColumn = new ColumnStructure(asStructure.GetAsRightName);
+                rightColumn.Size = -1;
+                foreach (var table in dataBase.Tables)
+                {
+                    foreach (ColumnStructure column in table.Columns)
+                    {
+                        foreach (string columnName in asStructure.ColumnNames)
+                        {
+                            if (column.Name == columnName)
+                            {
+                                if (column.Size > rightColumn.Size)
+                                {
+                                    rightColumn.Size = column.Size;
+                                    rightColumn.Type = column.Type;
+                                    rightColumn.TypeID = column.TypeID;
+                                }
+                                asTables.Add(table);
+                            }
+                        }
+                    }
+                }
+
+                asStructure.AsRightColumn = rightColumn;
+                
+                asTables = asTables.Distinct().ToList();
+                if (asTables.Count == 1)
+                {
+                    asStructure.IsSelectPart = true;
+                    asStructure.Tables = asTables;
+                    asStructure.AsRightColumn.OldName = asStructure.AsRightColumn.Name;
+                    asStructure.AsRightColumn.Name =
+                        asStructure.Tables[0].ShortName + asStructure.AsRightColumn.Name;
+                    asStructure.AsRightColumn.IsRenamed = true;
+                }
+                else
+                {
+                    asStructure.IsSelectPart = false;
+                    asStructure.Tables = asTables;
+                }
+            }
+        }
+        
         private string GetQuery(int queryNumber)
         {
             string query;
@@ -1110,7 +1143,7 @@ namespace MySQL_Clear_standart
                 output += table.Name + Environment.NewLine;
                 foreach (ColumnStructure column in table.Columns)
                 {
-                    output += "\t" + column.Name +"\t\t" + column.Type.Name + "\t" + column.IsForSelect + Environment.NewLine;
+                    output += "\t" + column.Name +"\t\t" + column.Type.Name + "\t" + column.Size + Environment.NewLine;
                 }
             }
             return output;
@@ -1158,21 +1191,55 @@ namespace MySQL_Clear_standart
             return subDataBase;
         }
 
+        private List<AsStructure> GetCorrectAsStructures(List<AsStructure> asStructures, TableStructure table)
+        {
+            List<AsStructure> outList = new List<AsStructure>();
+            foreach (var asStructure in asStructures)
+            {
+                if (asStructure.Tables.Count==1)
+                {
+                    if (asStructure.Tables[0] == table && asStructure.IsSelectPart)
+                    {
+                        outList.Add(asStructure);
+                    }
+                }
+            }
+
+            return outList;
+        }
+       
+        private void FindeWhereStructureTable(List<WhereStructure> whereList, DataBaseStructure dataBase)
+        {
+            foreach (WhereStructure ws in whereList)
+            {
+                foreach (TableStructure dataBaseTable in dataBase.Tables)
+                {
+                    foreach (ColumnStructure column in dataBaseTable.Columns)
+                    {
+                        if (column.Name == ws.getLeftColumn)
+                        {
+                            ws.Table = dataBaseTable.Name;
+                        }
+                    }
+
+                }
+            }
+        }
+
         private SelectStructure[] MakeSelect(DataBaseStructure dataBase, MainListener listener)
         {
             GetTree();
+            SetIsForSelectFlags(dataBase, listener.SelectColumnNames);
             SelectStructure[] selectQueries = new SelectStructure[dataBase.Tables.Length];
-            FindeWhereStructureTable(listener.WhereList, dataBase);
-            foreach (AsStructure asStructure in listener.AsList)
-            {
-                asStructure.FindeTable(dataBase);
-            }
 
+            FindeWhereStructureTable(listener.WhereList, dataBase);
+            FillAsStructures(dataBase, listener.AsList);
+            
             for (var i = 0; i < dataBase.Tables.Length; i++)
             {
                 selectQueries[i] = new SelectStructure("S_" + listener.Depth + "_" + i, dataBase.Tables[i],
                     GetCorrectWhereStructure(listener.WhereList, dataBase.Tables[i].Name),
-                    GetCorrectAsStructure(listener.AsList, listener.TableNames[i])
+                    GetCorrectAsStructures(listener.AsList, dataBase.Tables[i])
                     );
             }
             foreach (SelectStructure select in selectQueries)
@@ -1183,6 +1250,8 @@ namespace MySQL_Clear_standart
             return selectQueries;
         }
         
+
+
         #endregion
 
         #region FormMethods
