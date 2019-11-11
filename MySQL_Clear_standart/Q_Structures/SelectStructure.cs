@@ -80,14 +80,7 @@ namespace MySQL_Clear_standart
             List<ColumnStructure> tempList = new List<ColumnStructure>();
             foreach (ColumnStructure column in _inputTable.Columns)
             {
-                if(column.IsForSelect)
-                {
                     tempList.Add(column);
-                }
-                //else if()
-                //{
-                    
-                //}
             }
 
             foreach (AsStructure asStructure in _asList)
@@ -116,7 +109,7 @@ namespace MySQL_Clear_standart
             _output = "SELECT ";
             for (int i = 0; i < _inputTable.Columns.Length; i++)
             {
-                _output += "\r\n\t" + _inputTable.Columns[i].Name + " ";
+                _output += "\r\n\t" + _inputTable.Columns[i].Name;
                 if (i!= _inputTable.Columns.Length-1)
                 {
                     _output += ",";
