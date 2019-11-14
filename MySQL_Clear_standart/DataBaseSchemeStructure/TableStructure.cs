@@ -21,6 +21,17 @@ namespace MySQL_Clear_standart.DataBaseSchemeStructure
         {
             _name = name;
             _columns = columns;
+            foreach (ColumnStructure column in _columns)
+            {
+                column.Table = this;
+            }
+        }
+
+        public TableStructure(TableStructure mainTable)
+        {
+            _columns = mainTable.Columns;
+            _name = mainTable.Name;
+            _shortName = mainTable.ShortName;
         }
 
         [XmlArray]

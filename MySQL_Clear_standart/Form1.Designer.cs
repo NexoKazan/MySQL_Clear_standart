@@ -33,15 +33,16 @@
             this.tabPage3 = new System.Windows.Forms.TabPage();
             this.textBox4 = new System.Windows.Forms.TextBox();
             this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.checkBox_tab2_DisableHeavyQuerry = new System.Windows.Forms.CheckBox();
             this.textBox_tab2_AllResult = new System.Windows.Forms.TextBox();
             this.btn_tab2_CreateAll = new System.Windows.Forms.Button();
             this.btn_tab2_CreateSort = new System.Windows.Forms.Button();
             this.textBox_tab2_SortResult = new System.Windows.Forms.TextBox();
-            this.textBox_tab2_SelectResult = new System.Windows.Forms.TextBox();
+            this.textBox_tab2_JoinResult = new System.Windows.Forms.TextBox();
             this.btn_tab2_CreateJoin = new System.Windows.Forms.Button();
             this.comboBox_tab2_QueryNumber = new System.Windows.Forms.ComboBox();
             this.btn_tab2_SelectQuery = new System.Windows.Forms.Button();
-            this.textBox_tab2_JoinResult = new System.Windows.Forms.TextBox();
+            this.textBox_tab2_SelectResult = new System.Windows.Forms.TextBox();
             this.textBox_tab2_Query = new System.Windows.Forms.TextBox();
             this.btn_tab2_CreateSelect = new System.Windows.Forms.Button();
             this.tabPage1 = new System.Windows.Forms.TabPage();
@@ -56,7 +57,6 @@
             this.btn_tab1_CreateTree = new System.Windows.Forms.Button();
             this.textBox_tab1_Query = new System.Windows.Forms.TextBox();
             this.tabControl_main = new System.Windows.Forms.TabControl();
-            this.checkBox_tab2_DisableHeavyQuerry = new System.Windows.Forms.CheckBox();
             this.tabPage3.SuspendLayout();
             this.tabPage2.SuspendLayout();
             this.tabPage1.SuspendLayout();
@@ -96,11 +96,11 @@
             this.tabPage2.Controls.Add(this.btn_tab2_CreateAll);
             this.tabPage2.Controls.Add(this.btn_tab2_CreateSort);
             this.tabPage2.Controls.Add(this.textBox_tab2_SortResult);
-            this.tabPage2.Controls.Add(this.textBox_tab2_SelectResult);
+            this.tabPage2.Controls.Add(this.textBox_tab2_JoinResult);
             this.tabPage2.Controls.Add(this.btn_tab2_CreateJoin);
             this.tabPage2.Controls.Add(this.comboBox_tab2_QueryNumber);
             this.tabPage2.Controls.Add(this.btn_tab2_SelectQuery);
-            this.tabPage2.Controls.Add(this.textBox_tab2_JoinResult);
+            this.tabPage2.Controls.Add(this.textBox_tab2_SelectResult);
             this.tabPage2.Controls.Add(this.textBox_tab2_Query);
             this.tabPage2.Controls.Add(this.btn_tab2_CreateSelect);
             this.tabPage2.Location = new System.Drawing.Point(4, 22);
@@ -110,6 +110,17 @@
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "tabPage2";
             this.tabPage2.UseVisualStyleBackColor = true;
+            // 
+            // checkBox_tab2_DisableHeavyQuerry
+            // 
+            this.checkBox_tab2_DisableHeavyQuerry.AutoSize = true;
+            this.checkBox_tab2_DisableHeavyQuerry.Location = new System.Drawing.Point(47, 10);
+            this.checkBox_tab2_DisableHeavyQuerry.Name = "checkBox_tab2_DisableHeavyQuerry";
+            this.checkBox_tab2_DisableHeavyQuerry.Size = new System.Drawing.Size(100, 17);
+            this.checkBox_tab2_DisableHeavyQuerry.TabIndex = 15;
+            this.checkBox_tab2_DisableHeavyQuerry.Text = "DisableHeavyQ";
+            this.checkBox_tab2_DisableHeavyQuerry.UseVisualStyleBackColor = true;
+            this.checkBox_tab2_DisableHeavyQuerry.CheckedChanged += new System.EventHandler(this.checkBox_tab2_DisableHeavyQuerry_CheckedChanged);
             // 
             // textBox_tab2_AllResult
             // 
@@ -155,17 +166,17 @@
             this.textBox_tab2_SortResult.TabIndex = 11;
             this.textBox_tab2_SortResult.KeyDown += new System.Windows.Forms.KeyEventHandler(this.allow_SelectAl);
             // 
-            // textBox_tab2_SelectResult
+            // textBox_tab2_JoinResult
             // 
-            this.textBox_tab2_SelectResult.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this.textBox_tab2_JoinResult.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.textBox_tab2_SelectResult.Location = new System.Drawing.Point(215, 83);
-            this.textBox_tab2_SelectResult.Multiline = true;
-            this.textBox_tab2_SelectResult.Name = "textBox_tab2_SelectResult";
-            this.textBox_tab2_SelectResult.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.textBox_tab2_SelectResult.Size = new System.Drawing.Size(204, 468);
-            this.textBox_tab2_SelectResult.TabIndex = 10;
-            this.textBox_tab2_SelectResult.KeyDown += new System.Windows.Forms.KeyEventHandler(this.allow_SelectAl);
+            this.textBox_tab2_JoinResult.Location = new System.Drawing.Point(215, 83);
+            this.textBox_tab2_JoinResult.Multiline = true;
+            this.textBox_tab2_JoinResult.Name = "textBox_tab2_JoinResult";
+            this.textBox_tab2_JoinResult.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.textBox_tab2_JoinResult.Size = new System.Drawing.Size(204, 468);
+            this.textBox_tab2_JoinResult.TabIndex = 10;
+            this.textBox_tab2_JoinResult.KeyDown += new System.Windows.Forms.KeyEventHandler(this.allow_SelectAl);
             // 
             // btn_tab2_CreateJoin
             // 
@@ -211,17 +222,17 @@
             this.btn_tab2_SelectQuery.UseVisualStyleBackColor = true;
             this.btn_tab2_SelectQuery.Click += new System.EventHandler(this.btn_SelectQuerry_tab2_Click);
             // 
-            // textBox_tab2_JoinResult
+            // textBox_tab2_SelectResult
             // 
-            this.textBox_tab2_JoinResult.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this.textBox_tab2_SelectResult.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.textBox_tab2_JoinResult.Location = new System.Drawing.Point(425, 83);
-            this.textBox_tab2_JoinResult.Multiline = true;
-            this.textBox_tab2_JoinResult.Name = "textBox_tab2_JoinResult";
-            this.textBox_tab2_JoinResult.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.textBox_tab2_JoinResult.Size = new System.Drawing.Size(204, 468);
-            this.textBox_tab2_JoinResult.TabIndex = 2;
-            this.textBox_tab2_JoinResult.KeyDown += new System.Windows.Forms.KeyEventHandler(this.allow_SelectAl);
+            this.textBox_tab2_SelectResult.Location = new System.Drawing.Point(425, 83);
+            this.textBox_tab2_SelectResult.Multiline = true;
+            this.textBox_tab2_SelectResult.Name = "textBox_tab2_SelectResult";
+            this.textBox_tab2_SelectResult.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.textBox_tab2_SelectResult.Size = new System.Drawing.Size(204, 468);
+            this.textBox_tab2_SelectResult.TabIndex = 2;
+            this.textBox_tab2_SelectResult.KeyDown += new System.Windows.Forms.KeyEventHandler(this.allow_SelectAl);
             // 
             // textBox_tab2_Query
             // 
@@ -400,19 +411,6 @@
             this.tabControl_main.Size = new System.Drawing.Size(1136, 583);
             this.tabControl_main.TabIndex = 5;
             // 
-            // checkBox_tab2_DisableHeavyQuerry
-            // 
-            this.checkBox_tab2_DisableHeavyQuerry.AutoSize = true;
-            this.checkBox_tab2_DisableHeavyQuerry.Checked = true;
-            this.checkBox_tab2_DisableHeavyQuerry.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.checkBox_tab2_DisableHeavyQuerry.Location = new System.Drawing.Point(47, 10);
-            this.checkBox_tab2_DisableHeavyQuerry.Name = "checkBox_tab2_DisableHeavyQuerry";
-            this.checkBox_tab2_DisableHeavyQuerry.Size = new System.Drawing.Size(100, 17);
-            this.checkBox_tab2_DisableHeavyQuerry.TabIndex = 15;
-            this.checkBox_tab2_DisableHeavyQuerry.Text = "DisableHeavyQ";
-            this.checkBox_tab2_DisableHeavyQuerry.UseVisualStyleBackColor = true;
-            this.checkBox_tab2_DisableHeavyQuerry.CheckedChanged += new System.EventHandler(this.checkBox_tab2_DisableHeavyQuerry_CheckedChanged);
-            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -446,7 +444,7 @@
         private System.Windows.Forms.TabPage tabPage2;
         private System.Windows.Forms.ComboBox comboBox_tab2_QueryNumber;
         private System.Windows.Forms.Button btn_tab2_SelectQuery;
-        private System.Windows.Forms.TextBox textBox_tab2_JoinResult;
+        private System.Windows.Forms.TextBox textBox_tab2_SelectResult;
         private System.Windows.Forms.TextBox textBox_tab2_Query;
         private System.Windows.Forms.Button btn_tab2_CreateSelect;
         private System.Windows.Forms.TabPage tabPage1;
@@ -460,7 +458,7 @@
         private System.Windows.Forms.TextBox textBox_tab1_Query;
         private System.Windows.Forms.TabControl tabControl_main;
         private System.Windows.Forms.Button btn_tab2_CreateJoin;
-        private System.Windows.Forms.TextBox textBox_tab2_SelectResult;
+        private System.Windows.Forms.TextBox textBox_tab2_JoinResult;
         private System.Windows.Forms.TextBox textBox_tab2_SortResult;
         private System.Windows.Forms.Button btn_tab2_CreateSort;
         private System.Windows.Forms.Button btn_tab2_CreateAll;

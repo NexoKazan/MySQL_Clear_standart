@@ -25,6 +25,7 @@ using ClusterixN.Network.Packets;
 using MySQL_Clear_standart.Listeners;
 using MySQL_Clear_standart.Network;
 using MySQL_Clear_standart.Properties;
+using MySQL_Clear_standart.Q_Part_Structures;
 using MySQL_Clear_standart.Q_Structures;
 
 
@@ -113,7 +114,10 @@ namespace MySQL_Clear_standart
             }
 
             SetID(_dbName);
+            SetTables(_dbName);
         }
+
+        
 
         private void GetQuerryTreesScreens(string path, int start, int end)
         {
@@ -128,13 +132,13 @@ namespace MySQL_Clear_standart
         }
         
         //Сопоставление типов столбцов с типами из базы данных.
-        private void SetID(DataBaseStructure inDB)
+        private void SetID(DataBaseStructure inDb)
         {
-            foreach (TableStructure dbTable in inDB.Tables)
+            foreach (TableStructure dbTable in inDb.Tables)
             {
                 foreach (ColumnStructure dbColumn in dbTable.Columns)
                 {
-                    foreach (S_Type dbType in inDB.Types)
+                    foreach (S_Type dbType in inDb.Types)
                     {
                         if (dbColumn.TypeID == dbType.ID)
                         {
@@ -143,6 +147,18 @@ namespace MySQL_Clear_standart
                             break;
                         }
                     }
+                }
+            }
+        }
+
+        //обратная связь столбцов и колонок.
+        private void SetTables(DataBaseStructure database)
+        {
+            foreach (TableStructure table in database.Tables)
+            {
+                foreach (ColumnStructure column in table.Columns)
+                {
+                    column.Table = table;
                 }
             }
         }
@@ -169,10 +185,10 @@ namespace MySQL_Clear_standart
             }
         }
 
-        private string GetQuery(int queryNumber)
+        private string GetQuery(int queryNumber, bool state, ComboBox box)
         {
             string query;
-            if (!checkBox_tab1_DisableHeavyQuerry.Checked)
+            if (!state)
             {
                 switch (queryNumber)
                 {
@@ -246,32 +262,32 @@ namespace MySQL_Clear_standart
                     case 1:
                         query =
                             "SELECT\r\n\tL_RETURNFLAG,\r\n\tL_LINESTATUS,\r\n\tSUM(L_QUANTITY) AS SUM_QTY,\r\n\tSUM(L_EXTENDEDPRICE) AS SUM_BASE_PRICE,\r\n\tSUM(L_EXTENDEDPRICE * (1 - L_DISCOUNT)) AS SUM_DISC_PRICE,\r\n\tSUM(L_EXTENDEDPRICE * (1 - L_DISCOUNT) * (1 + L_TAX)) AS SUM_CHARGE,\r\n\tAVG(L_QUANTITY) AS AVG_QTY,\r\n\tAVG(L_EXTENDEDPRICE) AS AVG_PRICE,\r\n\tAVG(L_DISCOUNT) AS AVG_DISC,\r\n\tCOUNT(*) AS COUNT_ORDER\r\nFROM\r\n\tLINEITEM\r\nWHERE\r\n\tL_SHIPDATE <='1998-12-01' - INTERVAL '90' DAY\r\nGROUP BY\r\n\tL_RETURNFLAG,\r\n\tL_LINESTATUS\r\nORDER BY\r\n\tL_RETURNFLAG,\r\n\tL_LINESTATUS;\r\n";
-                        comboBox_tab1_QueryNumber.Text = "3";
+                        box.Text = "3";
                         break;
                     case 3:
                         query =
                             "SELECT\r\n\tL_ORDERKEY,\r\n\tSUM(L_EXTENDEDPRICE * (1 - L_DISCOUNT)) AS REVENUE,\r\n\tO_ORDERDATE,\r\n\tO_SHIPPRIORITY\r\nFROM\r\n\tCUSTOMER,\r\n\tORDERS,\r\n\tLINEITEM\r\nWHERE\r\n\tC_MKTSEGMENT = 'HOUSEHOLD'\r\n\tAND C_CUSTKEY = O_CUSTKEY\r\n\tAND L_ORDERKEY = O_ORDERKEY\r\n\tAND O_ORDERDATE < '1995-03-31'\r\n\tAND L_SHIPDATE > '1995-03-31'\r\nGROUP BY\r\n\tL_ORDERKEY,\r\n\tO_ORDERDATE,\r\n\tO_SHIPPRIORITY\r\nORDER BY\r\n\tREVENUE DESC,\r\n\tO_ORDERDATE;\r\n";
-                        comboBox_tab1_QueryNumber.Text = "5";
+                        box.Text = "5";
                         break;
                     case 5:
                         query =
                             "SELECT\r\n\tN_NAME,\r\n\tSUM(L_EXTENDEDPRICE * (1 - L_DISCOUNT)) AS REVENUE\r\nFROM\r\n\tCUSTOMER,\r\n\tORDERS,\r\n\tLINEITEM,\r\n\tSUPPLIER,\r\n\tNATION,\r\n\tREGION\r\nWHERE\r\n\tC_CUSTKEY = O_CUSTKEY\r\n\tAND L_ORDERKEY = O_ORDERKEY\r\n\tAND L_SUPPKEY = S_SUPPKEY\r\n\tAND C_NATIONKEY = S_NATIONKEY\r\n\tAND S_NATIONKEY = N_NATIONKEY\r\n\tAND N_REGIONKEY = R_REGIONKEY\r\n\tAND R_NAME = 'MIDDLE EAST'\r\n\tAND O_ORDERDATE >= '1995-01-01'\r\n\tAND O_ORDERDATE < '1995-01-01' + INTERVAL '1' YEAR\r\nGROUP BY\r\n\tN_NAME\r\nORDER BY\r\n\tREVENUE DESC;\r\n";
-                        comboBox_tab1_QueryNumber.Text = "6";
+                        box.Text = "6";
                         break;
                     case 6:
                         query =
                             "SELECT\r\n\tSUM(L_EXTENDEDPRICE * L_DISCOUNT) AS REVENUE\r\nFROM\r\n\tLINEITEM\r\nWHERE\r\n\tL_SHIPDATE >= '1997-01-01'\r\n\tAND L_SHIPDATE < '1997-01-01' + INTERVAL '1' YEAR\r\n\tAND L_DISCOUNT BETWEEN 0.07 - 0.01 AND 0.07 + 0.01\r\n\tAND L_QUANTITY < 24;\r\n";
-                        comboBox_tab1_QueryNumber.Text = "10";
+                        box.Text = "10";
                         break;
                     case 10:
                         query =
                             "SELECT\r\n\tC_CUSTKEY,\r\n\tC_NAME,\r\n\tSUM(L_EXTENDEDPRICE * (1 - L_DISCOUNT)) AS REVENUE,\r\n\tC_ACCTBAL,\r\n\tN_NAME,\r\n\tC_ADDRESS,\r\n\tC_PHONE,\r\n\tC_COMMENT\r\nFROM\r\n\tCUSTOMER,\r\n\tORDERS,\r\n\tLINEITEM,\r\n\tNATION\r\nWHERE\r\n\tC_CUSTKEY = O_CUSTKEY\r\n\tAND L_ORDERKEY = O_ORDERKEY\r\n\tAND O_ORDERDATE >= '1994-04-01'\r\n\tAND O_ORDERDATE < '1994-04-01' + INTERVAL '3' MONTH\r\n\tAND L_RETURNFLAG = 'R'\r\n\tAND C_NATIONKEY = N_NATIONKEY\r\nGROUP BY\r\n\tC_CUSTKEY,\r\n\tC_NAME,\r\n\tC_ACCTBAL,\r\n\tC_PHONE,\r\n\tN_NAME,\r\n\tC_ADDRESS,\r\n\tC_COMMENT\r\nORDER BY\r\n\tREVENUE DESC;\r\n";
-                        comboBox_tab1_QueryNumber.Text = "12";
+                        box.Text = "12";
                         break;
                     case 12:
                         query =
                             "SELECT\r\n\tL_SHIPMODE,\r\n\tSUM(CASE\r\n\t\tWHEN O_ORDERPRIORITY = '1-URGENT'\r\n\t\t\tOR O_ORDERPRIORITY = '2-HIGH'\r\n\t\t\tTHEN 1\r\n\t\tELSE 0\r\n\tEND) AS HIGH_LINE_COUNT,\r\n\tSUM(CASE\r\n\t\tWHEN O_ORDERPRIORITY <> '1-URGENT'\r\n\t\t\tAND O_ORDERPRIORITY <> '2-HIGH'\r\n\t\t\tTHEN 1\r\n\t\tELSE 0\r\n\tEND) AS LOW_LINE_COUNT\r\nFROM\r\n\tORDERS,\r\n\tLINEITEM\r\nWHERE\r\n\tO_ORDERKEY = L_ORDERKEY\r\n\tAND L_SHIPMODE IN ('AIR', 'SHIP')\r\n\tAND L_COMMITDATE < L_RECEIPTDATE\r\n\tAND L_SHIPDATE < L_COMMITDATE\r\n\tAND L_RECEIPTDATE >= '1994-01-01'\r\n\tAND L_RECEIPTDATE < '1994-01-01' + INTERVAL '1' YEAR\r\nGROUP BY\r\n\tL_SHIPMODE\r\nORDER BY\r\n\tL_SHIPMODE;\r\n";
-                        comboBox_tab1_QueryNumber.Text = "14";
+                        box.Text = "14";
                         break;
                     case 14:
                         query =
@@ -280,7 +296,7 @@ namespace MySQL_Clear_standart
                     default:
                         query =
                             "SELECT\r\n\tL_ORDERKEY,\r\n\tSUM(L_EXTENDEDPRICE * (1 - L_DISCOUNT)) AS REVENUE,\r\n\tSUM(C_MKTSEGMENT * (1 - L_DISCOUNT)) AS REVENUE2,\r\n\tO_ORDERDATE,\r\n\tO_SHIPPRIORITY\r\nFROM\r\n\tCUSTOMER,\r\n\tORDERS,\r\n\tLINEITEM\r\nWHERE\r\n\tC_MKTSEGMENT = \'HOUSEHOLD\'\r\n\tAND C_CUSTKEY = O_CUSTKEY\r\n\tAND L_ORDERKEY = O_ORDERKEY\r\n\tAND O_ORDERDATE < \'1995-03-31\'\r\n\tAND L_SHIPDATE  > \'1995-03-31\'\r\nGROUP BY\r\n\tL_ORDERKEY,\r\n\tO_ORDERDATE,\r\n\tO_SHIPPRIORITY\r\nORDER BY\r\n\tREVENUE DESC,\r\n\tO_ORDERDATE;\r\n";
-                        comboBox_tab1_QueryNumber.Text = "1";
+                        box.Text = "1";
                         break;
                 }
             }
@@ -296,14 +312,14 @@ namespace MySQL_Clear_standart
                 output += table.Name + Environment.NewLine;
                 foreach (ColumnStructure column in table.Columns)
                 {
-                    output += "\t" + column.Name +"\t\t" + column.Type.Name + "\t" + column.Size + Environment.NewLine;
+                    output += "\t" + column.Name +"\t\t" +column.Table.Name + Environment.NewLine;
                 }
             }
             return output;
         }
     
-        private DataBaseStructure CreateSubDatabase(DataBaseStructure fullDataBase, string[] TableNames,
-            string[] ColumnNames)
+        private DataBaseStructure CreateSubDatabase(DataBaseStructure fullDataBase, string[] tableNames,
+            string[] columnNames)
         {
             DataBaseStructure subDataBase;
             List<TableStructure> tmpTables = new List<TableStructure>();
@@ -311,11 +327,11 @@ namespace MySQL_Clear_standart
 
             foreach (TableStructure fullTable in fullDataBase.Tables)
             {
-                foreach (string subTableName in TableNames)
+                foreach (string subTableName in tableNames)
                 {
                     if (subTableName == fullTable.Name)
                     {
-                        tmpTables.Add(fullTable);
+                        tmpTables.Add(new TableStructure(fullTable));
                         break;
                     }
                 }
@@ -326,7 +342,7 @@ namespace MySQL_Clear_standart
                 tmpColumns = new List<ColumnStructure>();
                 foreach (ColumnStructure tmpTableColumn in tmpTable.Columns)
                 {
-                    foreach (string subColumnName in ColumnNames)
+                    foreach (string subColumnName in columnNames)
                     {
                         if (subColumnName == tmpTableColumn.Name)
                         {
@@ -421,7 +437,7 @@ namespace MySQL_Clear_standart
                 {
                     foreach (ColumnStructure column in dataBaseTable.Columns)
                     {
-                        if (column.Name == ws.getLeftColumn)
+                        if (column.Name == ws.LeftColumn)
                         {
                             ws.Table = dataBaseTable.Name;
                         }
@@ -463,9 +479,9 @@ namespace MySQL_Clear_standart
         }
 
         #endregion
-
-       
         
+        #region Методы для Join
+
         //"Филл Джонс"
         private void FillJoins(List<JoinStructure> joinList, DataBaseStructure dataBase,
             List<SelectStructure> selectQueries)
@@ -724,8 +740,10 @@ namespace MySQL_Clear_standart
             return output;
         }
         
-        
-        
+        #endregion
+
+        #region Методы для Sort
+
         private ColumnStructure GetCorrectOrderByColumn(List<ColumnStructure> columns, string columnName)
         {
             ColumnStructure correctColumn = new ColumnStructure();
@@ -739,12 +757,8 @@ namespace MySQL_Clear_standart
             return correctColumn;
         }
         
+        #endregion
 
-        
-        
-        
-
-        
         private void CreateScheme(SelectStructure[] selectQuery)
         {
             List<TableStructure> outTablesList = new List<TableStructure>();
@@ -797,21 +811,31 @@ namespace MySQL_Clear_standart
                 dbSerializer.Serialize(fs, outDB);
             }
         }
+       
         #region Make-методы
         
         private SelectStructure[] MakeSelect(DataBaseStructure dataBase, MainListener listener)
         {
-            GetTree();
             SetIsForSelectFlags(dataBase, listener.SelectColumnNames);
             SelectStructure[] selectQueries = new SelectStructure[dataBase.Tables.Length];
+            List<WhereStructure> tmpWhere = new List<WhereStructure>();
 
-            FindeWhereStructureTable(listener.WhereList, dataBase);
+            foreach (BinaryComparisionPredicateStructure binary in listener.Binaries)
+            {
+                if (binary.Type == 1)
+                {
+                    WhereStructure tmp = new WhereStructure(binary.LeftString, binary.ComparisionSymphol, binary.RightString);
+                    tmpWhere.Add(tmp);
+                }
+            }
+
+            FindeWhereStructureTable(tmpWhere, dataBase);
             FillAsStructures(dataBase, listener.AsList);
             
             for (var i = 0; i < dataBase.Tables.Length; i++)
             {
                 selectQueries[i] = new SelectStructure("S_" + listener.Depth + "_" + i, dataBase.Tables[i],
-                    GetCorrectWhereStructure(listener.WhereList, dataBase.Tables[i].Name),
+                    GetCorrectWhereStructure(tmpWhere, dataBase.Tables[i].Name),
                     GetCorrectAsStructures(listener.AsList, dataBase.Tables[i])
                     );
             }
@@ -825,9 +849,30 @@ namespace MySQL_Clear_standart
         
         private JoinStructure[] MakeJoin(DataBaseStructure dataBase, MainListener listener, SelectStructure[] selects)
         {
-            JoinStructure[] joinQueries = listener.JoinStructures.ToArray();
+            List<JoinStructure> tmpJoins = new List<JoinStructure>();
+            foreach (var binary in listener.Binaries) 
+            {
+                if (binary.Type == 2)
+                {
+                    JoinStructure tmp = new JoinStructure(binary.LeftString, binary.RightString, binary.ComparisionSymphol);
+                    tmpJoins.Add(tmp);
+                }
+            }
+            JoinStructure[] joinQueries = tmpJoins.ToArray();
             SelectStructure[] selectQueries = selects;
             FillJoins(joinQueries.ToList(), dataBase, selectQueries.ToList());
+
+            List<JoinStructure> tmpList = new List<JoinStructure>();
+            foreach (JoinStructure join in joinQueries)
+            {
+                if (join.LeftColumn!=null)
+                {
+                   tmpList.Add(join);
+                }
+            }
+
+            joinQueries = tmpList.ToArray();
+
             GetJoinSequence(joinQueries.ToList(), listener.Depth);
             joinQueries = SortJoin(joinQueries.ToList(), listener.Depth).ToArray();
             foreach (var join in joinQueries)
@@ -906,8 +951,6 @@ namespace MySQL_Clear_standart
                 XmlSerializer dbSerializer = new XmlSerializer(typeof(DataBaseStructure));
                 dbSerializer.Serialize(fs, _dbName);
             }
-
-
         }
 
         private void textBox1_TextChanged(object sender, EventArgs e)
@@ -948,11 +991,11 @@ namespace MySQL_Clear_standart
 
         private void ReSize()
         {
-            textBox_tab2_Query.Width = textBox_tab2_JoinResult.Width = textBox_tab2_SelectResult.Width = textBox_tab2_SortResult.Width = textBox_tab2_AllResult.Width = (tabPage2.Width - 100) / 5;
-            textBox_tab2_JoinResult.Location = new Point(textBox_tab2_Query.Location.X + 40 + textBox_tab2_Query.Width, textBox_tab2_JoinResult.Location.Y);
-            textBox_tab2_SelectResult.Location = new Point(textBox_tab2_JoinResult.Location.X + 20 + textBox_tab2_JoinResult.Width, textBox_tab2_JoinResult.Location.Y);
-            textBox_tab2_SortResult.Location = new Point(textBox_tab2_SelectResult.Location.X + 20 + textBox_tab2_JoinResult.Width, textBox_tab2_JoinResult.Location.Y);
-            textBox_tab2_AllResult.Location = new Point(textBox_tab2_SortResult.Location.X + 20 + textBox_tab2_JoinResult.Width, textBox_tab2_JoinResult.Location.Y);
+            textBox_tab2_Query.Width = textBox_tab2_SelectResult.Width = textBox_tab2_JoinResult.Width = textBox_tab2_SortResult.Width = textBox_tab2_AllResult.Width = (tabPage2.Width - 100) / 5;
+            textBox_tab2_SelectResult.Location = new Point(textBox_tab2_Query.Location.X + 40 + textBox_tab2_Query.Width, textBox_tab2_SelectResult.Location.Y);
+            textBox_tab2_JoinResult.Location = new Point(textBox_tab2_SelectResult.Location.X + 20 + textBox_tab2_SelectResult.Width, textBox_tab2_SelectResult.Location.Y);
+            textBox_tab2_SortResult.Location = new Point(textBox_tab2_JoinResult.Location.X + 20 + textBox_tab2_SelectResult.Width, textBox_tab2_SelectResult.Location.Y);
+            textBox_tab2_AllResult.Location = new Point(textBox_tab2_SortResult.Location.X + 20 + textBox_tab2_SelectResult.Width, textBox_tab2_SelectResult.Location.Y);
         }
 
         #endregion
@@ -1001,7 +1044,7 @@ namespace MySQL_Clear_standart
             //запросы TPC-H (убраны Date)
             if (!checkBox_tab1_DisableHeavyQuerry.Checked)
             {
-                textBox_tab1_Query.Text = GetQuery(Convert.ToInt16(comboBox_tab1_QueryNumber.Text));
+                textBox_tab1_Query.Text = GetQuery(Convert.ToInt16(comboBox_tab1_QueryNumber.Text), checkBox_tab1_DisableHeavyQuerry.Checked, comboBox_tab1_QueryNumber);
                 if (Convert.ToInt16(comboBox_tab1_QueryNumber.Text) < 14)
                 {
                     comboBox_tab1_QueryNumber.Text = (Convert.ToInt16(comboBox_tab1_QueryNumber.Text) + 1).ToString();
@@ -1013,7 +1056,7 @@ namespace MySQL_Clear_standart
             }
             else
             {
-                textBox_tab1_Query.Text = GetQuery(Convert.ToInt16(comboBox_tab1_QueryNumber.Text));
+                textBox_tab1_Query.Text = GetQuery(Convert.ToInt16(comboBox_tab1_QueryNumber.Text), checkBox_tab1_DisableHeavyQuerry.Checked, comboBox_tab1_QueryNumber);
                 
                 if (Convert.ToInt16(comboBox_tab1_QueryNumber.Text) == 14)
                 {
@@ -1036,21 +1079,18 @@ namespace MySQL_Clear_standart
                 textBox_tab1_Query.Location.Y);
             GetTree();
             _output = "\r\n========Return================\r\n";
+            
+            foreach (var subQlistener in _listener.SubQueryListeners)
+            {
+                _subJoinQuery = MakeJoin(CreateSubDatabase(_dbName, subQlistener.TableNames.ToArray(), subQlistener.ColumnNames.ToArray()),
+                    subQlistener, MakeSelect(CreateSubDatabase(_dbName, subQlistener.TableNames.ToArray(), subQlistener.ColumnNames.ToArray()), subQlistener)).ToList();
+            }
 
-            List<string> columns = _listener.ColumnNames.Distinct().ToList();
-            List<string> tables = _listener.TableNames.Distinct().ToList();
-            _output = "\r\n========TABLES================\r\n";
-            foreach (var table in tables)
+            foreach (var join in _subJoinQuery)
             {
-                _output += table + Environment.NewLine;
+                textBox_tab2_JoinResult.Text += "\r\n========" + join.Name + "========\r\n" + join.Output + "\r\n";
             }
-            _output += "\r\n========COLUMNS================\r\n";
-            foreach (var column in columns)
-            {
-                _output += column + Environment.NewLine;
-            }
-            DataBaseStructure subDbTest = CreateSubDatabase(_dbName, tables.ToArray(), columns.ToArray());
-            _output = ShowDataBase(subDbTest);
+
             textBox_tab1_Query.Text = _output;
         }
         
@@ -1062,68 +1102,89 @@ namespace MySQL_Clear_standart
         {
             //составление запросов SELECT
             
-            textBox_tab2_JoinResult.Clear();
+            textBox_tab2_SelectResult.Clear();
+            GetTree();
             _selectQuery = MakeSelect(CreateSubDatabase(_dbName, _listener.TableNames.ToArray(), _listener.ColumnNames.ToArray()), _listener);
             for (int i = 0; i < _selectQuery.Length; i++)
             {
-                textBox_tab2_JoinResult.Text += "\r\n========" + _selectQuery[i].Name + "=========\r\n";
-                textBox_tab2_JoinResult.Text += _selectQuery[i].Output + "\r\n";
+                textBox_tab2_SelectResult.Text += "\r\n=======" + _selectQuery[i].Name + "=========\r\n";
+                textBox_tab2_SelectResult.Text += _selectQuery[i].Output + "\r\n";
             }
 
             if (_listener.SubQueryListeners.Count != 0)
             {
-                textBox_tab2_JoinResult.Text += "\r\n========SUB_Q=========\r\n";
+                textBox_tab2_SelectResult.Text += "\r\n========SUB_Q=========\r\n";
                 foreach (var subQlistener in _listener.SubQueryListeners)
                 {
-                    MakeSubSelect(subQlistener);
+                    _subSelectQuery =
+                        MakeSelect(
+                            CreateSubDatabase(_dbName, subQlistener.TableNames.ToArray(),
+                                subQlistener.ColumnNames.ToArray()), subQlistener);
                 }
 
                 foreach (SelectStructure subSelect in _subSelectQuery)
                 {
-                    textBox_tab2_JoinResult.Text += "\r\n========" + subSelect.Name + "=========\r\n";
-                    textBox_tab2_JoinResult.Text += subSelect.Output + "\r\n";
+                    textBox_tab2_SelectResult.Text += "\r\n========" + subSelect.Name + "=========\r\n";
+                    textBox_tab2_SelectResult.Text += subSelect.Output + "\r\n";
                 }
             }
         }
 
         private void btn_CreateJoin_Click(object sender, EventArgs e)
         {
+            GetTree();
             _joinQuery =
                 MakeJoin(CreateSubDatabase(_dbName, _listener.TableNames.ToArray(), _listener.ColumnNames.ToArray()),
-                    _listener, MakeSelect(_dbName, _listener)).ToList();
-            textBox_tab2_SelectResult.Clear();
+                    _listener, MakeSelect(CreateSubDatabase(_dbName, _listener.TableNames.ToArray(), _listener.ColumnNames.ToArray()), _listener)).ToList();
+            textBox_tab2_JoinResult.Clear();
             foreach (var join in _joinQuery)
             {
-                textBox_tab2_SelectResult.Text += "\r\n========" + join.Name + "========\r\n" + join.Output + "\r\n";
+                textBox_tab2_JoinResult.Text += "\r\n========" + join.Name + "========\r\n" + join.Output + "\r\n";
             }
             if (_listener.SubQueryListeners.Count != 0)
             {
-                textBox_tab2_SelectResult.Text += "\r\n========SUB_Q=========\r\n";
+                textBox_tab2_JoinResult.Text += "\r\n========SUB_Q=========\r\n";
                 foreach (var subQlistener in _listener.SubQueryListeners)
                 {
-                    MakeSubJoin(subQlistener);
+                    _subJoinQuery = MakeJoin(CreateSubDatabase(_dbName, subQlistener.TableNames.ToArray(), subQlistener.ColumnNames.ToArray()),
+                        subQlistener, MakeSelect(CreateSubDatabase(_dbName, subQlistener.TableNames.ToArray(), subQlistener.ColumnNames.ToArray()), subQlistener)).ToList();
+
                 }
 
                 foreach (var join in _subJoinQuery)
                 {
-                    textBox_tab2_SelectResult.Text += "\r\n========" + join.Name + "========\r\n" + join.Output + "\r\n";
+                    textBox_tab2_JoinResult.Text += "\r\n========" + join.Name + "========\r\n" + join.Output + "\r\n";
                 }
             }
         }
         
         private void btn_CreateSort_Click(object sender, EventArgs e)
         {
-            SelectStructure[] selects = MakeSelect(_dbName, _listener);
+            GetTree();
+            SelectStructure[] selects = MakeSelect(CreateSubDatabase(_dbName, _listener.TableNames.ToArray(), _listener.ColumnNames.ToArray()), _listener);
             _sortQuery = MakeSort(
                 CreateSubDatabase(_dbName, _listener.TableNames.ToArray(), _listener.ColumnNames.ToArray()),
                 _listener, MakeJoin(_dbName, _listener, selects), selects);
             textBox_tab2_SortResult.Clear();
             textBox_tab2_SortResult.Text = "\r\n========" + _sortQuery.Name + "========\r\n" + _sortQuery.Output + "\r\n";
+            
+            //SelectStructure[] subSelects;
+            //SortStructure sort;
+            //MainListener listener = _listener.SubQueryListeners.First();
+            
+            //    subSelects = MakeSelect(_dbName, listener);
+            //    sort  = MakeSort(
+            //        _dbName,
+            //        listener, MakeJoin(_dbName, listener, subSelects), subSelects);
+            
+            //textBox_tab2_SelectResult.Text += "\r\n========SUB_Q=========\r\n";
+            //textBox_tab2_SortResult.Text = "\r\n========" + sort.Name + "========\r\n" + sort.Output + "\r\n";
+
         }
         
         private void btn_CreateTest_Click(object sender, EventArgs e)
         {
-
+            GetTree();
             SelectStructure[] selectQ = MakeSelect(
                 CreateSubDatabase(_dbName, _listener.TableNames.ToArray(), _listener.ColumnNames.ToArray()),
                 _listener);
@@ -1197,7 +1258,7 @@ namespace MySQL_Clear_standart
             //clinet.Send(new XmlQueryPacket() { XmlQuery = qb.GetQuery().ToString() });
         }
 
-         private void btn_SelectQuerry_tab2_Click(object sender, EventArgs e)
+        private void btn_SelectQuerry_tab2_Click(object sender, EventArgs e)
         {
             //Выбрать запрос на 2й вкладке
 
@@ -1279,7 +1340,7 @@ namespace MySQL_Clear_standart
 
             if (!checkBox_tab2_DisableHeavyQuerry.Checked)
             {
-                textBox_tab2_Query.Text = GetQuery(Convert.ToInt16(comboBox_tab2_QueryNumber.Text));
+                textBox_tab2_Query.Text = GetQuery(Convert.ToInt16(comboBox_tab2_QueryNumber.Text), checkBox_tab2_DisableHeavyQuerry.Checked, comboBox_tab2_QueryNumber);
                 if (Convert.ToInt16(comboBox_tab2_QueryNumber.Text) < 14)
                 {
                     comboBox_tab2_QueryNumber.Text = (Convert.ToInt16(comboBox_tab2_QueryNumber.Text) + 1).ToString();
@@ -1291,7 +1352,7 @@ namespace MySQL_Clear_standart
             }
             else
             {
-                textBox_tab2_Query.Text = GetQuery(Convert.ToInt16(comboBox_tab2_QueryNumber.Text));
+                textBox_tab2_Query.Text = GetQuery(Convert.ToInt16(comboBox_tab2_QueryNumber.Text), checkBox_tab2_DisableHeavyQuerry.Checked, comboBox_tab2_QueryNumber);
                 
                 if (Convert.ToInt16(comboBox_tab2_QueryNumber.Text) == 14)
                 {
@@ -1303,71 +1364,6 @@ namespace MySQL_Clear_standart
         #endregion
        
         #region Актуальные методы(в разработке)
-        
-
-        private void MakeSubSelect(MainListener subQuery_listener)
-        {
-            //    _subSelectQuery = new SelectStructure[subQuery_listener.TableNames.Count];
-            //    FindeWhereStructureTable(subQuery_listener.WhereList, _dbName);
-            //    FillAsStructures(_dbName, subQuery_listener.AsList); //переделать _dbName;
-
-            //    for (int i = 0; i < subQuery_listener.TableNames.Count; i++)
-            //    {
-            //        //_subSelectQuery[i] = new SelectStructure
-            //        //(
-            //        //    "S_" + subQuery_listener.Depth + "_" + i.ToString(), //name(s)
-
-            //        //    GetCorrectWhereStructure(subQuery_listener.WhereList,
-            //        //        subQuery_listener.TableNames[i]), //WhereStructure(WhereStructure)
-            //        //    GetCorrectAsStructure(subQuery_listener.AsList, subQuery_listener.TableNames[i]) //asStructure(asStructure)
-            //        //);
-            //    }
-
-            //    foreach (SelectStructure select in _subSelectQuery)
-            //    {
-            //        select.CreateQuerry();
-            //    }
-            //    CreateScheme(_subSelectQuery);
-        }
-
-        private void MakeSubJoin(MainListener subQuery_listener)
-        {
-
-            //MakeSubSelect(subQuery_listener);
-            //_subJoinQuery = subQuery_listener.JoinStructures;
-
-            //List<SelectStructure> tmpSelects = new List<SelectStructure>();
-            //tmpSelects.AddRange(_subSelectQuery);
-            //bool tmpSelect = true;
-            //foreach (SelectStructure select in _selectQuery)
-            //{
-            //    foreach (var subSelect in _subSelectQuery)
-            //    {
-            //        if (select.TableName == subSelect.TableName)
-            //        {
-            //            tmpSelect = false;
-            //            break;
-            //        }
-            //    }
-
-            //    if (tmpSelect)
-            //    {
-            //        tmpSelects.Add(select);
-            //    }
-            //}
-
-            //FillJoins(_subJoinQuery, _dbName, tmpSelects);
-            //GetJoinSequence(_subJoinQuery, subQuery_listener.Depth);
-            //_subJoinQuery = SortJoin(_subJoinQuery, subQuery_listener.Depth);
-            //foreach (var join in _subJoinQuery)
-            //{
-            //    join.CreateQuerry();
-            //}
-
-            //CreateScheme(_subJoinQuery);
-        }
-
-
 
         #endregion
         

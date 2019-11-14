@@ -15,9 +15,11 @@ namespace MySQL_Clear_standart.DataBaseSchemeStructure
         private string _oldName;
         private int _size;
         private int _isPrimary; // 0-не ключ 1-единичный ключ, 2-составной ключ, 3-другое
+        private int _usageCounter;
         private bool _isForSelect = false;
         private bool _isRenamed = false;
         private S_Type _type;
+        private TableStructure _table;
 
         public ColumnStructure() {}
 
@@ -40,6 +42,20 @@ namespace MySQL_Clear_standart.DataBaseSchemeStructure
             _name = name;
         }
 
+        public ColumnStructure(ColumnStructure inColumn)
+        {
+            _name = inColumn.Name;
+            _typeID = inColumn.TypeID;
+            _oldName = inColumn.OldName;
+            _size = inColumn.Size;
+            _isPrimary = inColumn.IsPrimary;
+            _usageCounter = inColumn.UsageCounter;
+            _isForSelect = inColumn.IsForSelect;
+            _isRenamed = inColumn.IsRenamed;
+            _type = inColumn.Type;
+            _table = inColumn.Table;
+        }
+        
         [XmlAttribute]
         public int IsPrimary {
             get { return _isPrimary; }
@@ -92,6 +108,21 @@ namespace MySQL_Clear_standart.DataBaseSchemeStructure
         {
             get { return _oldName; }
             set { _oldName = value; }
+        }
+
+        [XmlIgnore]
+        public int UsageCounter
+        {
+            get { return _usageCounter; }
+            set { _usageCounter = value; }
+        }
+
+        [XmlIgnore]
+        public TableStructure Table
+        {
+            get { return _table; }
+            set { _table = value; }
+
         }
     }
 }

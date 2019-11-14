@@ -8,16 +8,21 @@ using System.Threading.Tasks;
 using Antlr4.Runtime.Tree;
 using MySQL_Clear_standart.Listeners;
 using MySQL_Clear_standart.Q_Structures;
+using MySQL_Clear_standart.Q_Part_Structures;
+
 namespace MySQL_Clear_standart.Listeners
 {
     class MainListener : MySqlParserBaseListener
     {
         private int _depth;
         private int _tmpDepth;
+        private int _id;
         private IVocabulary _vocabulary;
         private List<string> _columnNames = new List<string>();
         private List<string> _tableNames = new List<string>();
         private List<string> _selectColumnNames = new List<string>();
+        
+        private List<BinaryComparisionPredicateStructure> _binaries = new List<BinaryComparisionPredicateStructure>();
 
         public MainListener(int depth)
         {
@@ -27,6 +32,12 @@ namespace MySQL_Clear_standart.Listeners
         public int Depth
         {
             get { return _depth; }
+        }
+
+        public int ID
+        {
+            get { return _id; }
+            set { _id = value; }
         }
         
         public IVocabulary Vocabulary
@@ -48,6 +59,11 @@ namespace MySQL_Clear_standart.Listeners
         public List<string> SelectColumnNames
         {
             get { return _selectColumnNames; }
+        }
+
+        public List<BinaryComparisionPredicateStructure> Binaries
+        {
+            get { return _binaries; }
         }
 
         public override void EnterFullColumnName([NotNull] MySqlParser.FullColumnNameContext context)
@@ -77,11 +93,10 @@ namespace MySQL_Clear_standart.Listeners
         public List<string> ExprColumnNames = new List<string>();
         public List<string> SelectColumns = new List<string>();
         public List<string> GroupByColumnsNames = new List<string>();
-        public List<JoinStructure> JoinStructures = new List<JoinStructure>();
-        public List<WhereStructure> WhereList = new List<WhereStructure>();
+        //public List<JoinStructure> JoinStructures = new List<JoinStructure>();
+        //public List<WhereStructure> WhereList = new List<WhereStructure>();
         public List<AsStructure> AsList = new List<AsStructure>();
-        public List<OrderByStructure> OrderByList = new List<OrderByStructure>();
-
+        public List<OrderByStructure> OrderByList = new List<OrderByStructure>();   
         public List<MainListener> SubQueryListeners = new List<MainListener>();
         
         private bool _triggerEnterSelectFunctionElemenAsExist = false;
@@ -118,25 +133,23 @@ namespace MySQL_Clear_standart.Listeners
 
             if (_depth == _tmpDepth)
             {
-                if (!context.GetChild(2).GetChild(0).GetType().ToString().Contains("SubqueryExpessionAtom"))
+                BinaryComparisionPredicateStructure tmpBinary = new BinaryComparisionPredicateStructure(context.left.GetText(), context.comparisonOperator().GetText(), context.right.GetText());
+                if (context.GetChild(2).GetChild(0).GetType().ToString().Contains("ConstantExpressionAtomContext"))
                 {
-                    if (context.Stop.Type != 968)
-                    {
-                        ExprColumnNames.Add(context.left.GetText());
-                        WhereList.Add(new WhereStructure(context.GetText(), context.left.GetText()));
-                    }
-                    else
-                    {
-                        if (context.Stop.Type == 968)
-                        {
-                            JoinListener tmpJoinListener = new JoinListener();
-                            ParseTreeWalker wlk = new ParseTreeWalker();
-                            wlk.Walk(tmpJoinListener, context);
-                            JoinStructures.Add(new JoinStructure(context.Start.Text, context.Stop.Text,
-                                tmpJoinListener.Output));
-                        }
-                    }
+                    tmpBinary.Type = (int)PredicateType.simple;}
+
+                if (context.GetChild(2).GetChild(0).GetType().ToString()
+                    .Contains("FullColumnNameExpressionAtomContext"))
+                {
+                    tmpBinary.Type = 2;
                 }
+
+                if (context.GetChild(2).GetChild(0).GetType().ToString().Contains("SubqueryExpessionAtomContext"))
+                {
+                    tmpBinary.Type = 3;
+                    tmpBinary.SubQid = ID++;
+                }
+                _binaries.Add(tmpBinary);
             }
         }
 
@@ -170,6 +183,7 @@ namespace MySQL_Clear_standart.Listeners
         {
             _depth++;
             MainListener tmpSubListener = new MainListener(_depth);
+            tmpSubListener.ID = _id++;
             ParseTreeWalker walker = new ParseTreeWalker();
             walker.Walk(tmpSubListener, context.selectStatement());
             SubQueryListeners.Add(tmpSubListener);

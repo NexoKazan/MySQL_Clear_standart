@@ -10,13 +10,24 @@ namespace MySQL_Clear_standart
     class WhereStructure
     {
         private string _string; //переименовать!
-        private string _column;
+        private string _leftColumn;
+        private string _rightExpr;
         private string _table;
+        private string _comparisionOperator;
+
 
         public WhereStructure(string fullString, string leftColumn)
         {
             _string = fullString;
-            _column = leftColumn;
+            _leftColumn = leftColumn;
+        }
+
+        public WhereStructure(string leftColumn, string comparisionOperator, string rightColumn)
+        {
+            _comparisionOperator = comparisionOperator;
+            _leftColumn = leftColumn;
+            _rightExpr = rightColumn;
+            _string = _leftColumn + " " + _comparisionOperator + " " + _rightExpr;
         }
 
         public string Table
@@ -30,9 +41,21 @@ namespace MySQL_Clear_standart
             get { return _string; }
         }
 
-        public string getLeftColumn
+        public string LeftColumn
         {
-            get { return _column; }
+            get { return _leftColumn; }
+        }
+
+        public string RightExpr
+        {
+            get { return _rightExpr; }
+            set { _rightExpr = value; }
+        }
+
+        public string ComparisionOperator
+        {
+            get { return _comparisionOperator; }
+            set { _comparisionOperator = value; }
         }
     }
 }
