@@ -17,10 +17,17 @@ namespace MySQL_Clear_standart.Listeners
         private int _depth;
         private int _tmpDepth;
         private int _id;
+        private bool _triggerEnterSelectFunctionElemenAsExist = false;
+        public string _return = "Return:\r\n";
+        private string _subSelectFunction;
         private IVocabulary _vocabulary;
         private List<string> _columnNames = new List<string>();
         private List<string> _tableNames = new List<string>();
         private List<string> _selectColumnNames = new List<string>();
+        private List<string> _groupByColumnsNames = new List<string>();
+        private List<AsStructure> _asList = new List<AsStructure>();
+        private List<OrderByStructure> _orderByList = new List<OrderByStructure>();   
+        private List<MainListener> _subQueryListeners = new List<MainListener>();
         
         private List<BinaryComparisionPredicateStructure> _binaries = new List<BinaryComparisionPredicateStructure>();
 
@@ -66,6 +73,32 @@ namespace MySQL_Clear_standart.Listeners
             get { return _binaries; }
         }
 
+        public List<string> GroupByColumnsNames
+        {
+            get { return _groupByColumnsNames; }
+            set { _groupByColumnsNames = value; }
+        }
+
+        public List<AsStructure> AsList
+        {
+            get { return _asList; }
+        }
+
+        public List<OrderByStructure> OrderByList
+        {
+            get { return _orderByList; }
+        }
+
+        public List<MainListener> SubQueryListeners
+        {
+            get { return _subQueryListeners; }
+        }
+
+        public string SubSelectFunction
+        {
+            get { return _subSelectFunction; }
+        }
+
         public override void EnterFullColumnName([NotNull] MySqlParser.FullColumnNameContext context)
         {
             _columnNames.Add(context.GetText());
@@ -81,30 +114,6 @@ namespace MySQL_Clear_standart.Listeners
             if(_depth == _tmpDepth)
                 _selectColumnNames.Add(context.GetText());
         }
-
-        public override void EnterLogicalExpression([NotNull] MySqlParser.LogicalExpressionContext context)
-        {
-
-        }
-
-        public IVocabulary voc;
-        //public List<string> TableNames = new List<string>();
-        //public List<string> ColumnNames = new List<string>();
-        public List<string> ExprColumnNames = new List<string>();
-        public List<string> SelectColumns = new List<string>();
-        public List<string> GroupByColumnsNames = new List<string>();
-        //public List<JoinStructure> JoinStructures = new List<JoinStructure>();
-        //public List<WhereStructure> WhereList = new List<WhereStructure>();
-        public List<AsStructure> AsList = new List<AsStructure>();
-        public List<OrderByStructure> OrderByList = new List<OrderByStructure>();   
-        public List<MainListener> SubQueryListeners = new List<MainListener>();
-        
-        private bool _triggerEnterSelectFunctionElemenAsExist = false;
-     
-
-        public string _return = "Return:\r\n";
-
-        
         
         public override void EnterTableSourceBase([NotNull] MySqlParser.TableSourceBaseContext context)
         { 
@@ -123,18 +132,20 @@ namespace MySQL_Clear_standart.Listeners
                     wlk.Walk(asl, context);
                     AsList.Add(new AsStructure(asl.AsColumnList, asl._output, asl._functionOutput,
                         context.uid().GetText(), asl._functionName));
-                    ExprColumnNames.AddRange(asl.AsColumnList);
+                }
+                else
+                {
+                    _subSelectFunction = context.GetText();
                 }
             }
         }
 
         public override void EnterBinaryComparasionPredicate([NotNull] MySqlParser.BinaryComparasionPredicateContext context)
-        {//обернуть в два листенера
-
+        {
             if (_depth == _tmpDepth)
             {
                 BinaryComparisionPredicateStructure tmpBinary = new BinaryComparisionPredicateStructure(context.left.GetText(), context.comparisonOperator().GetText(), context.right.GetText());
-                if (context.GetChild(2).GetChild(0).GetType().ToString().Contains("ConstantExpressionAtomContext"))
+                if (context.GetChild(2).GetChild(0).GetType().ToString().Contains("ConstantExpressionAtomContext") || context.GetChild(2).GetChild(0).GetType().ToString().Contains("MathExpressionAtomContext"))
                 {
                     tmpBinary.Type = (int)PredicateType.simple;}
 
@@ -147,14 +158,14 @@ namespace MySQL_Clear_standart.Listeners
                 if (context.GetChild(2).GetChild(0).GetType().ToString().Contains("SubqueryExpessionAtomContext"))
                 {
                     tmpBinary.Type = 3;
-                    tmpBinary.SubQid = ID++;
+                    _id++;
+                    tmpBinary.SubQid = _id;
+
                 }
                 _binaries.Add(tmpBinary);
             }
         }
-
-       
-
+        
         public override void EnterGroupByItem([NotNull] MySqlParser.GroupByItemContext context)
         {
             if(_depth == _tmpDepth)
@@ -183,7 +194,7 @@ namespace MySQL_Clear_standart.Listeners
         {
             _depth++;
             MainListener tmpSubListener = new MainListener(_depth);
-            tmpSubListener.ID = _id++;
+            tmpSubListener.ID = _id;
             ParseTreeWalker walker = new ParseTreeWalker();
             walker.Walk(tmpSubListener, context.selectStatement());
             SubQueryListeners.Add(tmpSubListener);

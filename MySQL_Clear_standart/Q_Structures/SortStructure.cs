@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using MySQL_Clear_standart.DataBaseSchemeStructure;
+using MySQL_Clear_standart.Q_Part_Structures;
 using MySQL_Clear_standart.Q_Structures;
 
 namespace MySQL_Clear_standart
@@ -14,6 +15,13 @@ namespace MySQL_Clear_standart
         private string _fromName;
         private string _output;
         private string _createTableColumnNames;
+
+        private BinaryComparisionPredicateStructure _connectBinary;
+        private SelectStructure _subSelect;
+        private JoinStructure _subJoin;
+        private JoinStructure _notFilledJoin;
+        private string _selectString;
+
         private SelectStructure _select;
         private JoinStructure _join;
         private TableStructure _outTable;
@@ -65,12 +73,44 @@ namespace MySQL_Clear_standart
         {
             get { return _name; }
         }
-
-
+        
         public string CreateTableColumnNames
         {
             get { return _createTableColumnNames; }
         }
+
+        
+        
+        public JoinStructure NotFilledJoin
+        {
+            get { return _notFilledJoin; }
+            set { _notFilledJoin = value; }
+        }
+
+        public JoinStructure SubJoin
+        {
+            get { return _subJoin; }
+            set { _subJoin = value; }
+        }
+
+        public SelectStructure SubSelect
+        {
+            get { return _subSelect; }
+            set { _subSelect = value; }
+        }
+
+        public BinaryComparisionPredicateStructure ConnectBinary
+        {
+            get { return _connectBinary; }
+            set { _connectBinary = value; }
+        }
+
+        public string SelectString
+        {
+            get { return _selectString; }
+            set { _selectString = value; }
+        }
+
 
         public void CreateQuerry()
         {
@@ -150,6 +190,13 @@ namespace MySQL_Clear_standart
             
             _output = _output.Remove(_output.Length - 1, 1);
             _output += "FROM\r\n\t" + _fromName + "\r\n";
+
+            if (_connectBinary != null)
+            {
+                _output += "WHERE" + Environment.NewLine;
+                _output += GetSubQueryString();
+            }
+
             if (_groupByColumnList.Count != 0)
             {
                 _output += "GROUP BY\r\n\t";
@@ -170,7 +217,7 @@ namespace MySQL_Clear_standart
 
             if(_orderByStructures.Count!=0)
             {
-                _output += "ORDER BY\r\n\t";
+                _output +=Environment.NewLine + "ORDER BY\r\n\t";
             }
 
             foreach (OrderByStructure orderBy in _orderByStructures)
@@ -222,6 +269,31 @@ namespace MySQL_Clear_standart
                 }
             }
         }
-        
+
+        private string GetSubQueryString()
+        {
+            string subQOutput = Environment.NewLine;
+            subQOutput += "\t";
+            subQOutput += _connectBinary.LeftString + " " + _connectBinary.ComparisionSymphol + " (SELECT" +
+                          Environment.NewLine;
+            subQOutput += "\t" + _selectString;
+            subQOutput +=Environment.NewLine + "FROM " + Environment.NewLine;
+            if (_subJoin!=null)
+            {
+                subQOutput += "\t" + _subJoin.Name;
+            }
+            else
+            {
+                subQOutput += "\t" + _subSelect.Name;
+            }
+
+            if (_notFilledJoin!=null)
+            {
+                subQOutput += Environment.NewLine + "WHERE" + Environment.NewLine;
+                subQOutput +="\t" + _notFilledJoin.LeftColumnString + " = " +  _notFilledJoin.RightColumnString;
+            }
+
+            return subQOutput;
+        }
     }
 }

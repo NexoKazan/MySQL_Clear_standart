@@ -129,21 +129,22 @@ namespace MySQL_Clear_standart
         }
 
         #endregion
-        
+
         public void CreateQuerry()
         {
+            ColumnCounterDelete();
             if (_leftJoin != null)
             {
                 _columns.AddRange(_leftJoin.Columns);
                 if (_switched)
                 {
-                    if(_leftSelect!=null)
-                    _columns.AddRange(_leftSelect.OutColumn);
+                    if (_leftSelect != null)
+                        _columns.AddRange(_leftSelect.OutColumn);
                 }
                 else
                 {
-                    if(_rightSelect!=null)
-                    _columns.AddRange(_rightSelect.OutColumn);
+                    if (_rightSelect != null)
+                        _columns.AddRange(_rightSelect.OutColumn);
                 }
             }
             else
@@ -159,6 +160,7 @@ namespace MySQL_Clear_standart
 
                 }
             }
+
             List<ColumnStructure> tmpColumns = new List<ColumnStructure>();
             foreach (ColumnStructure column in _columns)
             {
@@ -168,28 +170,38 @@ namespace MySQL_Clear_standart
                 }
                 else
                 {
-                    if (column.Name != LeftColumn.Name && column.Name != RightColumn.Name )
+                    if (_leftColumn != null && _rightColumn != null)
                     {
-                        tmpColumns.Add(column);
-                    }   
-                }
-            }
-            _columns = tmpColumns;
-            _outTable = new TableStructure(_name + "_TB", _columns.ToArray());
-            _output = "SELECT\r\n\t";
-            for (int i = 0; i < _columns.Count; i++)
-            {
-                if (i < _columns.Count - 1)
-                {
-                    _output += _columns[i].Name + ",\r\n\t";
-                }
-                else
-                {
-                    _output += _columns[i].Name + "\r\n";
+                        if (column.Name != _leftColumn.Name && column.Name != _rightColumn.Name)
+                        {
+                            tmpColumns.Add(column);
+                        }
+                    }
                 }
             }
 
-            _output += "FROM\r\n\t";
+            _columns = tmpColumns;
+            _outTable = new TableStructure(_name + "_TB", _columns.ToArray());
+            _output = "SELECT";
+            bool commaPointer = false;
+            for (int i = 0; i < _columns.Count; i++)
+            {
+                if (_columns[i].UsageCounter > 0 || _columns[i].IsForSelect)
+                {
+
+                    if (!commaPointer)
+                    {
+                        _output += "\r\n\t" + _columns[i].Name;
+                        commaPointer = true;
+                    }
+                    else
+                    {
+                        _output += ",\r\n\t" + _columns[i].Name;
+                    }
+                }
+            }
+
+            _output += "\r\nFROM\r\n\t";
 
             if (_leftJoin != null)
             {
@@ -199,11 +211,12 @@ namespace MySQL_Clear_standart
                 }
                 else
                 {
-                    _output +=  _leftJoin.Name + "\r\n";
+                    _output += _leftJoin.Name + "\r\n";
                 }
+
                 if (_switched)
                 {
-                    if(_leftSelect!=null)
+                    if (_leftSelect != null)
                     {
                         _output += _leftSelect.Name + "\r\n";
                     }
@@ -224,23 +237,160 @@ namespace MySQL_Clear_standart
                 }
                 else
                 {
-                    _output +=  "\r\n";
+                    _output += "\r\n";
                 }
-                
+
                 if (_rightSelect != null)
                 {
                     _output += _rightSelect.Name + "\r\n";
                 }
                 else
                 {
-                    _output +=  "\r\n";
+                    _output += "\r\n";
                 }
             }
 
-            _output += "WHERE\r\n\t" + _leftColumn.Name + " " + _comparisonOperator + " " + _rightColumn.Name;
+            if (_leftColumn != null && _rightColumn != null)
+            {
+                _output += "WHERE\r\n\t" + _leftColumn.Name + " " + _comparisonOperator + " " + _rightColumn.Name;
+            }
+
             SetIndex();
             SetCreateTableColumnList();
         }
+
+        public void CreateQuerry(string left, string right)
+        {
+            ColumnCounterDelete();
+            if (_leftJoin != null)
+            {
+                _columns.AddRange(_leftJoin.Columns);
+                if (_switched)
+                {
+                    if (_leftSelect != null)
+                        _columns.AddRange(_leftSelect.OutColumn);
+                }
+                else
+                {
+                    if (_rightSelect != null)
+                        _columns.AddRange(_rightSelect.OutColumn);
+                }
+            }
+            else
+            {
+                if (_leftSelect != null)
+                {
+                    _columns.AddRange(_leftSelect.OutColumn);
+                }
+
+                if (_rightSelect != null)
+                {
+                    _columns.AddRange(_rightSelect.OutColumn);
+
+                }
+            }
+
+            List<ColumnStructure> tmpColumns = new List<ColumnStructure>();
+            foreach (ColumnStructure column in _columns)
+            {
+                if (column.IsForSelect)
+                {
+                    tmpColumns.Add(column);
+                }
+                else
+                {
+                    if (_leftColumn != null && _rightColumn != null)
+                    {
+                        if (column.Name != _leftColumn.Name && column.Name != _rightColumn.Name)
+                        {
+                            tmpColumns.Add(column);
+                        }
+                    }
+                }
+            }
+
+            _columns = tmpColumns;
+            _outTable = new TableStructure(_name + "_TB", _columns.ToArray());
+            _output = "SELECT";
+            bool commaPointer = false;
+            for (int i = 0; i < _columns.Count; i++)
+            {
+                if (_columns[i].UsageCounter > 0 || _columns[i].IsForSelect)
+                {
+
+                    if (!commaPointer)
+                    {
+                        _output += "\r\n\t" + _columns[i].Name;
+                        commaPointer = true;
+                    }
+                    else
+                    {
+                        _output += ",\r\n\t" + _columns[i].Name;
+                    }
+                }
+            }
+
+            _output += "\r\nFROM\r\n\t";
+
+            #region old4
+            //if (_leftJoin != null)
+            //{
+            //    if (_leftSelect != null || _rightSelect != null)
+            //    {
+            //        _output += _leftJoin.Name + ",\r\n\t";
+            //    }
+            //    else
+            //    {
+            //        _output += _leftJoin.Name + "\r\n";
+            //    }
+
+            //    if (_switched)
+            //    {
+            //        if (_leftSelect != null)
+            //        {
+            //            _output += _leftSelect.Name + "\r\n";
+            //        }
+            //    }
+            //    else
+            //    {
+            //        if (_rightSelect != null)
+            //        {
+            //            _output += _rightSelect.Name + "\r\n";
+            //        }
+            //    }
+            //}
+            //else
+            //{
+            //    if (_leftSelect != null)
+            //    {
+            //        _output += _leftSelect.Name + ",\r\n\t";
+            //    }
+            //    else
+            //    {
+            //        _output += "\r\n";
+            //    }
+
+            //    if (_rightSelect != null)
+            //    {
+            //        _output += _rightSelect.Name + "\r\n";
+            //    }
+            //    else
+            //    {
+            //        _output += "\r\n";
+            //    }
+            //}
+            #endregion
+
+            _output += left + Environment.NewLine + right;
+            if (_leftColumn != null && _rightColumn != null)
+            {
+                _output += Environment.NewLine + "WHERE\r\n\t" + _leftColumn.Name + " " + _comparisonOperator + " " + _rightColumn.Name;
+            }
+
+            SetIndex();
+            SetCreateTableColumnList();
+        }
+
 
         private void SetIndex()
         {
@@ -357,6 +507,19 @@ namespace MySQL_Clear_standart
                 }
             }
         
+        }
+
+        private void ColumnCounterDelete()
+        {
+            if (_leftColumn != null)
+            {
+                _leftColumn.UsageCounter--;
+            }
+
+            if (_rightColumn != null)
+            {
+                _rightColumn.UsageCounter--;
+            }
         }
     }
 }

@@ -130,7 +130,7 @@
             this.textBox_tab2_AllResult.Multiline = true;
             this.textBox_tab2_AllResult.Name = "textBox_tab2_AllResult";
             this.textBox_tab2_AllResult.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.textBox_tab2_AllResult.Size = new System.Drawing.Size(204, 468);
+            this.textBox_tab2_AllResult.Size = new System.Drawing.Size(204, 451);
             this.textBox_tab2_AllResult.TabIndex = 14;
             this.textBox_tab2_AllResult.KeyDown += new System.Windows.Forms.KeyEventHandler(this.allow_SelectAl);
             // 
@@ -162,7 +162,7 @@
             this.textBox_tab2_SortResult.Multiline = true;
             this.textBox_tab2_SortResult.Name = "textBox_tab2_SortResult";
             this.textBox_tab2_SortResult.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.textBox_tab2_SortResult.Size = new System.Drawing.Size(204, 468);
+            this.textBox_tab2_SortResult.Size = new System.Drawing.Size(204, 451);
             this.textBox_tab2_SortResult.TabIndex = 11;
             this.textBox_tab2_SortResult.KeyDown += new System.Windows.Forms.KeyEventHandler(this.allow_SelectAl);
             // 
@@ -174,7 +174,7 @@
             this.textBox_tab2_JoinResult.Multiline = true;
             this.textBox_tab2_JoinResult.Name = "textBox_tab2_JoinResult";
             this.textBox_tab2_JoinResult.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.textBox_tab2_JoinResult.Size = new System.Drawing.Size(204, 468);
+            this.textBox_tab2_JoinResult.Size = new System.Drawing.Size(204, 451);
             this.textBox_tab2_JoinResult.TabIndex = 10;
             this.textBox_tab2_JoinResult.KeyDown += new System.Windows.Forms.KeyEventHandler(this.allow_SelectAl);
             // 
@@ -230,7 +230,7 @@
             this.textBox_tab2_SelectResult.Multiline = true;
             this.textBox_tab2_SelectResult.Name = "textBox_tab2_SelectResult";
             this.textBox_tab2_SelectResult.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.textBox_tab2_SelectResult.Size = new System.Drawing.Size(204, 468);
+            this.textBox_tab2_SelectResult.Size = new System.Drawing.Size(204, 451);
             this.textBox_tab2_SelectResult.TabIndex = 2;
             this.textBox_tab2_SelectResult.KeyDown += new System.Windows.Forms.KeyEventHandler(this.allow_SelectAl);
             // 

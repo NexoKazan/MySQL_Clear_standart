@@ -19,13 +19,14 @@ namespace MySQL_Clear_standart
         private bool _isSelectPart = false;
         private bool _isSingleColumn = false;
         private bool _isSortPart = false;
+        private ColumnStructure[] _asColumns;
         private ColumnStructure _asRightColumn;
-        private List<string> _asColumnList;
+        private List<string> _asColumnNames;
         private List<TableStructure> _asTables;
 
-        public AsStructure(List<string> asColumns, string asString, string functionString, string asRightName, string aggregateFunctionName)
+        public AsStructure(List<string> asColumnsNames, string asString, string functionString, string asRightName, string aggregateFunctionName)
         {
-            _asColumnList = asColumns;
+            _asColumnNames = asColumnsNames;
             _clearString = asString;
             _asRightName = asRightName;
             _functionString = functionString;
@@ -74,7 +75,7 @@ namespace MySQL_Clear_standart
 
         public List<string> ColumnNames
         {
-            get { return _asColumnList; }
+            get { return _asColumnNames; }
         }
 
         public List<TableStructure> Tables
@@ -82,6 +83,11 @@ namespace MySQL_Clear_standart
             get { return _asTables; }
             set { _asTables = value; }
         }
-       
+
+        public ColumnStructure[] AsColumns
+        {
+            get { return _asColumns; }
+            set { _asColumns = value; }
+        }
     }
 }

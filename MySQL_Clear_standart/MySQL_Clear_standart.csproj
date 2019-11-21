@@ -51,11 +51,11 @@
   <ItemGroup>
     <Compile Include="Listeners\MainListener.cs" />
     <Compile Include="Q_Part_Structures\BinaryComparisionPredicateStructure.cs" />
-    <Compile Include="Q_Structures\AsStructure.cs" />
+    <Compile Include="Q_Part_Structures\AsStructure.cs" />
     <Compile Include="DataBaseSchemeStructure\ColumnStructure.cs" />
     <Compile Include="DataBaseSchemeStructure\DataBaseStructure.cs" />
     <Compile Include="DataBaseSchemeStructure\TableStructure.cs" />
-    <Compile Include="Q_Structures\OrderByStructure.cs" />
+    <Compile Include="Q_Part_Structures\OrderByStructure.cs" />
     <Compile Include="Q_Structures\JoinStructure.cs" />
     <Compile Include="Listeners\AsListener.cs" />
     <Compile Include="Listeners\JoinListener.cs" />
@@ -84,7 +84,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Visual\TextMeasurer.cs" />
     <Compile Include="Visual\TreeVisitor.cs" />
-    <Compile Include="Q_Structures\WhereStructure.cs" />
+    <Compile Include="Q_Part_Structures\WhereStructure.cs" />
     <Compile Include="XmlSerializationBase.cs" />
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
@@ -124,12 +124,6 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="bin\Debug\db.xml" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="bin\Debug\dbr.xml" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="res\db.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <SubType>Designer</SubType>
@@ -159,6 +153,9 @@
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="bin\Debug\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

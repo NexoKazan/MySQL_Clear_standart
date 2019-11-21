@@ -14,6 +14,7 @@ namespace MySQL_Clear_standart
         private string _rightExpr;
         private string _table;
         private string _comparisionOperator;
+        private ColumnStructure _column;
 
 
         public WhereStructure(string fullString, string leftColumn)
@@ -56,6 +57,12 @@ namespace MySQL_Clear_standart
         {
             get { return _comparisionOperator; }
             set { _comparisionOperator = value; }
+        }
+
+        public ColumnStructure Column
+        {
+            get { return _column; }
+            set { _column = value; }
         }
     }
 }

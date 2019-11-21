@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using MySQL_Clear_standart.DataBaseSchemeStructure;
 
 namespace MySQL_Clear_standart
@@ -73,13 +74,14 @@ namespace MySQL_Clear_standart
             get { return _inputTable; }
         }
         
-
         public void CreateQuerry()
         {
             //выдернуто из свойства OutTable
+            ColumnCounterDelete();
             List<ColumnStructure> tempList = new List<ColumnStructure>();
             foreach (ColumnStructure column in _inputTable.Columns)
             {
+                if(column.IsForSelect || column.UsageCounter>0)
                     tempList.Add(column);
             }
 
@@ -107,12 +109,21 @@ namespace MySQL_Clear_standart
             _outTable = new TableStructure(_name + "_TB", _outColumn.ToArray());
 
             _output = "SELECT ";
+            bool commaPointer = false;
             for (int i = 0; i < _inputTable.Columns.Length; i++)
             {
-                _output += "\r\n\t" + _inputTable.Columns[i].Name;
-                if (i!= _inputTable.Columns.Length-1)
+                if (_inputTable.Columns[i].UsageCounter > 0 || _inputTable.Columns[i].IsForSelect)
                 {
-                    _output += ",";
+                    
+                   if (!commaPointer)
+                    {
+                        _output += "\r\n\t" + _inputTable.Columns[i].Name;
+                        commaPointer = true;
+                    }
+                   else
+                   {
+                       _output += ",\r\n\t" + _inputTable.Columns[i].Name;
+                   }
                 }
             }
 
@@ -156,6 +167,27 @@ namespace MySQL_Clear_standart
                 {
                     _createTableColumnNames += ",\r\n";
                 }
+            }
+        }
+
+        private void ColumnCounterDelete()
+        {
+            foreach (WhereStructure ws in _whereList)
+            {
+                ws.Column.UsageCounter--;
+            }
+
+            foreach (AsStructure aS in _asList)
+            {
+                foreach (ColumnStructure column in aS.AsColumns)
+                {
+                    column.UsageCounter--;
+                }
+            }
+
+            foreach (ColumnStructure column in _inputTable.Columns)
+            {
+                //column.UsageCounter--;
             }
         }
     }
