@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.168
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MySQL_Clear_standart", "MySQL_Clear_standart\MySQL_Clear_standart.csproj", "{4FA8174E-8EBD-4302-8A1B-1E47DA74AFDB}"
 EndProject
@@ -21,8 +21,8 @@ Global
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{4FA8174E-8EBD-4302-8A1B-1E47DA74AFDB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{4FA8174E-8EBD-4302-8A1B-1E47DA74AFDB}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4FA8174E-8EBD-4302-8A1B-1E47DA74AFDB}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{4FA8174E-8EBD-4302-8A1B-1E47DA74AFDB}.Debug|x64.Build.0 = Debug|Any CPU
+		{4FA8174E-8EBD-4302-8A1B-1E47DA74AFDB}.Debug|x64.ActiveCfg = Debug|x64
+		{4FA8174E-8EBD-4302-8A1B-1E47DA74AFDB}.Debug|x64.Build.0 = Debug|x64
 		{4FA8174E-8EBD-4302-8A1B-1E47DA74AFDB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4FA8174E-8EBD-4302-8A1B-1E47DA74AFDB}.Release|Any CPU.Build.0 = Release|Any CPU
 		{4FA8174E-8EBD-4302-8A1B-1E47DA74AFDB}.Release|x64.ActiveCfg = Release|Any CPU
@@ -46,5 +46,8 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{82242B68-E565-456D-8FC4-14D97C041F90} = {EFB9F0B5-CA63-4EE5-883F-3B4953D8A053}
 		{11498144-C913-4946-81AF-0B5E92C2FC05} = {EFB9F0B5-CA63-4EE5-883F-3B4953D8A053}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {A66DF78B-F80D-4903-A222-E188F49A5ED5}
 	EndGlobalSection
 EndGlobal

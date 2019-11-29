@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using MySQL_Clear_standart.DataBaseSchemeStructure;
+using MySQL_Clear_standart.Q_Part_Structures;
 
 namespace MySQL_Clear_standart
 {
@@ -20,6 +21,7 @@ namespace MySQL_Clear_standart
         private TableStructure _inputTable;
         private List<WhereStructure> _whereList;
         private List<AsStructure> _asList;
+        private List<LikeStructure> _likeList;
         private TableStructure _outTable;
         private ColumnStructure[] _outColumn;
         
@@ -59,6 +61,12 @@ namespace MySQL_Clear_standart
             set { _createTableColumnNames = value; }
         }
 
+        public List<LikeStructure> LikeList
+        {
+            get { return _likeList; }
+            set { _likeList = value; }
+        }
+        
         public ColumnStructure[] OutColumn
         {
             get { return _outColumn; }
@@ -87,6 +95,8 @@ namespace MySQL_Clear_standart
 
             foreach (AsStructure asStructure in _asList)
             {//Сосздать конструктор для новых столбцов
+                asStructure.AsRightColumn.UsageCounter = 100;//хардкод, сделать поределение
+                                                             
                 if (!asStructure.AsRightColumn.IsRenamed && asStructure.AsRightColumn.OldName!=null)
                 {
                     string tmpNameHolder = asStructure.AsRightColumn.OldName;
@@ -129,6 +139,7 @@ namespace MySQL_Clear_standart
 
             foreach (var asStructure in _asList)
             {
+                
                 if (_output != "SELECT ")
                 {
                     _output += ",";
@@ -141,10 +152,9 @@ namespace MySQL_Clear_standart
             }
 
             _output += "\r\n" + "FROM " + "\r\n\t" + _tableName + "\r\n" ;
-            if (_whereList.Count != 0)
+            if (_whereList.Count != 0 || _likeList != null)
             {
                 _output += "WHERE ";
-
                 foreach (WhereStructure whereStructure in _whereList)
                 {
                     if (whereStructure.Table == _tableName)
@@ -152,11 +162,23 @@ namespace MySQL_Clear_standart
                         _output += "\r\n\t" + whereStructure.getWhereString;
                     }
 
-                    if (whereStructure != _whereList.LastOrDefault())
+                    if (whereStructure != _whereList.LastOrDefault() || (_likeList!=null && _likeList.Count>0))
                     {
                         _output += " AND ";
                     }
 
+                }
+
+                if (_likeList != null)
+                {
+                    foreach (LikeStructure like in _likeList)
+                    {
+                        _output += Environment.NewLine + "\t" + like.LeftColumn.Name + " LIKE " + like.RightExpression;
+                        if (like != _likeList.LastOrDefault())
+                        {
+                            _output += " AND ";
+                        }
+                    }
                 }
             }
 
@@ -168,6 +190,7 @@ namespace MySQL_Clear_standart
                     _createTableColumnNames += ",\r\n";
                 }
             }
+            _output += ";";
         }
 
         private void ColumnCounterDelete()
@@ -182,6 +205,14 @@ namespace MySQL_Clear_standart
                 foreach (ColumnStructure column in aS.AsColumns)
                 {
                     column.UsageCounter--;
+                }
+            }
+
+            if (_likeList != null)
+            {
+                foreach (LikeStructure like in _likeList)
+                {
+                    like.LeftColumn.UsageCounter--;
                 }
             }
 

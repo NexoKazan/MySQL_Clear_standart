@@ -57,6 +57,7 @@
             this.btn_tab1_CreateTree = new System.Windows.Forms.Button();
             this.textBox_tab1_Query = new System.Windows.Forms.TextBox();
             this.tabControl_main = new System.Windows.Forms.TabControl();
+            this.checkBox_Tab2_ClusterXNEnable = new System.Windows.Forms.CheckBox();
             this.tabPage3.SuspendLayout();
             this.tabPage2.SuspendLayout();
             this.tabPage1.SuspendLayout();
@@ -91,6 +92,7 @@
             // 
             // tabPage2
             // 
+            this.tabPage2.Controls.Add(this.checkBox_Tab2_ClusterXNEnable);
             this.tabPage2.Controls.Add(this.checkBox_tab2_DisableHeavyQuerry);
             this.tabPage2.Controls.Add(this.textBox_tab2_AllResult);
             this.tabPage2.Controls.Add(this.btn_tab2_CreateAll);
@@ -411,6 +413,16 @@
             this.tabControl_main.Size = new System.Drawing.Size(1136, 583);
             this.tabControl_main.TabIndex = 5;
             // 
+            // checkBox_Tab2_ClusterXNEnable
+            // 
+            this.checkBox_Tab2_ClusterXNEnable.AutoSize = true;
+            this.checkBox_Tab2_ClusterXNEnable.Location = new System.Drawing.Point(531, 10);
+            this.checkBox_Tab2_ClusterXNEnable.Name = "checkBox_Tab2_ClusterXNEnable";
+            this.checkBox_Tab2_ClusterXNEnable.Size = new System.Drawing.Size(112, 17);
+            this.checkBox_Tab2_ClusterXNEnable.TabIndex = 16;
+            this.checkBox_Tab2_ClusterXNEnable.Text = "ClusterXN_Enable";
+            this.checkBox_Tab2_ClusterXNEnable.UseVisualStyleBackColor = true;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -466,6 +478,7 @@
         private System.Windows.Forms.CheckBox checkBox_tab1_DisableHeavyQuerry;
         private System.Windows.Forms.RichTextBox richTextBox_tab1_Query;
         private System.Windows.Forms.CheckBox checkBox_tab2_DisableHeavyQuerry;
+        private System.Windows.Forms.CheckBox checkBox_Tab2_ClusterXNEnable;
     }
 }
 

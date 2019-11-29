@@ -25,6 +25,7 @@ namespace MySQL_Clear_standart.Listeners
         private List<string> _tableNames = new List<string>();
         private List<string> _selectColumnNames = new List<string>();
         private List<string> _groupByColumnsNames = new List<string>();
+        private List<LikeStructure> _likeList = new List<LikeStructure>();
         private List<AsStructure> _asList = new List<AsStructure>();
         private List<OrderByStructure> _orderByList = new List<OrderByStructure>();   
         private List<MainListener> _subQueryListeners = new List<MainListener>();
@@ -94,6 +95,10 @@ namespace MySQL_Clear_standart.Listeners
             get { return _subQueryListeners; }
         }
 
+        public List<LikeStructure> LkeList
+        {
+            get { return _likeList; }
+        }
         public string SubSelectFunction
         {
             get { return _subSelectFunction; }
@@ -204,6 +209,19 @@ namespace MySQL_Clear_standart.Listeners
         public override void ExitSubqueryExpessionAtom([NotNull] MySqlParser.SubqueryExpessionAtomContext context)
         {
             _depth--;
+        }
+
+        public override void EnterLikePredicate([NotNull] MySqlParser.LikePredicateContext context)
+        {
+            if (_depth == _tmpDepth)
+            {
+                LikeStructure tmpLike = new LikeStructure(context.Stop.Text, context.Start.Text);
+                if (context.NOT()!=null)
+                {
+                    tmpLike.IsNot = true;
+                }
+                _likeList.Add(tmpLike);
+            }
         }
     }
 }

@@ -252,11 +252,19 @@ namespace MySQL_Clear_standart
 
             if (_leftColumn != null && _rightColumn != null)
             {
-                _output += "WHERE\r\n\t" + _leftColumn.Name + " " + _comparisonOperator + " " + _rightColumn.Name;
+                if (!_switched)
+                {
+                    _output += Environment.NewLine + "WHERE\r\n\t" + _leftColumn.Name + " " + _comparisonOperator + " " + _rightColumn.Name;
+                }
+                else
+                {
+                    _output += Environment.NewLine + "WHERE\r\n\t" + _rightColumn.Name + " " + _comparisonOperator + " " + _leftColumn.Name;
+                }
             }
 
             SetIndex();
             SetCreateTableColumnList();
+            _output += ";";
         }
 
         public void CreateQuerry(string left, string right)
@@ -381,14 +389,22 @@ namespace MySQL_Clear_standart
             //}
             #endregion
 
-            _output += left + Environment.NewLine + right;
+            _output += left +", " +  Environment.NewLine + right;
             if (_leftColumn != null && _rightColumn != null)
             {
-                _output += Environment.NewLine + "WHERE\r\n\t" + _leftColumn.Name + " " + _comparisonOperator + " " + _rightColumn.Name;
+                if (!_switched)
+                {
+                    _output += Environment.NewLine + "WHERE\r\n\t" + _leftColumn.Name + " " + _comparisonOperator + " " + _rightColumn.Name;
+                }
+                else
+                {
+                    _output += Environment.NewLine + "WHERE\r\n\t" + _rightColumn.Name + " " + _comparisonOperator + " " + _leftColumn.Name;
+                }
             }
 
             SetIndex();
             SetCreateTableColumnList();
+            _output += ";";
         }
 
 
@@ -402,13 +418,11 @@ namespace MySQL_Clear_standart
                     {
                         _leftJoin.IndexColumnName = column.Name;
                     }
-                    else
+                    if (column.Name == RightColumnString)
                     {
-                        if (column.Name == RightColumnString)
-                        {
-                            _leftJoin.IndexColumnName = column.Name;
-                        }
+                        _leftJoin.IndexColumnName = column.Name;
                     }
+                    
                 }
                 
                 if (_switched)

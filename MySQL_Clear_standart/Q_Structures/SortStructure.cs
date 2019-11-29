@@ -194,7 +194,156 @@ namespace MySQL_Clear_standart
             if (_connectBinary != null)
             {
                 _output += "WHERE" + Environment.NewLine;
-                _output += GetSubQueryString();
+                if (_subJoin!=null)
+                {
+                    _output += GetSubQueryString(_subJoin.Name);
+                }
+                else
+                {
+                    _output += GetSubQueryString(_subSelect.Name);
+                }
+                
+            }
+
+            
+            if (_groupByColumnList.Count != 0)
+            {
+                _output += "GROUP BY\r\n\t";
+            }
+
+            foreach (string column in _groupByColumnList)
+            {
+                _output += column;
+                if (column != _groupByColumnList.Last())
+                {
+                    _output += ",\r\n\t";
+                }
+                else
+                {
+                    _output += "\r\n";
+                }
+            }
+
+            if(_orderByStructures.Count!=0)
+            {
+                _output +=Environment.NewLine + "ORDER BY\r\n\t";
+            }
+
+            foreach (OrderByStructure orderBy in _orderByStructures)
+            {
+                if (!orderBy.Column.IsRenamed)
+                {
+                    _output += orderBy.Column.Name;
+                }
+                else
+                {
+                    _output += orderBy.Column.OldName;
+                }
+
+                if (orderBy.IsDESC)
+                {
+                    _output += " DESC";
+                }
+
+                if (orderBy != _orderByStructures.Last())
+                {
+                    _output += ",\r\n\t";
+                }
+                else
+                {
+                    _output += "\r\n";
+                }
+
+                
+            }
+            SetCreateTableColumnList();
+            _output += ";";
+        }
+
+        public void CreateQuerry(string tag)
+        {
+            _output = "SELECT \r\n\t";
+            List<ColumnStructure> tmpSelectColumns = new List<ColumnStructure>();
+            if (_join != null)
+            {
+                //_fromName = _join.Name;
+                foreach (ColumnStructure column in _join.Columns)
+                {
+                    if (column.IsForSelect)
+                    {
+                        tmpSelectColumns.Add(column);
+                    }
+                }
+            }
+            else
+            {
+                //_fromName = _select.Name;
+                foreach (ColumnStructure column in _select.OutColumn)
+                {
+                    if (column.IsForSelect)
+                    {
+                        tmpSelectColumns.Add(column);
+                    }
+                }
+            }
+
+            _fromName = tag;
+            foreach (ColumnStructure column in tmpSelectColumns)
+            {
+                if (column != tmpSelectColumns.Last())
+                {
+                    _output += column.Name + ",\r\n\t";
+                }
+                else
+                {
+                    _output += column.Name + "\r\n\t";
+                }
+            }
+
+            if (_asSortList.Count != 0 && tmpSelectColumns.Count!=0)
+            {
+                _output = _output.Insert(_output.Length - 3, ",");
+            }
+
+            foreach (AsStructure asStructure in _asSortList)
+            {
+                if (asStructure.AsRightColumn.IsRenamed)
+                {
+                    string tmpHolder = asStructure.AsRightColumn.Name;
+                    asStructure.AsRightColumn.Name = asStructure.AsRightColumn.OldName;
+                    asStructure.AsRightColumn.IsRenamed = false;
+                    asStructure.AsRightColumn.OldName = tmpHolder;
+                }
+                if(asStructure.AsRightColumn.OldName!=null)
+                {
+                    _output += asStructure.AggregateFunctionName + "(" + asStructure.AsRightColumn.OldName + ")" + " AS " +
+                           asStructure.AsRightColumn.Name;
+                }
+                else
+                {
+                    _output += asStructure.AggregateFunctionName + "(" + asStructure.AsString + ")" + " AS " +
+                               asStructure.AsRightColumn.Name;
+                }
+                tmpSelectColumns.Add(asStructure.AsRightColumn);
+                if (asStructure != _asSortList.Last())
+                {
+                    _output += ",\r\n\t";
+                }
+                else
+                {
+                    _output += "\r\n\t";
+                }
+            }
+
+            _outTable = new TableStructure(_name+"_TB", tmpSelectColumns.ToArray());
+            
+            _output = _output.Remove(_output.Length - 1, 1);
+            _output += "FROM\r\n\t" + _fromName + "\r\n";
+
+            if (_connectBinary != null)
+            {
+                _output += "WHERE" + Environment.NewLine;
+                _output += GetSubQueryString(tag);
             }
 
             if (_groupByColumnList.Count != 0)
@@ -248,6 +397,7 @@ namespace MySQL_Clear_standart
                 
             }
             SetCreateTableColumnList();
+            _output += ";";
         }
 
         private void SetCreateTableColumnList()
@@ -270,29 +420,25 @@ namespace MySQL_Clear_standart
             }
         }
 
-        private string GetSubQueryString()
+        private string GetSubQueryString(string from)
         {
             string subQOutput = Environment.NewLine;
             subQOutput += "\t";
-            subQOutput += _connectBinary.LeftString + " " + _connectBinary.ComparisionSymphol + " (SELECT" +
+            subQOutput += _connectBinary.LeftString + " " + _connectBinary.ComparisionSymphol + " ( SELECT" +
                           Environment.NewLine;
             subQOutput += "\t" + _selectString;
             subQOutput +=Environment.NewLine + "FROM " + Environment.NewLine;
-            if (_subJoin!=null)
-            {
-                subQOutput += "\t" + _subJoin.Name;
-            }
-            else
-            {
-                subQOutput += "\t" + _subSelect.Name;
-            }
+            
+                subQOutput += "\t" + from + " AS SUB";
+            
 
             if (_notFilledJoin!=null)
             {
                 subQOutput += Environment.NewLine + "WHERE" + Environment.NewLine;
-                subQOutput +="\t" + _notFilledJoin.LeftColumnString + " = " +  _notFilledJoin.RightColumnString;
+                subQOutput +="\t" + _notFilledJoin.LeftColumnString + " = " + "SUB." +  _notFilledJoin.RightColumnString;
             }
 
+            subQOutput += " )";
             return subQOutput;
         }
     }

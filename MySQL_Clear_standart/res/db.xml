@@ -87,7 +87,7 @@
         <ColumnStructure IsPrimary="0" Name="P_NAME" TypeID="5"/>
         <ColumnStructure IsPrimary="0" Name="P_MFGR" TypeID="1"/>
         <ColumnStructure IsPrimary="0" Name="P_BRAND" TypeID="6"/>
-        <ColumnStructure IsPrimary="0" Name="P_Type" TypeID="1"/>
+        <ColumnStructure IsPrimary="0" Name="P_TYPE" TypeID="1"/>
         <ColumnStructure IsPrimary="0" Name="P_SIZE" TypeID="2"/>
         <ColumnStructure IsPrimary="0" Name="P_CONTAINER" TypeID="6"/>
         <ColumnStructure IsPrimary="0" Name="P_RETAILPRICE" TypeID="7"/>
