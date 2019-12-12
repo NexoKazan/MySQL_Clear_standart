@@ -164,7 +164,7 @@ namespace MySQL_Clear_standart
             List<ColumnStructure> tmpColumns = new List<ColumnStructure>();
             foreach (ColumnStructure column in _columns)
             {
-                if (column.IsForSelect)
+                if (column.IsForSelect || column.UsageCounter > 0)
                 {
                     tmpColumns.Add(column);
                 }

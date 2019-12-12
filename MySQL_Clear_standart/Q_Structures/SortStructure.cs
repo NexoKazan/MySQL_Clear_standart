@@ -257,6 +257,7 @@ namespace MySQL_Clear_standart
                 
             }
             SetCreateTableColumnList();
+            SetIndexes();
             _output += ";";
         }
 
@@ -397,6 +398,7 @@ namespace MySQL_Clear_standart
                 
             }
             SetCreateTableColumnList();
+            SetIndexes();
             _output += ";";
         }
 
@@ -440,6 +442,66 @@ namespace MySQL_Clear_standart
 
             subQOutput += " )";
             return subQOutput;
+        }
+
+        private void SetIndexes()
+        {
+            if (_join != null)
+            {
+                if (_notFilledJoin != null)
+                {
+                    foreach (ColumnStructure column in _join.Columns)
+                    {
+                        if (_notFilledJoin.LeftColumnString == column.Name)
+                        {
+                            _join.IndexColumnName = column.Name;
+                        }
+                        else if(_notFilledJoin.RightColumnString == column.Name)
+                        {
+                            _join.IndexColumnName = column.Name;
+                        }
+                    }
+                }
+                else
+                {
+                    foreach (ColumnStructure column in _join.Columns)
+                    {
+                        if (column.IsPrimary == 1)
+                        {
+                            _join.IndexColumnName = column.Name;
+                        }
+                    }
+                }
+            }
+
+            if (_subJoin != null)
+            {
+                if (_notFilledJoin != null)
+                {
+                    foreach (ColumnStructure column in _subJoin.Columns)
+                    {
+                        if (_notFilledJoin.LeftColumnString == column.Name)
+                        {
+                            _subJoin.IndexColumnName = column.Name;
+                        }
+                        else if(_notFilledJoin.RightColumnString == column.Name)
+                        {
+                            _subJoin.IndexColumnName = column.Name;
+                        }
+                    }
+                }
+                else
+                {
+                    foreach (ColumnStructure column in _subJoin.Columns)
+                    {
+                        if (column.IsPrimary == 1)
+                        {
+                            _subJoin.IndexColumnName = column.Name;
+                        }
+                    }
+                }
+            }
+
         }
     }
 }

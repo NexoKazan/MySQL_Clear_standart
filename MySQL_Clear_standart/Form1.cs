@@ -81,6 +81,7 @@ namespace MySQL_Clear_standart
         
         private bool _toDoTextFlag;
         bool pictureSize = false;
+        private string _connectionIP;
         
 
         #endregion
@@ -405,7 +406,7 @@ namespace MySQL_Clear_standart
         }
 
         private void FillAsStructures(DataBaseStructure dataBase, List<AsStructure> asStructures)
-        {
+        {            
             List<TableStructure> asTables = new List<TableStructure>();
             foreach (AsStructure asStructure in asStructures)
             {
@@ -450,6 +451,18 @@ namespace MySQL_Clear_standart
                 {
                     asStructure.IsSelectPart = false;
                     asStructure.Tables = asTables;
+                }
+                if(asStructure.AsString == "*")
+                {
+                    foreach (S_Type type in dataBase.Types)
+                    {
+                        if (type.Name == "INT")
+                        {
+                            asStructure.AsRightColumn.Type = type;
+                            asStructure.AsRightColumn.Size = type.Size;
+                            asStructure.AsRightColumn.TypeID = type.ID;
+                        }
+                    }
                 }
             }
         }
@@ -1387,6 +1400,11 @@ namespace MySQL_Clear_standart
             textBox_tab2_AllResult.Location = new Point(textBox_tab2_SortResult.Location.X + 20 + textBox_tab2_SelectResult.Width, textBox_tab2_SelectResult.Location.Y);
         }
 
+        private void comboBox_tab2_IP_TextChanged(object sender, EventArgs e)
+        {
+            _connectionIP = comboBox_tab2_IP.Text;
+        }
+
         #endregion
         
         #region TAB_1
@@ -1470,8 +1488,9 @@ namespace MySQL_Clear_standart
             _output = "";
             _output += "\r\n========Return================\r\n";
 
+            _output += ShowDataBase(_queryDB);
+            
             SelectStructure[] tmpSelect = MakeSelect(_queryDB, _listener);
-            JoinStructure[] tmpJoin = MakeJoin(_queryDB, _listener, tmpSelect);
 
             _output += "\r\n========SELECT================\r\n";
 
@@ -1480,21 +1499,24 @@ namespace MySQL_Clear_standart
                 _output += select.Name + Environment.NewLine;
                 foreach (ColumnStructure column in select.OutColumn)
                 {
-                    _output += column.Name + Environment.NewLine;
+                    _output += column.Name + " " + column.UsageCounter + Environment.NewLine;
                 }
 
                 _output += Environment.NewLine;
             }
             _output += "\r\n========JOIN================\r\n";
+            
+            JoinStructure[] tmpJoin = MakeJoin(_queryDB, _listener, tmpSelect);
+
             foreach (JoinStructure join in tmpJoin)
             {
                 _output += join.Name + Environment.NewLine;
-                if(join.LeftSelect!=null)
+                if (join.LeftSelect != null)
                 {
                     _output += Environment.NewLine + "LEFT_SELECT" + Environment.NewLine;
                     foreach (var column in join.LeftSelect.OutColumn)
                     {
-                        _output += column.Name + Environment.NewLine;
+                        _output += column.Name + " " + column.UsageCounter + Environment.NewLine;
                     }
                 }
 
@@ -1503,7 +1525,7 @@ namespace MySQL_Clear_standart
                     _output += Environment.NewLine + "RIGHT" + Environment.NewLine;
                     foreach (ColumnStructure column in join.RightSelect.OutColumn)
                     {
-                        _output += column.Name + Environment.NewLine;
+                        _output += column.Name + " " + column.UsageCounter + Environment.NewLine;
                     }
                 }
                 if (join.LeftJoin != null)
@@ -1511,7 +1533,7 @@ namespace MySQL_Clear_standart
                     _output += Environment.NewLine + "LEFT_JOIN" + Environment.NewLine;
                     foreach (ColumnStructure column in join.LeftJoin.Columns)
                     {
-                        _output += column.Name + Environment.NewLine;
+                        _output += column.Name + " " + column.UsageCounter + Environment.NewLine;
                     }
                 }
             }
@@ -1655,7 +1677,10 @@ namespace MySQL_Clear_standart
             {
                 testQuery.Append("\r\n -- ========" + select.Name + "=========\r\n");
                 //testQuery.Append(string.Format(dropSyntax, select.Name));
-                testQuery.Append(string.Format(createTableSyntax, select.Name, select.CreateTableColumnNames, string.Format(createIndexSyntax, select.Name + "_INDEX", select.Name, select.IndexColumnName)));
+                testQuery.Append(string.Format(createTableSyntax, select.Name, select.CreateTableColumnNames,
+                    select.IndexColumnName != null ? 
+                    string.Format(createIndexSyntax, select.Name + "_INDEX", select.Name, select.IndexColumnName)
+                    : ""));
                 testQuery.Append(string.Format(querSyntax, select.Output));
                 //testQuery.Append(string.Format(createIndexSyntax, select.Name + "_INDEX", select.Name, select.IndexColumnName));
                 dropBuilder.Append(string.Format(dropSyntax, select.Name));
@@ -1665,7 +1690,7 @@ namespace MySQL_Clear_standart
                 testQuery.Append("\r\n -- ========" + join.Name + "=========\r\n");
                // testQuery.Append(string.Format(dropSyntax, join.Name));
                 testQuery.Append(string.Format(createTableSyntax, join.Name, join.CreateTableColumnNames, 
-                    join != joinQ.LastOrDefault() ?
+                    join.IndexColumnName != null ?
                     string.Format(createIndexSyntax, join.Name + "_INDEX", join.Name,
                         join.IndexColumnName) : " "));
                 testQuery.Append(string.Format(querSyntax, join.Output));
@@ -1679,7 +1704,10 @@ namespace MySQL_Clear_standart
                 {
                     testQuery.Append("\r\n -- ========" + select.Name + "=========\r\n");
                     //testQuery.Append(string.Format(dropSyntax, select.Name));
-                    testQuery.Append(string.Format(createTableSyntax, select.Name, select.CreateTableColumnNames, string.Format(createIndexSyntax, select.Name + "_INDEX", select.Name, select.IndexColumnName)));
+                    testQuery.Append(string.Format(createTableSyntax, select.Name, select.CreateTableColumnNames,
+                        select.IndexColumnName != null ? 
+                        string.Format(createIndexSyntax, select.Name + "_INDEX", select.Name, select.IndexColumnName)
+                        : ""));
                     testQuery.Append(string.Format(querSyntax, select.Output));
                     //testQuery.Append(string.Format(createIndexSyntax, select.Name + "_INDEX", select.Name, select.IndexColumnName));
                     dropBuilder.Append(string.Format(dropSyntax, select.Name));
@@ -1689,7 +1717,7 @@ namespace MySQL_Clear_standart
                     testQuery.Append("\r\n -- ========" + join.Name + "=========\r\n");
                     // testQuery.Append(string.Format(dropSyntax, join.Name));
                     testQuery.Append(string.Format(createTableSyntax, join.Name, join.CreateTableColumnNames, 
-                        join != subJoinQ.LastOrDefault() ?
+                        join.IndexColumnName != null ?
                             string.Format(createIndexSyntax, join.Name + "_INDEX", join.Name,
                                 join.IndexColumnName) : " "));
                     testQuery.Append(string.Format(querSyntax, join.Output));
@@ -1731,7 +1759,12 @@ namespace MySQL_Clear_standart
                 }
             }
             if(checkBox_Tab2_ClusterXNEnable.Checked)
-            TryConnect(connectJoins, sortQ);
+                if (subJoinQ != null)
+                    TryConnect(connectJoins, sortQ, subJoinQ.Length - 1, _connectionIP);
+                else
+                {
+                    TryConnect(connectJoins,sortQ,-1, _connectionIP);
+                }
         }
 
         private void btn_SelectQuerry_tab2_Click(object sender, EventArgs e)
@@ -1765,7 +1798,7 @@ namespace MySQL_Clear_standart
        
         #region Актуальные методы(в разработке)
 
-        private void TryConnect(JoinStructure[] joinQ, SortStructure sortQ)
+        private void TryConnect(JoinStructure[] joinQ, SortStructure sortQ, int subJoinIndex, string address)
         {
             QueryBuilder qb = new QueryBuilder(int.Parse(comboBox_tab2_QueryNumber.Text));
 
@@ -1792,7 +1825,7 @@ namespace MySQL_Clear_standart
                     qb.AddSelectQuery(select2);
 
                     leftRelation = qb.CreateRelation(
-                        select2, joinQ[index].LeftSelect.Name,
+                        select2, "a",//joinQ[index].LeftSelect.Name,
                         qb.CreateRelationSchema(joinQ[index].LeftSelect.OutTable.Columns
                                 .Select(j => new Field() {Name = j.Name, Params = j.Type.Name})
                                 .ToList(),
@@ -1815,7 +1848,7 @@ namespace MySQL_Clear_standart
                 {
                     rightRelation =
                         qb.CreateRelation(
-                            select, joinQ[index].RightSelect.Name,
+                            select,"a",//joinQ[index].RightSelect.Name,
                             qb.CreateRelationSchema(joinQ[index].RightSelect.OutTable.Columns
                                     .Select(j => new Field() {Name = j.Name, Params = j.Type.Name})
                                     .ToList(),
@@ -1832,7 +1865,7 @@ namespace MySQL_Clear_standart
                 {
                     rightRelation =
                         qb.CreateRelation(
-                            select, joinQ[index].LeftSelect.Name,
+                            select, "a",//joinQ[index].LeftSelect.Name,
                             qb.CreateRelationSchema(joinQ[index].LeftSelect.OutTable.Columns
                                     .Select(j => new Field() {Name = j.Name, Params = j.Type.Name})
                                     .ToList(),
@@ -1858,18 +1891,32 @@ namespace MySQL_Clear_standart
                         leftRelation, rightRelation));
             }
 
-            qb.SetSortQuery(qb.CreateSortQuery(sortQ.Output, qb.CreateRelationSchema(sortQ.OutTable.Columns
-                    .Select(j => new Field() {Name = j.Name, Params = j.Type.Name})
-                    .ToList(),
-                new List<Index>()
-                {
-                }), 0, "SELECT * FROM " + Constants.RelationNameTag + ";", qb.CreateRelation(c_join.Last()), qb.CreateRelation(c_join[2])));
+            if (subJoinIndex > -1) //ПАЧИНИТЬ
+            {
+                qb.SetSortQuery(qb.CreateSortQuery(sortQ.Output, qb.CreateRelationSchema(sortQ.OutTable.Columns
+                            .Select(j => new Field() {Name = j.Name, Params = j.Type.Name})
+                            .ToList(),
+                        new List<Index>()
+                        {
+                        }), 0, "SELECT * FROM " + Constants.RelationNameTag + ";", qb.CreateRelation(c_join.Last()),
+                    qb.CreateRelation(c_join[subJoinIndex])));
+            }
+            else
+            {
+                qb.SetSortQuery(qb.CreateSortQuery(sortQ.Output, qb.CreateRelationSchema(sortQ.OutTable.Columns
+                            .Select(j => new Field() {Name = j.Name, Params = j.Type.Name})
+                            .ToList(),
+                        new List<Index>()
+                        {
+                        }), 0, "SELECT * FROM " + Constants.RelationNameTag + ";", qb.CreateRelation(c_join.Last())));
+            
+            }
 
 
             var query = qb.GetQuery();
             query.Save(query.Number + ".xml");
 
-            var clinet = new ClusterixClient("127.0.0.1", 1234);
+            var clinet = new ClusterixClient(address, 1234); //10.114.20.200"
             clinet.Send(new XmlQueryPacket() { XmlQuery = query.SaveToString() });
 
             string debug = "==========DEBUG==========";
@@ -1885,6 +1932,7 @@ namespace MySQL_Clear_standart
         }
 
         #endregion
+
         
     }
 }
